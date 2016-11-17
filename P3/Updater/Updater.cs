@@ -1,4 +1,5 @@
-﻿using System;
+﻿using P3.Utils;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,75 +13,115 @@ namespace P3.Updater
 {
     class SoftUpdater
     {
-        String XmlForUpdate = "";
-        XMLcode x1 = new XMLcode();
+        String _remotePropPath = "";
+        //String _localPropPath;
+        XMLcode xml;
+
+        LogFile logFile = new LogFile();
+
+        public SoftUpdater(XMLcode _xml)
+        {
+            xml = _xml;            
+        }
+
 
         public void UpdateSoft()
         {
-            String[] cht = new String[26];
-            cht = x1.ReadXml();
-            XmlForUpdate = cht[26];
-
-
-            List<String> ch = new List<string>();
-
-            String updVer, pathToTemp = Environment.CurrentDirectory + @"\Temp\";
-            String pathToUpd = Environment.CurrentDirectory + @"\Updater\";
-            String updPath = pathToUpd + @"\UpdProp.xml";
-
-            if (XmlForUpdate != "")
+            try
             {
-                ch = x1.ReadXmlForUpdate(XmlForUpdate);
-            }
+                _remotePropPath = xml.ReadLocalPropXml();
 
-            if (ch[0] != Application.ProductVersion && Directory.Exists(ch[1]))
-            {
-                updVer = x1.ReadXmlU(updPath);
+                List<String> remoteProp = new List<string>();
 
-                if (ch[2] != updVer && Directory.Exists(ch[3]))
+                String updVer, tempFolderPath = Environment.CurrentDirectory + @"\Temp\";
+                String updFolderPath = Environment.CurrentDirectory + @"\Updater\";
+                String updPropPath = updFolderPath + @"\UpdaterProp.xml";
+
+                if (_remotePropPath != "")
                 {
-                    if (Directory.Exists(pathToTemp))
-                    {
-                        delFromDir(pathToTemp);
-                    }
-
-                    Directory.CreateDirectory(pathToTemp);
-
-                    CopyDir(ch[3], pathToTemp);
-
-                    DirectoryInfo dir = new DirectoryInfo(pathToUpd);
-                    dir.Delete(true);
-
-                    CopyDir(pathToTemp, pathToUpd);
-
-                    delFromDir(pathToTemp);
+                    remoteProp = xml.ReadRemotePropXml(_remotePropPath);
                 }
-                if (MessageBox.Show("Появилась новая версия Phonebook! Обновить?", "Внимание", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
-                    Process.Start(pathToUpd + @"\PhonebookUpdater.exe");
+
+                if (remoteProp[0] != Application.ProductVersion && Directory.Exists(remoteProp[1]))
+                {
+                    updVer = xml.ReadXmlU(updPropPath);
+
+                    if (remoteProp[2] != updVer && Directory.Exists(remoteProp[3]))
+                    {
+                        if (Directory.Exists(tempFolderPath))
+                        {
+                            DelDir(tempFolderPath);
+                        }
+
+                        Directory.CreateDirectory(tempFolderPath);
+
+                        CopyDir(remoteProp[3], tempFolderPath);
+
+                        DirectoryInfo dir = new DirectoryInfo(updFolderPath);
+                        dir.Delete(true);
+
+                        CopyDir(tempFolderPath, updFolderPath);
+
+                        DelDir(tempFolderPath);
+                    }
+                    //if (MessageBox.Show("Появилась новая версия Phonebook! Обновить?", "Внимание", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                        //Process.Start(updFolderPath + @"\PhonebookUpdater.exe");
+
+
+                }
+                String logText = DateTime.Now.ToString() + "|event|SoftUpdater - UpdateSoft| Обновление завершено";
+                logFile.WriteLog(logText);
+
+            }
+            catch (Exception exception)
+            {
+                String logText = DateTime.Now.ToString() + "|fail|SoftUpdater - UpdateSoft|" + exception.Message;
+                logFile.WriteLog(logText);
             }
         }
 
-        static void CopyDir(string FromDir, string ToDir)
+        public void CopyDir(string FromDir, string ToDir)
         {
-            Directory.CreateDirectory(ToDir);
-            foreach (string s1 in Directory.GetFiles(FromDir))
+            try
             {
-                string s2 = ToDir + "\\" + Path.GetFileName(s1);
-                File.Copy(s1, s2);
+                Directory.CreateDirectory(ToDir);
+                foreach (string s1 in Directory.GetFiles(FromDir))
+                {
+                    string s2 = ToDir + "\\" + Path.GetFileName(s1);
+                    File.Copy(s1, s2);
+                }
+
+                String logText = DateTime.Now.ToString() + "|event|SoftUpdater - CopyDir| Копирование файлов Updaytera завершено";
+                logFile.WriteLog(logText);
             }
-            foreach (string s in Directory.GetDirectories(FromDir))
+            catch (Exception exception)
             {
-                CopyDir(s, ToDir + "\\" + Path.GetFileName(s));
+                String logText = DateTime.Now.ToString() + "|fail|SoftUpdater - CopyDir|" + exception.Message;
+                logFile.WriteLog(logText);
             }
+            //foreach (string s in Directory.GetDirectories(FromDir))
+            //{
+            //    CopyDir(s, ToDir + "\\" + Path.GetFileName(s));
+            //}
         }
 
-        static void delFromDir(String dirPath)
+        public void DelDir(String dirPath)
         {
-            DirectoryInfo dir = new DirectoryInfo(dirPath);
+            try
+            {
+                DirectoryInfo dir = new DirectoryInfo(dirPath);
 
-            foreach (FileInfo file in dir.GetFiles()) file.Delete();
-            foreach (DirectoryInfo subDirectory in dir.GetDirectories()) subDirectory.Delete(true);
+                foreach (FileInfo file in dir.GetFiles()) file.Delete();
+                foreach (DirectoryInfo subDirectory in dir.GetDirectories()) subDirectory.Delete(true);
 
+                String logText = DateTime.Now.ToString() + "|event|SoftUpdater - DelDir| Удаление папки Temp завершено";
+                logFile.WriteLog(logText);
+            }
+            catch (Exception exception)
+            {
+                String logText = DateTime.Now.ToString() + "|fail|SoftUpdater - DelDir|" + exception.Message;
+                logFile.WriteLog(logText);
+            }
         }
     }
 }

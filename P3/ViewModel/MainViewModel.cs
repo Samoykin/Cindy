@@ -17,6 +17,9 @@ namespace P3.ViewModel
         DBconnect dbc = new DBconnect();
         String path = @"DBTels.sqlite";
 
+        #region Settings
+        String _localPropPath = "LocalProp.xml";
+        #endregion
 
         #region Properties
         //public People person { get; set; }
@@ -54,9 +57,18 @@ namespace P3.ViewModel
 
         public MainViewModel()
         {
+            XMLcode xml = new XMLcode(_localPropPath); ;
+            if (!File.Exists(_localPropPath))
+            {
+                xml.CreateXml();
+                xml.CreateNodesXml();
+                
+            }
+
+
             try
             {
-                SoftUpdater upd = new SoftUpdater();
+                SoftUpdater upd = new SoftUpdater(xml);
                 upd.UpdateSoft();
             }
             catch { }
