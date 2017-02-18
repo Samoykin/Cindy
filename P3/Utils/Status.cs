@@ -100,7 +100,7 @@ namespace P3.Utils
             String pattern = @"(\w{2,}\s\w[.]\s|\w{2,}\s\w[.]\w[.])";
             Regex regex = new Regex(pattern);
 
-            String pattern2 = @"(на больн\D+|в отпуске\D+|в команд\D+|не будет\D+|на обучен\D+)";
+            String pattern2 = @"(на больн\D+|в отпуске\D+|в команд\D+|не будет\D+|на обучен\D+|отсутствует\D+)";
             Regex regex2 = new Regex(pattern2);
 
             String pattern3 = @"(\d+\W\d+\D+\d+\W\d+[-]\d+\W\d+|\d+\W\d+[-]\d+\W\d+|\d+\W\d+)";

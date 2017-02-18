@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
@@ -170,6 +171,7 @@ namespace P3.Utils
                 dbc.ClearTable("employee");
             }
             catch { }
+
             dbc.EmployeeWrite(tID, tNames, tTels, tTels2, tTels3, tEmail, tDiv, tPos);
 
 

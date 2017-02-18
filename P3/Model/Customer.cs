@@ -1,9 +1,13 @@
-﻿using System;
+﻿using P3.Contacts;
+using P3.Utils;
+using P3.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace P3.Model
 {
@@ -121,5 +125,34 @@ namespace P3.Model
 
 
         #endregion
+
+        public void Clear()
+        {
+            FullName = "";
+            PhoneWork = "";
+            PhoneMobile = "";
+            Email = "";
+            Position = "";
+            Company = "";
+        }
+
+        //Отправка E-mail
+        private ICommand _sendMail;
+        public ICommand SendMail
+        {
+            get
+            {
+                if (_sendMail == null)
+                { _sendMail = new RelayCommand<object>(this.SendMail_Execute); }
+                return _sendMail;
+            }
+        }
+
+        private void SendMail_Execute(object parameter)
+        {
+            SendMail sm = new SendMail();
+            sm.SendMailOutlook(parameter.ToString());
+        }
+
     }
 }

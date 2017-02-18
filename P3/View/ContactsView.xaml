@@ -1,0 +1,162 @@
+﻿<UserControl x:Class="P3.View.ContactsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             mc:Ignorable="d">
+    <Grid Name="gridContactMain" Margin="10,0,1,1">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="264"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+        </Grid.RowDefinitions>
+
+
+        <Grid Name="gridContactList" Grid.Column="0" Margin="0,0,0,1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="25"></RowDefinition>
+            </Grid.RowDefinitions>
+
+
+
+            <WrapPanel Grid.Row="0" Margin="0,0,0,1">
+                <Button Content="Сброс" Width="60" Command="{Binding ClickCommand2Cust}" Margin="0,0,7,0"/>
+                <TextBox x:Name="tb3" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" InputLanguageManager.InputLanguage="ru-RU" VerticalAlignment="Top" Width="183" Text="{Binding misc.TextChangeCust, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="TextChanged" >
+                            <i:InvokeCommandAction Command="{Binding ClickCommandCust}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
+            </WrapPanel>
+
+            <Expander Header="Новый контакт" Grid.Row="1" Margin="0,0,0,7" >
+                <StackPanel>
+                    <Grid  Name="gridCarDetailsCustNew" DataContext="{Binding Path=newContact}" VerticalAlignment="Top">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="7">Имя:</TextBlock>
+                        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding Path=FullName}" TextWrapping="Wrap" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="7">Рабочий:</TextBlock>
+                        <TextBox Grid.Row="1" Grid.Column="1" Margin="5"  Text="{Binding Path=PhoneWork}" TextWrapping="Wrap" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="7">Мобильный:</TextBlock>
+                        <TextBox Grid.Row="2" Grid.Column="1" Margin="5"  Text="{Binding Path=PhoneMobile}" TextWrapping="Wrap" />
+                        <TextBlock Grid.Row="3" Margin="7" >E-mail:</TextBlock>
+                        <TextBox Grid.Row="3" Grid.Column="1" Margin="5" Text="{Binding Path=Email}" TextWrapping="Wrap" ></TextBox>
+                        <TextBlock Grid.Row="4" Margin="7" >Должность:</TextBlock>
+                        <TextBox Grid.Row="4" Grid.Column="1" Margin="5" Text="{Binding Path=Position}" TextWrapping="Wrap"></TextBox>
+                        <TextBlock Grid.Row="5" Margin="7" >Организация:</TextBlock>
+                        <TextBox Grid.Row="5" Grid.Column="1" Margin="5" Text="{Binding Path=Company}" TextWrapping="Wrap"></TextBox>
+
+                    </Grid>
+                    <Button Content="Добавить" Width="130" Command="{Binding SaveNewCust}" Margin="0,0,0,7" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Expander>
+
+            <Expander Header="Сортировка" Grid.Row="2" Margin="0,0,0,7">
+                <StackPanel>
+                    <RadioButton Content="Имя ↑" Command="{Binding SortNameContAscCommand}" Margin="20,0,0,0" IsChecked="True"/>
+                    <RadioButton Content="Имя ↓" Command="{Binding SortNameContDescCommand}" Margin="20,0,0,0"/>
+                </StackPanel>
+
+            </Expander>
+            <ListView Name="lstCustomer" Grid.Row="3" SelectedIndex="{Binding misc.SelectedIndexCust}" ItemsSource="{Binding customerLst}" HorizontalAlignment="Left" Width="250" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,0,0">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding FullName}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+
+            </ListView>
+            <WrapPanel Grid.Row="4">
+                <TextBlock Margin="5"  Text="Всего контактов:"/>
+                <TextBlock Margin="5"  Text="{Binding Path=misc.ContactsCount}" FontFamily="/P3;component/Fonts/#Open Sans" FontWeight="Bold" Foreground="#FF2DADF5"/>
+                <!--<TextBox Margin="5"  Text="{Binding Path=misc.EmployeeCount}" IsReadOnly="True" BorderBrush="{x:Null}"/>-->
+            </WrapPanel>
+
+
+
+
+
+
+        </Grid>
+
+        <StackPanel Grid.Column="1">
+            <Grid  Name="gridCarDetailsCust" DataContext="{Binding ElementName=lstCustomer, Path=SelectedItem}" Width="503"  VerticalAlignment="Top" HorizontalAlignment="Left">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+
+
+                </Grid.RowDefinitions>
+
+                <TextBlock x:Name="tbContactName" Grid.Row="0" Grid.Column="1" Margin="5"  Text="{Binding Path=FullName}" FontSize="16" Foreground="#FF17B02C" FontFamily="/P3;component/Fonts/#Open Sans" FontWeight="Bold" TextWrapping="Wrap" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Margin="7">Рабочий:</TextBlock>
+                <TextBox Grid.Row="1" Grid.Column="1" Margin="5"  Text="{Binding Path=PhoneWork}" BorderBrush="{x:Null}"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Margin="7">Мобильный:</TextBlock>
+                <TextBox Grid.Row="2" Grid.Column="1" Margin="5"  Text="{Binding Path=PhoneMobile}" BorderBrush="{x:Null}"/>
+                <TextBlock Grid.Row="3" Margin="7" >E-mail:</TextBlock>
+                <!--<TextBox Grid.Row="3" Grid.Column="1" Margin="5" Text="{Binding Path=Email}" BorderBrush="{x:Null}"></TextBox>-->
+
+                <TextBox Name="email" Grid.Row="3" Grid.Column="1" Margin="5" Text="{Binding Path=Email, UpdateSourceTrigger=PropertyChanged}" BorderBrush="{x:Null}" Foreground="#FF1500EC"  >
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDoubleClick" >
+                            <i:InvokeCommandAction Command="{Binding SendMail}" CommandParameter="{Binding ElementName=email, Path=Text}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
+
+                <TextBlock Grid.Row="4" Margin="7" >Должность:</TextBlock>
+                <TextBox Grid.Row="4" Grid.Column="1" Margin="5" Text="{Binding Path=Position}" BorderBrush="{x:Null}" TextWrapping="Wrap"></TextBox>
+                <TextBlock Grid.Row="5" Margin="7" >Организация:</TextBlock>
+                <TextBox Grid.Row="5" Grid.Column="1" Margin="5" Text="{Binding Path=Company}" BorderBrush="{x:Null}"></TextBox>
+
+            </Grid>
+            <WrapPanel>
+                <Button Content="Сохранить" Width="100" Command="{Binding SaveData}" CommandParameter="{Binding Path=Text, ElementName=tbContactName}" Margin="0,0,0,7"/>
+                <TextBlock Margin="5"  Text="{Binding Path=misc.SaveStatus}" Foreground="#FF2300FF" />
+            </WrapPanel>
+        </StackPanel>
+
+        <WrapPanel Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,1,0" Width="263">
+            <Button Content="Открыть Excel" Width="120" Command="{Binding UpdCustCommand}" Margin="0,0,10,7" HorizontalAlignment="Left"/>
+            <Button Content="Сохранить как" Width="120" Command="{Binding SaveCustCommand}" CommandParameter="123" Margin="0,0,10,7"/>
+
+        </WrapPanel>
+
+
+
+    </Grid>
+</UserControl>

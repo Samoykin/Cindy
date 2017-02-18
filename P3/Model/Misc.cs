@@ -27,20 +27,30 @@ namespace P3.Model
 
         #endregion
 
-        private string _TextChange; //поле поиска по имени сотрудника
-        private string _TextChangeCust; //поле поиска по имени заказчика
-        private int _SelectedIndex; //индекс в ListView списка сотрудников
-        private int _SelectedIndexCust; //индекс в ListView списка заказчиков
-        private string _SelectedDiv; //выбранное значение в ComboBox по подразделениям
-        private int _Vacation; //кол-во сотрудников в отпуске
-        private int _BTrip; //кол-во сотрудников в командировке
-        private int _Sick; //кол-во сотрудников на больничном
-        private string _Page1State; //
-        private string _Page2State; //
-        private string _Page3State; //
-        private string _DinnerSelectedPeople; //Выбранный сотрудник для добавления
+        private String _TextChange; //поле поиска по имени сотрудника
+        private String _TextChangeCust; //поле поиска по имени заказчика
+        private Int32 _SelectedIndex; //индекс в ListView списка сотрудников
+        private Int32 _SelectedIndexCust; //индекс в ListView списка заказчиков
+        private String _SelectedDiv; //выбранное значение в ComboBox по подразделениям
+        private Int32 _Vacation; //кол-во сотрудников в отпуске
+        private Int32 _BTrip; //кол-во сотрудников в командировке
+        private Int32 _Sick; //кол-во сотрудников на больничном
+        private String _Page1State; //
+        private String _Page2State; //
+        private String _Page3State; //
+        private String _PageStatistic; //
+        private String _DinnerSelectedPeople; //Выбранный сотрудник для добавления
+        private Int32 _EmployeeCount; //количество сотрудников
+        private Int32 _ContactsCount; //количество контактов
+        private String _SaveStatus; //количество контактов
+        private String _UpdStatus; //состояние обновления данных с сайта
+        private Int32 _MiddleAge; //средний возраст
+        private Int32 _MiddleTimeRecord; //средний стаж
+        private string _startPageVisible; //видимость стартовой страницы
+        private string _filterPageVisible; //видимость страницы с данными
 
-        public string TextChange
+
+        public String TextChange
         {
             get { return _TextChange; }
             set
@@ -54,7 +64,7 @@ namespace P3.Model
             }
         }
 
-        public string TextChangeCust
+        public String TextChangeCust
         {
             get { return _TextChangeCust; }
             set
@@ -68,7 +78,7 @@ namespace P3.Model
             }
         }
 
-        public int SelectedIndex
+        public Int32 SelectedIndex
         {
             get { return _SelectedIndex; }
             set
@@ -81,7 +91,7 @@ namespace P3.Model
             }
         }
 
-        public int SelectedIndexCust
+        public Int32 SelectedIndexCust
         {
             get { return _SelectedIndexCust; }
             set
@@ -94,7 +104,7 @@ namespace P3.Model
             }
         }
 
-        public string SelectedDiv
+        public String SelectedDiv
         {
             get { return _SelectedDiv; }
             set
@@ -107,7 +117,7 @@ namespace P3.Model
             }
         }
 
-        public int Vacation
+        public Int32 Vacation
         {
             get { return _Vacation; }
             set
@@ -120,7 +130,7 @@ namespace P3.Model
             }
         }
 
-        public int BTrip
+        public Int32 BTrip
         {
             get { return _BTrip; }
             set
@@ -133,7 +143,7 @@ namespace P3.Model
             }
         }
 
-        public int Sick
+        public Int32 Sick
         {
             get { return _Sick; }
             set
@@ -146,7 +156,7 @@ namespace P3.Model
             }
         }
 
-        public string Page1State
+        public String Page1State
         {
             get { return _Page1State; }
             set
@@ -160,7 +170,7 @@ namespace P3.Model
             }
         }
 
-        public string Page2State
+        public String Page2State
         {
             get { return _Page2State; }
             set
@@ -174,7 +184,7 @@ namespace P3.Model
             }
         }
 
-        public string Page3State
+        public String Page3State
         {
             get { return _Page3State; }
             set
@@ -188,7 +198,21 @@ namespace P3.Model
             }
         }
 
-        public string DinnerSelectedPeople
+        public String PageStatistic
+        {
+            get { return _PageStatistic; }
+            set
+            {
+                if (_PageStatistic != value)
+                {
+                    _PageStatistic = value;
+                    OnPropertyChanged("PageStatistic");
+                    //onCount();
+                }
+            }
+        }
+
+        public String DinnerSelectedPeople
         {
             get { return _DinnerSelectedPeople; }
             set
@@ -202,7 +226,110 @@ namespace P3.Model
             }
         }
 
+        public Int32 EmployeeCount
+        {
+            get { return _EmployeeCount; }
+            set
+            {
+                if (_EmployeeCount != value)
+                {
+                    _EmployeeCount = value;
+                    OnPropertyChanged("EmployeeCount");
+                }
+            }
+        }
 
+        public Int32 ContactsCount
+        {
+            get { return _ContactsCount; }
+            set
+            {
+                if (_ContactsCount != value)
+                {
+                    _ContactsCount = value;
+                    OnPropertyChanged("ContactsCount");
+                }
+            }
+        }
+
+        public String SaveStatus
+        {
+            get { return _SaveStatus; }
+            set
+            {
+                if (_SaveStatus != value)
+                {
+                    _SaveStatus = value;
+                    OnPropertyChanged("SaveStatus");
+                    //onCount();
+                }
+            }
+        }
+
+        public String UpdStatus
+        {
+            get { return _UpdStatus; }
+            set
+            {
+                if (_UpdStatus != value)
+                {
+                    _UpdStatus = value;
+                    OnPropertyChanged("UpdStatus");
+                    //onCount();
+                }
+            }
+        }
+        public Int32 MiddleAge
+        {
+            get { return _MiddleAge; }
+            set
+            {
+                if (_MiddleAge != value)
+                {
+                    _MiddleAge = value;
+                    OnPropertyChanged("MiddleAge");
+                }
+            }
+        }
+
+        public Int32 MiddleTimeRecord
+        {
+            get { return _MiddleTimeRecord; }
+            set
+            {
+                if (_MiddleTimeRecord != value)
+                {
+                    _MiddleTimeRecord = value;
+                    OnPropertyChanged("MiddleTimeRecord");
+                }
+            }
+        }
+        public String StartPageVisible
+        {
+            get { return _startPageVisible; }
+            set
+            {
+                if (_startPageVisible != value)
+                {
+                    _startPageVisible = value;
+                    OnPropertyChanged("StartPageVisible");
+                    //onCount();
+                }
+            }
+        }
+        public String FilterPageVisible
+        {
+            get { return _filterPageVisible; }
+            set
+            {
+                if (_filterPageVisible != value)
+                {
+                    _filterPageVisible = value;
+                    OnPropertyChanged("FilterPageVisible");
+                    //onCount();
+                }
+            }
+        }
 
     }
 }

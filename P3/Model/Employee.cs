@@ -1,9 +1,12 @@
-﻿using System;
+﻿using P3.Utils;
+using P3.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace P3.Model
 {
@@ -34,8 +37,12 @@ namespace P3.Model
         private string _Position;
         private string _ID;
         private string _Status;
-        private string _BirthDay;
-        private string _StartDay;
+        private DateTime _BirthDay;
+        private string _BirthDayShort;
+        private Int32 _Age; //возраст
+        private DateTime _StartDay;
+        private string _StartDayShort;
+        private String _TimeRecord; //стаж работы
         private string _Image;
 
         #endregion
@@ -162,7 +169,7 @@ namespace P3.Model
             }
         }
 
-        public string BirthDay
+        public DateTime BirthDay
         {
             get { return _BirthDay; }
             set
@@ -175,7 +182,20 @@ namespace P3.Model
             }
         }
 
-        public string StartDay
+        public string BirthDayShort
+        {
+            get { return _BirthDayShort; }
+            set
+            {
+                if (_BirthDayShort != value)
+                {
+                    _BirthDayShort = value;
+                    OnPropertyChanged("BirthDayShort");
+                }
+            }
+        }
+
+        public DateTime StartDay
         {
             get { return _StartDay; }
             set
@@ -184,6 +204,45 @@ namespace P3.Model
                 {
                     _StartDay = value;
                     OnPropertyChanged("StartDay");
+                }
+            }
+        }
+
+        public string StartDayShort
+        {
+            get { return _StartDayShort; }
+            set
+            {
+                if (_StartDayShort != value)
+                {
+                    _StartDayShort = value;
+                    OnPropertyChanged("StartDayShort");
+                }
+            }
+        }
+
+        public Int32 Age
+        {
+            get { return _Age; }
+            set
+            {
+                if (_Age != value)
+                {
+                    _Age = value;
+                    OnPropertyChanged("Age");
+                }
+            }
+        }
+
+        public String TimeRecord
+        {
+            get { return _TimeRecord; }
+            set
+            {
+                if (_TimeRecord != value)
+                {
+                    _TimeRecord = value;
+                    OnPropertyChanged("TimeRecord");
                 }
             }
         }
@@ -202,8 +261,23 @@ namespace P3.Model
         }
 
 
+        //Отправка E-mail
+        private ICommand _sendMail;
+        public ICommand SendMail
+        {
+            get
+            {
+                if (_sendMail == null)
+                { _sendMail = new RelayCommand<object>(this.SendMail_Execute); }
+                return _sendMail;
+            }
+        }
 
-
+        private void SendMail_Execute(object parameter)
+        {
+            SendMail sm = new SendMail();
+            sm.SendMailOutlook(parameter.ToString());
+        }
         #endregion
     }
 }

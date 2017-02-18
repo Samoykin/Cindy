@@ -12,13 +12,13 @@ using System.Text;
 
 namespace P3
 {
-    class DBconnect
+    class DBDinnerConnect
     {
-        public String DataBaseName = "DBTels.sqlite";
+        public String DataBaseName = "Dinners.sqlite";
         public String DataBase2Name = "DBTelsTemp.sqlite";
         //String DataBaseName2 = @"\\elcom.local\files\01-Deps\ДПАСУТП\01_Архив\!Common_ОРДС\Phonebook\DBTels.sqlite";
-        String pass = "Xt,ehfirf3";
-        //String pass = "";
+        //String pass = "Xt,ehfirf3";
+        String pass = "";
 
         public ObservableCollection<Employee> employeeLst { get; set; }
         public ObservableCollection<Customer> customerLst { get; set; }
@@ -208,7 +208,7 @@ namespace P3
             File.Copy(DataBase2Name, DataBaseName, true);
         }
 
-        public void EmployeeWrite2(List<Employee> employeeLst) 
+        public void EmployeeWrite2(List<Employee> employeeLst)
         {
             SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
 
@@ -241,39 +241,7 @@ namespace P3
             connection.Close();
         }
 
-        public void CustomerUpdatePerson(Customer contact)
-        {
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
-            connection.Open();
-            SQLiteCommand command;
-
-            //command = new SQLiteCommand("INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('" + contact[0] + "', '" + contact[1] + "', '" + contact[2] + "', '" + contact[3] + "', '" + contact[4] + "', '" + contact[5] + "');", connection);
-            command = new SQLiteCommand("UPDATE customer SET custNames = '" + contact.FullName + "', custPos = '" + contact.Position + "', custTels = '" + contact.PhoneMobile + "', custTels2 = '" + contact.PhoneWork + "', custEmail = '" + contact.Email + "', custComp = '" + contact.Company + "' WHERE custNames Like '" + contact.FullName + "';", connection);
-                
-            command.ExecuteNonQuery();            
-
-            connection.Close();
-
-            File.Copy(DataBase2Name, DataBaseName, true);
-        }
-
-        public void CustomerWritePerson(Customer contact)
-        {
-
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
-            connection.Open();
-            SQLiteCommand command;
-
-            command = new SQLiteCommand("INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('" + contact.FullName + "', '" + contact.Position + "', '" + contact.PhoneMobile + "', '" + contact.PhoneWork + "', '" + contact.Email + "', '" + contact.Company + "');", connection);
-            //command = new SQLiteCommand("UPDATE customer SET custNames = '" + contact[0] + "', custPos = '" + contact[1] + "', custTels = '" + contact[2] + "', custTels2 = '" + contact[3] + "', custEmail = '" + contact[4] + "', custComp = '" + contact[5] + "' WHERE custNames Like '" + contact[0] + "';", connection);
-
-            command.ExecuteNonQuery();
-
-            connection.Close();
-
-            File.Copy(DataBase2Name, DataBaseName, true);
-        }
 
 
         public void InfoWrite(DateTime date, String name, String pcName, String ip, String remoteBD)
@@ -307,7 +275,7 @@ namespace P3
             connection.Close();
         }
 
-        public void EployeeStatusWrite(List<String> status, List<String> names, List<String> act) 
+        public void EployeeStatusWrite(List<String> status, List<String> names, List<String> act)
         {
             SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
             connection.Open();
@@ -324,8 +292,6 @@ namespace P3
             }
 
             connection.Close();
-
-            File.Copy(DataBase2Name, DataBaseName, true);
         }
 
         public void EployeeBirthDayWrite(List<String> birthDay, List<String> startDay, List<String> birthDayID)
@@ -378,7 +344,7 @@ namespace P3
                 }
                 else
                 {
-                    dtime = "21.12.1994";
+                    dtime = "20.12.1994";
                 }
 
                 //Дата прихода
@@ -389,7 +355,7 @@ namespace P3
                 }
                 else
                 {
-                    dtime2 = "21.12.1994";
+                    dtime2 = "20.12.1994";
                 }
 
                 DateTime tdTemp = DateTime.Now;
@@ -406,20 +372,8 @@ namespace P3
                 empl.ID = record["tID"].ToString();
                 empl.Status = record["tStatus"].ToString();
                 empl.BirthDay = Convert.ToDateTime(dtime);
-                //-------------------------------
-                //Возраст
                 empl.Age = tdTemp.Year - empl.BirthDay.Year;
-                if (tdTemp.Month < empl.BirthDay.Month )
-                {
-                    empl.Age = empl.Age - 1;
-                }
-                else if (tdTemp.Month == empl.BirthDay.Month && tdTemp.Day < empl.BirthDay.Day)
-                {
-                    empl.Age = empl.Age - 1;
-                }                
 
-                //-------------------------------
-                //День рождения
                 String monthTemp = empl.BirthDay.Month.ToString();
                 String dayTemp = empl.BirthDay.Day.ToString(); 
                 if (empl.BirthDay.Month < 10)
@@ -428,34 +382,12 @@ namespace P3
                     dayTemp = "0" + empl.BirthDay.Day.ToString();
                 empl.BirthDayShort = monthTemp + "." + dayTemp + "." + empl.BirthDay.Year.ToString();
 
-                //-------------------------------
-                //Стаж
                 empl.StartDay = Convert.ToDateTime(dtime2);
-
-                Int32 timeRecordTmp = tdTemp.Year - empl.StartDay.Year;
-
-                if (timeRecordTmp == 0)
+                empl.TimeRecord = (tdTemp.Year - empl.StartDay.Year).ToString();
+                if (empl.TimeRecord=="0")
                 {
                     empl.TimeRecord = "менее года";
                 }
-                else if (tdTemp.Month < empl.StartDay.Month)
-                {
-                    empl.TimeRecord = (timeRecordTmp - 1).ToString();
-                }
-                else if (tdTemp.Month == empl.StartDay.Month && tdTemp.Day < empl.StartDay.Day)
-                {
-                    empl.TimeRecord = (timeRecordTmp - 1).ToString();
-                }
-                else
-                    empl.TimeRecord = timeRecordTmp.ToString();
-
-                if (empl.TimeRecord == "0")
-                {
-                    empl.TimeRecord = "менее года";
-                }
-
-                //-------------------------------
-                //Дата начала работы 
                 monthTemp = empl.StartDay.Month.ToString();
                 dayTemp = empl.StartDay.Day.ToString();
                 if (empl.StartDay.Month < 10)
@@ -463,8 +395,6 @@ namespace P3
                 if (empl.StartDay.Day < 10)
                     dayTemp = "0" + empl.StartDay.Day.ToString();
                 empl.StartDayShort = monthTemp + "." + dayTemp + "." + empl.StartDay.Year.ToString();
-                //-------------------------------
-                //фото
                 empl.Image = AppDomain.CurrentDomain.BaseDirectory + @"\img\" + empl.ID + ".jpg";
 
                 employeeLst.Add(empl);
@@ -697,18 +627,18 @@ namespace P3
             dinnerList = new ObservableCollection<DinnerList> { };
 
             DateTime dt = new DateTime();
-            String tableName = "dinner" + DateTime.Today.ToString("yy") + "_" + DateTime.Today.ToString("MM");
+            String tableName = "dinner" + DateTime.Today.ToString("yy") + "_" + DateTime.Today.ToString("MM") + "_1";
 
             SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, pass));
 
             connection.Open();
-            SQLiteCommand command = new SQLiteCommand("SELECT * FROM '" + tableName + "' as t1 INNER JOIN 'employee' as t2 ON t1.idEmpl = t2.tID ;", connection);
+            SQLiteCommand command = new SQLiteCommand("SELECT * FROM '" + tableName + "';", connection);
             SQLiteDataReader reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
                 dinner = new DinnerList();
 
-                dinner.ID = record["tNames"].ToString();
+                dinner.ID = record["id"].ToString();
                 dinner.Day1 = record["day1"].ToString();
                 dinner.Day2 = record["day2"].ToString();
                 dinner.Day3 = record["day3"].ToString();
