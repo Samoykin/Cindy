@@ -4,5 +4,6 @@
              >
     <Application.Resources>
 
+        <BitmapImage x:Key="ImageFon" UriSource="Resources/fon7.jpg"/>
     </Application.Resources>
 </Application>

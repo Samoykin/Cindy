@@ -76,6 +76,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\NewsList.cs" />
     <Compile Include="Model\New.cs" />
     <Compile Include="Utils\EmplStatistic.cs" />
     <Compile Include="Utils\NewsData.cs" />
@@ -208,7 +209,9 @@
   <ItemGroup>
     <Resource Include="Resources\vacation2.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\fon7.jpg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -40,7 +40,9 @@ namespace P3.ViewModel
         //public People person { get; set; }
         public Misc misc { get; set; }
 
+        public ObservableCollection<New> news2 { get; set; }
         public ObservableCollection<New> futureNews2 { get; set; } 
+
         public ObservableCollection<Division> news { get; set; } //новости (не обращаем внимания на Division
         public ObservableCollection<Division> futureNews { get; set; } //предстоящие события
         public Statistic statistic { get; set; }
@@ -219,9 +221,9 @@ namespace P3.ViewModel
                 xml.CreateNodesXml();
                 
             }
-
+            misc = new Misc { };
             //(Environment.UserDomainName) == "ELCOM"
-            if (1==1)
+            if ((Environment.UserDomainName) == "ELCOM")
             {
                 
 
@@ -253,11 +255,12 @@ namespace P3.ViewModel
                 dinnerLst = new ObservableCollection<DinnerList> { };
 
                 //people = new ObservableCollection<People>{};
-                misc = new Misc { };
+                
                 newContact = new Customer { };
 
                 news = new ObservableCollection<Division> { };  //новости
                 futureNews = new ObservableCollection<Division> { };  //предстоящие события
+                news2 = new ObservableCollection<New> { };
                 futureNews2 = new ObservableCollection<New> { };  //предстоящие события
 
                 statistic = new Statistic { };
@@ -317,129 +320,38 @@ namespace P3.ViewModel
                 //Новости
                 NewsData nData = new NewsData();
 
-                //employeeLstTemp = new ObservableCollection<Employee>(employeeLstTemp.OrderBy(a => a.BirthDayShort));
+                NewsList nList = new NewsList();
+                List<New> newsT = new List<New>();
+                List<New> futureNewsT = new List<New>();
+                nList = nData.GetNews(employeeLst);
 
-                foreach (New n in nData.GetNews(employeeLst).OrderBy(a=>a.Date))
+                newsT = nList.news;
+                futureNewsT = nList.futureNews;
+
+                if (newsT != null && newsT.Count != 0)
                 {
-                    futureNews2.Add(n);
+                    foreach (New n in newsT.OrderBy(a => a.Date))
+                    {
+                        news2.Add(n);
+                    }
+                }
+                else
+                {
+                    New newT = new New();
+                    newT.Prefix = "На данный момент количество новостей ";
+                    newT.Postfix = " штук";
+                    news2.Add(newT);
                 }
 
-
-
-
-                foreach (Employee e in employeeLst)
+                if (futureNewsT != null)
                 {
-                    if (e.BirthDay.Month == DateTime.Now.Month && e.BirthDay.Day == DateTime.Now.Day)
+                    foreach (New n in futureNewsT.OrderBy(a => a.Date))
                     {
-                        Division newstemp = new Division();
-                        newstemp.Value = "";
-                        if (Convert.ToInt32(e.Age) % 5 == 0)
-                        {
-                            newstemp.Value = e.FullName.ToString() + " празднует Юбилей: " + e.Age.ToString() + " лет";
-                        }
-                        else
-                        {
-                            newstemp.Value = e.FullName.ToString() + " празднует " + e.Age.ToString() + "-й День рождения";
-                        }
-
-                        news.Add(newstemp);
+                        futureNews2.Add(n);
                     }
-
-                    if (e.StartDay.Month == DateTime.Now.Month && e.StartDay.Day == DateTime.Now.Day)
-                    {
-                        Division newstemp = new Division();
-                        newstemp.Value = "";
-                        if (e.TimeRecord != "менее года")
-                        {
-                            if (Convert.ToInt32(e.TimeRecord) % 5 == 0)
-                            {
-                                //юбилей
-                                newstemp.Value = e.FullName.ToString() + " празднует Юбилей: " + e.TimeRecord + " лет работы в компании";
-                            }
-                            else
-                            {
-                                newstemp.Value = e.FullName.ToString() + " празднует " + e.TimeRecord + "-й год работы в компании";
-                            }
-                        }
-                        else if (e.StartDay.Year == DateTime.Now.Year)
-                        {
-                            newstemp.Value = "Принят новый сотрудник " + e.FullName.ToString();
-                        }
-
-
-                        news.Add(newstemp);
-                    }
-
-                    //----------------------------------------------------------
-                    //Предстоящие события
-                    DateTime dt1 = DateTime.Now;
-                    DateTime dt2 = e.BirthDay;
-                    Int32 diff = dt1.Year - dt2.Year;
-
-                    //var interval = new TimeSpan(5);
-                    dt2 = e.BirthDay.AddYears(diff);
-
-                    //день рождения
-                    if (dt2 > dt1 && dt2 < dt1.AddDays(7))
-                    {
-                        Division newstemp = new Division();
-
-                        if (Convert.ToInt32(e.Age + 1) % 5 == 0)
-                        {
-                            newstemp.Value = e.FullName.ToString() + " " + e.BirthDay.ToString("dd.MM") + " празднует Юбилей: " + (e.Age + 1).ToString() + " лет";
-                        }
-                        else
-                        {
-                            newstemp.Value = e.FullName.ToString() + " " + e.BirthDay.ToString("dd.MM") + " празднует " + (e.Age + 1).ToString() + "-й День рождения";
-                        }
-
-                        futureNews.Add(newstemp);
-
-
-                    }
-                    //годовщина работы
-                    DateTime dt3 = DateTime.Now;
-                    DateTime dt4 = e.StartDay;
-                    Int32 diff2 = dt3.Year - dt4.Year;
-
-                    //var interval2 = new TimeSpan(5);
-                    dt2 = e.StartDay.AddYears(diff2);
-
-                    if (dt2 > dt1 && dt2 < dt1.AddDays(7))
-                    {
-                        Division newstemp = new Division();
-
-                        if (e.TimeRecord == "менее года")
-                        {
-                            newstemp.Value = e.FullName.ToString() + " " + e.StartDay.ToString("dd.MM") + " празднует 1-й год работы в компании";
-                        }
-                        else if (Convert.ToInt32(e.TimeRecord)+1 % 5 == 0)
-                        {
-                            //юбилей
-                            newstemp.Value = e.FullName.ToString() + " " + e.StartDay.ToString("dd.MM") + " празднует Юбилей: " + (Convert.ToInt32(e.TimeRecord) + 1) + " лет работы в компании";
-                        }
-                        else
-                        {
-                            newstemp.Value = e.FullName.ToString() + " " + e.StartDay.ToString("dd.MM") + " празднует " + (Convert.ToInt32(e.TimeRecord) + 1) + "-й год работы в компании";
-                        }
-                        futureNews.Add(newstemp);
-                    }
-
-
-
-                    //----------------------------------------------------------
-
-
-
-
-                    //if ((e.StartDay.Month > DateTime.Now.Month && e.StartDay.Day > DateTime.Now.Day) && (e.StartDay.Month < DateTime.Now.Month && e.StartDay.Day < DateTime.Now.Day + 7)
-                    //{
-                    //    Division newstemp = new Division();
-                    //    newstemp.Value = e.FullName.ToString() + " " + e.StartDayShort + " годовщина работы в компании";
-                    //    futureNews.Add(newstemp);
-                    //}
-
                 }
+
+                              
 
 
 
@@ -556,6 +468,11 @@ namespace P3.ViewModel
 
                 DataUpd();
 
+            }
+            else
+            {
+                misc.AccessDenied = "Collapsed";
+                misc.AccessDeniedMess = "Visible";
             }
 
         }
@@ -848,6 +765,10 @@ namespace P3.ViewModel
             misc.Page1State = "Visible";
             misc.Page3State = "Collapsed";
             misc.PageStatistic = "Collapsed";
+
+            //видимость стартовой страницы
+            misc.StartPageVisible = "Visible";
+            misc.FilterPageVisible = "Collapsed";
         }
 
         private void ClickMethod6()

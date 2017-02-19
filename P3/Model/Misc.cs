@@ -48,7 +48,8 @@ namespace P3.Model
         private Int32 _MiddleTimeRecord; //средний стаж
         private string _startPageVisible; //видимость стартовой страницы
         private string _filterPageVisible; //видимость страницы с данными
-
+        private string _accessDenied; //доступ закрыт если не в домене
+        private string _accessDeniedMess; //доступ закрыт если не в домене сообщение
 
         public String TextChange
         {
@@ -327,6 +328,30 @@ namespace P3.Model
                     _filterPageVisible = value;
                     OnPropertyChanged("FilterPageVisible");
                     //onCount();
+                }
+            }
+        }
+        public String AccessDenied
+        {
+            get { return _accessDenied; }
+            set
+            {
+                if (_accessDenied != value)
+                {
+                    _accessDenied = value;
+                    OnPropertyChanged("AccessDenied");
+                }
+            }
+        }
+        public String AccessDeniedMess
+        {
+            get { return _accessDeniedMess; }
+            set
+            {
+                if (_accessDeniedMess != value)
+                {
+                    _accessDeniedMess = value;
+                    OnPropertyChanged("AccessDeniedMess");
                 }
             }
         }

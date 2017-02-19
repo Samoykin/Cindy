@@ -46,7 +46,7 @@
 
         <Grid Grid.Row="0" Grid.Column="2" Margin="0,0,1,1">
             <!--<TextBlock Grid.Row="0" Grid.Column="1" Margin="5"  Text="{Binding Path=Value}" TextWrapping="Wrap" />-->
-            <ListView Name="news" ItemsSource="{Binding news}" Height="50" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,1,0" Background="{x:Null}" BorderBrush="{x:Null}">
+            <!--<ListView Name="news" ItemsSource="{Binding news}" Height="50" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,1,0" Background="{x:Null}" BorderBrush="{x:Null}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
@@ -56,7 +56,7 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
 
-            </ListView>
+            </ListView>-->
 
         </Grid>
 
@@ -134,42 +134,59 @@
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
-            </Grid.RowDefinitions>      
-            
-            
-            <ListView Name="news2" ItemsSource="{Binding news}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,1,0" Background="{x:Null}" BorderBrush="{x:Null}">
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Новости текущего дня:" TextWrapping="Wrap" FontFamily="/P3;component/Fonts/#Open Sans" FontWeight="Bold" Foreground="#FF2DADF5"/>
+
+            <ListView Name="News2" Grid.Row="1" ItemsSource="{Binding news2}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,1,0" Background="{x:Null}" BorderBrush="{x:Null}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel>
-                            <TextBlock Text="{Binding Value}" TextWrapping="Wrap"/>
-                            <Line Stroke="#FFD6DDFD" X2="200" Y1="1" Y2="1" X1="10" StrokeThickness="2"></Line>
-                        </StackPanel>
+                        <Grid Grid.Column="1" Grid.Row="1" Visibility="{Binding misc.StartPageVisible}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                            </Grid.RowDefinitions>                            
+                            <TextBlock Grid.Column="1" Text="{Binding FullName}" TextWrapping="Wrap" FontFamily="/P3;component/Fonts/#Open Sans"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Prefix}" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Column="3" Text="{Binding YearCount}" TextWrapping="Wrap" FontFamily="/P3;component/Fonts/#Open Sans" Foreground="#FF17B02C" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="4" Text="{Binding Postfix}" TextWrapping="Wrap"/>
+                        </Grid>
+
                     </DataTemplate>
                 </ListView.ItemTemplate>
 
             </ListView>
-            <ListView Name="futureNews" Grid.Row="1" ItemsSource="{Binding futureNews}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,1,0" Background="{x:Null}" BorderBrush="{x:Null}">
+
+            <TextBlock Grid.Row="2" Text="Грядущие события:" TextWrapping="Wrap" FontFamily="/P3;component/Fonts/#Open Sans" FontWeight="Bold" Foreground="#FF2DADF5"/>
+            
+            <ListView Name="futureNews2" Grid.Row="3" ItemsSource="{Binding futureNews2}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,1,0" Background="{x:Null}" BorderBrush="{x:Null}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel>
-                            <TextBlock Text="{Binding Value}" TextWrapping="Wrap"/>
-                            <Line Stroke="#FFD6DDFD" X2="200" Y1="1" Y2="1" X1="10" StrokeThickness="2"></Line>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
+                        <Grid Grid.Column="1" Grid.Row="1" Visibility="{Binding misc.StartPageVisible}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="45"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>                                
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="{Binding Date, StringFormat=dd.MM}" TextWrapping="Wrap" FontFamily="/P3;component/Fonts/#Open Sans" Foreground="#FF17B02C" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="1" Text="{Binding FullName}" TextWrapping="Wrap" FontFamily="/P3;component/Fonts/#Open Sans"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Prefix}" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Column="3" Text="{Binding YearCount}" TextWrapping="Wrap" FontFamily="/P3;component/Fonts/#Open Sans" Foreground="#FF17B02C" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="4" Text="{Binding Postfix}" TextWrapping="Wrap"/>
+                        </Grid>
 
-            </ListView>
-
-            <ListView Name="futureNews2" Grid.Row="2" ItemsSource="{Binding futureNews2}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,1,0" Background="{x:Null}" BorderBrush="{x:Null}">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <WrapPanel>
-                            <TextBlock Text="{Binding Date, StringFormat=dd.MM}" TextWrapping="Wrap"/>
-                            <TextBlock Text="{Binding FullName}" TextWrapping="Wrap"/>
-                            <TextBlock Text="{Binding Prefix}" TextWrapping="Wrap"/>
-                            <TextBlock Text="{Binding YearCount}" TextWrapping="Wrap"/>
-                            <TextBlock Text="{Binding Postfix}" TextWrapping="Wrap"/>
-                        </WrapPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
 
