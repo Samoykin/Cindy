@@ -1,158 +1,173 @@
-﻿using P3.Contacts;
-using P3.Utils;
-using P3.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-
-namespace P3.Model
+﻿namespace P3.Model
 {
-    class Customer : INotifyPropertyChanged
+    using System.ComponentModel;
+    using System.Windows.Input;
+
+    using Utils;
+    using ViewModel;
+
+    /// <summary>Заказчик.</summary>
+    public class Customer : INotifyPropertyChanged
     {
-        #region Implement INotyfyPropertyChanged members
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
-        #endregion
-
         #region Fields
 
-        private string _FullName;
-        private string _PhoneWork;
-        private string _PhoneMobile;
-        private string _Email;
-        private string _Position;
-        private string _Company;
-        
+        private string fullName;
+        private string phoneWork;
+        private string phoneMobile;
+        private string email;
+        private string position;
+        private string company;
+        private ICommand sendMail;
 
         #endregion
+
+        /// <summary>Событие изменения свойства.</summary>
+        public event PropertyChangedEventHandler PropertyChanged;
 
         #region Properties
 
-
+        /// <summary>Полное имя.</summary>
         public string FullName
         {
-            get { return _FullName; }
+            get
+            {
+                return this.fullName;
+            }
+
             set
             {
-                if (_FullName != value)
+                if (this.fullName != value)
                 {
-                    _FullName = value;
-                    OnPropertyChanged("FullName");
+                    this.fullName = value;
+                    this.OnPropertyChanged("FullName");
                 }
             }
         }
 
+        /// <summary>Рабочий телефон.</summary>
         public string PhoneWork
         {
-            get { return _PhoneWork; }
+            get
+            {
+                return this.phoneWork;
+            }
+
             set
             {
-                if (_PhoneWork != value)
+                if (this.phoneWork != value)
                 {
-                    _PhoneWork = value;
-                    OnPropertyChanged("PhoneWork");
+                    this.phoneWork = value;
+                    this.OnPropertyChanged("PhoneWork");
                 }
             }
         }
 
+        /// <summary>Мобильный телефон.</summary>
         public string PhoneMobile
         {
-            get { return _PhoneMobile; }
+            get
+            {
+                return this.phoneMobile;
+            }
+
             set
             {
-                if (_PhoneMobile != value)
+                if (this.phoneMobile != value)
                 {
-                    _PhoneMobile = value;
-                    OnPropertyChanged("PhoneMobile");
+                    this.phoneMobile = value;
+                    this.OnPropertyChanged("PhoneMobile");
                 }
             }
-        } 
+        }
 
+        /// <summary>Email.</summary>
         public string Email
         {
-            get { return _Email; }
+            get
+            {
+                return this.email;
+            }
+
             set
             {
-                if (_Email != value)
+                if (this.email != value)
                 {
-                    _Email = value;
-                    OnPropertyChanged("Email");
+                    this.email = value;
+                    this.OnPropertyChanged("Email");
                 }
             }
         }
 
+        /// <summary>Должность.</summary>
         public string Position
         {
-            get { return _Position; }
+            get
+            {
+                return this.position;
+            }
+
             set
             {
-                if (_Position != value)
+                if (this.position != value)
                 {
-                    _Position = value;
-                    OnPropertyChanged("Position");
+                    this.position = value;
+                    this.OnPropertyChanged("Position");
                 }
             }
         }
 
+        /// <summary>Компания.</summary>
         public string Company
         {
-            get { return _Company; }
+            get
+            {
+                return this.company;
+            }
+
             set
             {
-                if (_Company != value)
+                if (this.company != value)
                 {
-                    _Company = value;
-                    OnPropertyChanged("Company");
+                    this.company = value;
+                    this.OnPropertyChanged("Company");
                 }
             }
         }
-
- 
-
-
 
         #endregion
 
-        public void Clear()
-        {
-            FullName = "";
-            PhoneWork = "";
-            PhoneMobile = "";
-            Email = "";
-            Position = "";
-            Company = "";
-        }
-
-        //Отправка E-mail
-        private ICommand _sendMail;
+        /// <summary>Отправить E-mail.</summary>   
         public ICommand SendMail
         {
             get
             {
-                if (_sendMail == null)
-                { _sendMail = new RelayCommand<object>(this.SendMail_Execute); }
-                return _sendMail;
+                if (this.sendMail == null)
+                {
+                    this.sendMail = new RelayCommand<object>(this.SendMail_Execute);
+                }
+
+                return this.sendMail;
             }
         }
 
-        private void SendMail_Execute(object parameter)
+        #region Implement INotyfyPropertyChanged members
+
+        /// <summary>Изменения свойства.</summary>
+        /// <param name="propertyName">Имя свойства.</param>
+        protected virtual void OnPropertyChanged(string propertyName)
         {
-            SendMail sm = new SendMail();
-            sm.SendMailOutlook(parameter.ToString());
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
 
+        #endregion        
+
+        private void SendMail_Execute(object parameter)
+        {
+            var sm = new SendMail();
+            sm.SendMailOutlook(parameter.ToString());
+        }
     }
 }

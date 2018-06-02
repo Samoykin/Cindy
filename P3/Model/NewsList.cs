@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace P3.Model
+﻿namespace P3.Model
 {
-    class NewsList
-    {
-        public List<New> news { get; set; }
-        public List<New> futureNews { get; set; }
+    using System.Collections.Generic;
 
-            
+    /// <summary>Новостной список.</summary>
+    public class NewsList
+    {
+        /// <summary>Новости.</summary>
+        public List<New> News { get; set; }
+
+        /// <summary>Будущие новости.</summary>
+        public List<New> FutureNews { get; set; }            
     }
 }

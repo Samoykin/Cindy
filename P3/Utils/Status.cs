@@ -1,152 +1,144 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace P3.Utils
+﻿namespace P3.Utils
 {
-    class Status
+    using System;
+    using System.Collections.Generic;
+    using System.Net.NetworkInformation;
+    using System.Text.RegularExpressions;
+
+    /// <summary>Состояние.</summary>
+    public class Status
     {
-        DBconnect dbc = new DBconnect();
-        GetHTML ghtml = new GetHTML();
-        String address = "http://ares/Lists/List2/AllItems.aspx";
-        String htmlText;
-        String text;
-        Int32 countStatus;
-        List<String> status = new List<string>();
-        List<String> stName = new List<string>();
-        List<String> stState = new List<string>();
-        List<String> stDate = new List<string>();
-        List<String> stID = new List<string>();
-        List<String> stAct = new List<string>();
+        private DBconnect dbc = new DBconnect();
+        private GetHTML ghtml = new GetHTML();
+        private string address = "http://ares/Lists/List2/AllItems.aspx";
+        private string htmlText;
+        private string text;
+        private int countStatus;
+        private List<string> status = new List<string>();
+        private List<string> statusName = new List<string>();
+        private List<string> statusState = new List<string>();
+        private List<string> statusDate = new List<string>();
+        private List<string> statusID = new List<string>();
+        private List<string> statusAct = new List<string>();
 
-
-        //public Status(WebBrowser webBrowser1)
-        //{
-        //    // TODO: Complete member initialization
-        //    this.webBrowser1 = webBrowser1;
-        //}
-
-
-
+        /// <summary>Распарсить HTML.</summary>
         public void ParseHTML()
         {
-            Int16 i = 0;
-            Int32 startPos = 0;
+            short i = 0;
+            int startPos = 0;
 
-            Ping q = new Ping();
+            var q = new Ping();
 
             try
             {
-                PingReply an = q.Send("ares.elcom.local");
+                var an = q.Send("ares.elcom.local");
                 if (an.Status == IPStatus.Success)
                 {
-                    htmlText = ghtml.html(address);
+                    this.htmlText = this.ghtml.Html(this.address);
 
-                    if (htmlText.IndexOf(@"Кол-во значений", 0) != -1)
+                    if (this.htmlText.IndexOf(@"Кол-во значений", 0) != -1)
                     {
-                        text = htmlText.Substring(htmlText.IndexOf(@"Кол-во значений"));
-                        startPos = text.IndexOf(@"_self", 0);
+                        this.text = this.htmlText.Substring(this.htmlText.IndexOf(@"Кол-во значений"));
+                        startPos = this.text.IndexOf(@"_self", 0);
 
-                        countStatus = int.Parse(text.Substring(18, text.IndexOf(@"</B>", 19) - 18));
+                        this.countStatus = int.Parse(this.text.Substring(18, this.text.IndexOf(@"</B>", 19) - 18));
 
-                        while (i != countStatus)
+                        while (i != this.countStatus)
                         {
-                            status.Add(subObj("_self", startPos));
+                            this.status.Add(this.SubObj("_self", startPos));
 
                             startPos += 5;
-                            startPos = text.IndexOf(@"_self", startPos);
+                            startPos = this.text.IndexOf(@"_self", startPos);
                             i++;
                         }
 
-                        StatusParse();
+                        this.StatusParse();
                     }
-
                 }
             }
-            catch { }
-
-
+            catch
+            {
+            }
         }
 
-        public String subObj(String sub, Int32 startPos)
+        private string SubObj(string sub, int startPos)
         {
-            Int32 len = sub.Length + 2;
+            var len = sub.Length + 2;
             string sub2;
 
             if (sub == "_self")
-            { sub2 = @"</a>"; }
+            {
+                sub2 = @"</a>";
+            }
             else
-            { sub2 = @"</TD>"; }
+            {
+                sub2 = @"</TD>";
+            }
 
-            Int32 startNamePos = text.IndexOf(sub, startPos) + len;
-
-
-            Int32 endNamePos = text.IndexOf(sub2, startNamePos);
-
-            String subObj = text.Substring(startNamePos, endNamePos - startNamePos);
+            var startNamePos = this.text.IndexOf(sub, startPos) + len;
+            var endNamePos = this.text.IndexOf(sub2, startNamePos);
+            var subObj = this.text.Substring(startNamePos, endNamePos - startNamePos);
 
             return subObj;
         }
 
-        public void StatusParse()
+        private void StatusParse()
         {
-            String st = "";
-            //status1 = dbc.EmployeeReadStatus();
+            var st = string.Empty;
 
-            String pattern = @"(\w{2,}\s\w[.]\s|\w{2,}\s\w[.]\w[.])";
-            Regex regex = new Regex(pattern);
+            var pattern = @"(\w{2,}\s\w[.]\s|\w{2,}\s\w[.]\w[.])";
+            var regex = new Regex(pattern);
 
-            String pattern2 = @"(на больн\D+|в отпуске\D+|в команд\D+|не будет\D+|на обучен\D+|отсутствует\D+)";
-            Regex regex2 = new Regex(pattern2);
+            var pattern2 = @"(на больн\D+|в отпуске\D+|в команд\D+|не будет\D+|на обучен\D+|отсутствует\D+)";
+            var regex2 = new Regex(pattern2);
 
-            String pattern3 = @"(\d+\W\d+\D+\d+\W\d+[-]\d+\W\d+|\d+\W\d+[-]\d+\W\d+|\d+\W\d+)";
-            Regex regex3 = new Regex(pattern3);
+            var pattern3 = @"(\d+\W\d+\D+\d+\W\d+[-]\d+\W\d+|\d+\W\d+[-]\d+\W\d+|\d+\W\d+)";
+            var regex3 = new Regex(pattern3);
 
-            String pattern4 = @"( \(и.о. \D+\))";
-            Regex regex4 = new Regex(pattern4);
+            var pattern4 = @"( \(и.о. \D+\))";
+            var regex4 = new Regex(pattern4);
 
             int k = 0;
 
-            foreach (String str in status)
+            foreach (string str in this.status)
             {
-                Match match2 = regex2.Match(status[k]);
-                Match match3 = regex3.Match(status[k]);
-                Match match4 = regex4.Match(status[k]);
+                var match2 = regex2.Match(this.status[k]);
+                var match3 = regex3.Match(this.status[k]);
+                var match4 = regex4.Match(this.status[k]);
 
-                foreach (Match match in regex.Matches(status[k]))
+                foreach (Match match in regex.Matches(this.status[k]))
                 {
                     st = match.Value.Remove(match.Value.LastIndexOf('.'));
                     if (st.LastIndexOf('.') != -1)
+                    {
                         st = st.Remove(st.LastIndexOf('.'));
+                    }
 
-                    stName.Add(st);
-                    stState.Add(match2.Value + match3.Value + match4.Value);
-                    stDate.Add(match3.Value);
-                    stAct.Add(ActStatus(match3.Value));
+                    this.statusName.Add(st);
+                    this.statusState.Add(match2.Value + match3.Value + match4.Value);
+                    this.statusDate.Add(match3.Value);
+                    this.statusAct.Add(this.ActStatus(match3.Value));
                 }
+
                 k++;
             }
-            dbc.EployeeStatusWrite(stState, stName, stAct);
-            dbc.StatusWrite(status);
+
+            this.dbc.EployeeStatusWrite(this.statusState, this.statusName, this.statusAct);
+            this.dbc.StatusWrite(this.status);
         }
 
-        public String ActStatus(String date)
+        private string ActStatus(string date)
         {
-            String act = "";
-            String stD = "";
-            String endD = "";
+            var act = string.Empty;
+            var stD = string.Empty;
+            var endD = string.Empty;
             DateTime d1;
             DateTime d2;
 
-            String pattern3 = @"(\d+\W\d+)";
-            Regex regex3 = new Regex(pattern3);
+            var pattern3 = @"(\d+\W\d+)";
+            var regex3 = new Regex(pattern3);
 
-            Match match3 = regex3.Match(date);
-
+            var match3 = regex3.Match(date);
 
             switch (date.Length)
             {
@@ -154,9 +146,13 @@ namespace P3.Utils
                     d1 = DateTime.ParseExact(date, "dd.MM", null);
 
                     if (d1 <= DateTime.Today)
+                    {
                         act = "1";
+                    }
                     else
+                    {
                         act = "0";
+                    }
 
                     break;
 
@@ -168,15 +164,18 @@ namespace P3.Utils
                     d2 = DateTime.ParseExact(endD, "dd.MM", null);
 
                     if (d1 <= DateTime.Today && d2 >= DateTime.Today)
+                    {
                         act = "1";
+                    }
                     else
+                    {
                         act = "0";
-
+                    }
 
                     break;
             }
-            return act;
 
+            return act;
         }
     }
 }

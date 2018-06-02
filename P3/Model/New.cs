@@ -1,20 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace P3.Model
+﻿namespace P3.Model
 {
-    class New
-    {   
-        public DateTime Date { get; set; }
-        public string FullName { get; set; }
-        public int YearCount { get; set; }
-        public string Prefix { get; set; }
-        public string Postfix { get; set; }
+    using System;
 
-        
+    /// <summary>Новый.</summary>
+    public class New
+    {
+        /// <summary>Дата.</summary>
+        public DateTime Date { get; set; }
+
+        /// <summary>Полное имя.</summary>
+        public string FullName { get; set; }
+
+        /// <summary>Количество лет.</summary>
+        public int YearCount { get; set; }
+
+        /// <summary>Префикс.</summary>
+        public string Prefix { get; set; }
+
+        /// <summary>Постфикс.</summary>
+        public string Postfix { get; set; }        
     }
 }

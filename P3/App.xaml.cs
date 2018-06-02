@@ -1,14 +1,14 @@
-﻿using System.Windows;
-using P3.View;
-using P3.ViewModel;
-
-namespace P3
+﻿namespace P3
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
+    using System.Windows;
+
+    using View;
+    using ViewModel;
+
+    /// <summary>Interaction logic for App.xaml.</summary>
     public partial class App : Application
     {
+        /// <summary>Initializes a new instance of the <see cref="App" /> class.</summary>
         public App()
         {
             var mw = new MainWindowView

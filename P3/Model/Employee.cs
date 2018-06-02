@@ -1,283 +1,364 @@
-﻿using P3.Utils;
-using P3.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-
-namespace P3.Model
+﻿namespace P3.Model
 {
-    class Employee : INotifyPropertyChanged
-    {
-        #region Implement INotyfyPropertyChanged members
+    using System;
+    using System.ComponentModel;
+    using System.Windows.Input;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+    using Utils;
+    using ViewModel;
 
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
-        #endregion
-
+    /// <summary>Сотрудник.</summary>
+    public class Employee : INotifyPropertyChanged
+    { 
         #region Fields
 
-        private string _FullName;
-        private string _PhoneWork;
-        private string _PhoneMobile;
-        private string _PhoneExch;
-        private string _Email;
-        private string _Division;
-        private string _Position;
-        private string _ID;
-        private string _Status;
-        private DateTime _BirthDay;
-        private string _BirthDayShort;
-        private Int32 _Age; //возраст
-        private DateTime _StartDay;
-        private string _StartDayShort;
-        private String _TimeRecord; //стаж работы
-        private string _Image;
+        private string fullName;
+        private string phoneWork;
+        private string phoneMobile;
+        private string phoneExch;
+        private string email;
+        private string division;
+        private string position;
+        private string id;
+        private string status;
+        private DateTime birthDay;
+        private string birthDayShort;
+        private int age;
+        private DateTime startDay;
+        private string startDayShort;
+        private string timeRecord;
+        private string image;
+        private ICommand sendMail;
 
         #endregion
+
+        /// <summary>Событие изменения свойства.</summary>
+        public event PropertyChangedEventHandler PropertyChanged;
 
         #region Properties
 
-
+        /// <summary>Полное имя.</summary>
         public string FullName
         {
-            get { return _FullName; }
+            get
+            {
+                return this.fullName;
+            }
+
             set
             {
-                if (_FullName != value)
+                if (this.fullName != value)
                 {
-                    _FullName = value;
-                    OnPropertyChanged("FullName");
+                    this.fullName = value;
+                    this.OnPropertyChanged("FullName");
                 }
             }
         }
 
+        /// <summary>Рабочий телефон.</summary>
         public string PhoneWork
         {
-            get { return _PhoneWork; }
+            get
+            {
+                return this.phoneWork;
+            }
+
             set
             {
-                if (_PhoneWork != value)
+                if (this.phoneWork != value)
                 {
-                    _PhoneWork = value;
-                    OnPropertyChanged("PhoneWork");
+                    this.phoneWork = value;
+                    this.OnPropertyChanged("PhoneWork");
                 }
             }
         }
 
+        /// <summary>Мобильный телефон.</summary>
         public string PhoneMobile
         {
-            get { return _PhoneMobile; }
+            get
+            {
+                return this.phoneMobile;
+            }
+
             set
             {
-                if (_PhoneMobile != value)
+                if (this.phoneMobile != value)
                 {
-                    _PhoneMobile = value;
-                    OnPropertyChanged("PhoneMobile");
+                    this.phoneMobile = value;
+                    this.OnPropertyChanged("PhoneMobile");
                 }
             }
         }
 
+        /// <summary>Добавочный телефон.</summary>
         public string PhoneExch
         {
-            get { return _PhoneExch; }
+            get
+            {
+                return this.phoneExch;
+            }
+
             set
             {
-                if (_PhoneExch != value)
+                if (this.phoneExch != value)
                 {
-                    _PhoneExch = value;
-                    OnPropertyChanged("PhoneExch");
+                    this.phoneExch = value;
+                    this.OnPropertyChanged("PhoneExch");
                 }
             }
         }
 
+        /// <summary>Email.</summary>
         public string Email
         {
-            get { return _Email; }
+            get
+            {
+                return this.email;
+            }
+
             set
             {
-                if (_Email != value)
+                if (this.email != value)
                 {
-                    _Email = value;
-                    OnPropertyChanged("Email");
+                    this.email = value;
+                    this.OnPropertyChanged("Email");
                 }
             }
         }
 
+        /// <summary>Подразделение.</summary>
         public string Division
         {
-            get { return _Division; }
+            get
+            {
+                return this.division;
+            }
+
             set
             {
-                if (_Division != value)
+                if (this.division != value)
                 {
-                    _Division = value;
-                    OnPropertyChanged("Division");
+                    this.division = value;
+                    this.OnPropertyChanged("Division");
                 }
             }
         }
 
-
-
+        /// <summary>Должность.</summary>
         public string Position
         {
-            get { return _Position; }
+            get
+            {
+                return this.position;
+            }
+
             set
             {
-                if (_Position != value)
+                if (this.position != value)
                 {
-                    _Position = value;
-                    OnPropertyChanged("Position");
+                    this.position = value;
+                    this.OnPropertyChanged("Position");
                 }
             }
         }
 
+        /// <summary>ID.</summary>
         public string ID
         {
-            get { return _ID; }
+            get
+            {
+                return this.id;
+            }
+
             set
             {
-                if (_ID != value)
+                if (this.id != value)
                 {
-                    _ID = value;
-                    OnPropertyChanged("ID");
+                    this.id = value;
+                    this.OnPropertyChanged("ID");
                 }
             }
         }
 
+        /// <summary>Состояние.</summary>
         public string Status
         {
-            get { return _Status; }
+            get
+            {
+                return this.status;
+            }
+
             set
             {
-                if (_Status != value)
+                if (this.status != value)
                 {
-                    _Status = value;
-                    OnPropertyChanged("Status");
+                    this.status = value;
+                    this.OnPropertyChanged("Status");
                 }
             }
         }
 
+        /// <summary>День рождения.</summary>
         public DateTime BirthDay
         {
-            get { return _BirthDay; }
+            get
+            {
+                return this.birthDay;
+            }
+
             set
             {
-                if (_BirthDay != value)
+                if (this.birthDay != value)
                 {
-                    _BirthDay = value;
-                    OnPropertyChanged("BirthDay");
+                    this.birthDay = value;
+                    this.OnPropertyChanged("BirthDay");
                 }
             }
         }
 
+        /// <summary>День рождения коротко.</summary>
         public string BirthDayShort
         {
-            get { return _BirthDayShort; }
+            get
+            {
+                return this.birthDayShort;
+            }
+
             set
             {
-                if (_BirthDayShort != value)
+                if (this.birthDayShort != value)
                 {
-                    _BirthDayShort = value;
-                    OnPropertyChanged("BirthDayShort");
+                    this.birthDayShort = value;
+                    this.OnPropertyChanged("BirthDayShort");
                 }
             }
         }
 
+        /// <summary>Дата принятия на работу.</summary>
         public DateTime StartDay
         {
-            get { return _StartDay; }
+            get
+            {
+                return this.startDay;
+            }
+
             set
             {
-                if (_StartDay != value)
+                if (this.startDay != value)
                 {
-                    _StartDay = value;
-                    OnPropertyChanged("StartDay");
+                    this.startDay = value;
+                    this.OnPropertyChanged("StartDay");
                 }
             }
         }
 
+        /// <summary>Дата принятия на работу коротко.</summary>
         public string StartDayShort
         {
-            get { return _StartDayShort; }
+            get
+            {
+                return this.startDayShort;
+            }
+
             set
             {
-                if (_StartDayShort != value)
+                if (this.startDayShort != value)
                 {
-                    _StartDayShort = value;
-                    OnPropertyChanged("StartDayShort");
+                    this.startDayShort = value;
+                    this.OnPropertyChanged("StartDayShort");
                 }
             }
         }
 
-        public Int32 Age
+        /// <summary>Возраст.</summary>
+        public int Age
         {
-            get { return _Age; }
+            get
+            {
+                return this.age;
+            }
+
             set
             {
-                if (_Age != value)
+                if (this.age != value)
                 {
-                    _Age = value;
-                    OnPropertyChanged("Age");
+                    this.age = value;
+                    this.OnPropertyChanged("Age");
                 }
             }
         }
 
-        public String TimeRecord
+        /// <summary>Стаж.</summary>
+        public string TimeRecord
         {
-            get { return _TimeRecord; }
+            get
+            {
+                return this.timeRecord;
+            }
+
             set
             {
-                if (_TimeRecord != value)
+                if (this.timeRecord != value)
                 {
-                    _TimeRecord = value;
-                    OnPropertyChanged("TimeRecord");
+                    this.timeRecord = value;
+                    this.OnPropertyChanged("TimeRecord");
                 }
             }
         }
 
+        /// <summary>Фотография.</summary>
         public string Image
         {
-            get { return _Image; }
+            get
+            {
+                return this.image;
+            }
+
             set
             {
-                if (_Image != value)
+                if (this.image != value)
                 {
-                    _Image = value;
-                    OnPropertyChanged("Image");
+                    this.image = value;
+                    this.OnPropertyChanged("Image");
                 }
             }
         }
-
-
-        //Отправка E-mail
-        private ICommand _sendMail;
+        
+        /// <summary>Отправить письмо.</summary>
         public ICommand SendMail
         {
             get
             {
-                if (_sendMail == null)
-                { _sendMail = new RelayCommand<object>(this.SendMail_Execute); }
-                return _sendMail;
+                if (this.sendMail == null)
+                {
+                    this.sendMail = new RelayCommand<object>(this.SendMail_Execute);
+                }
+
+                return this.sendMail;
+            }
+        }        
+
+        #endregion
+
+        #region Implement INotyfyPropertyChanged members
+        
+        /// <summary>Изменения свойства.</summary>
+        /// <param name="propertyName">Имя свойства.</param>
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 
+        #endregion
+
         private void SendMail_Execute(object parameter)
         {
-            SendMail sm = new SendMail();
+            var sm = new SendMail();
             sm.SendMailOutlook(parameter.ToString());
         }
-        #endregion
     }
 }

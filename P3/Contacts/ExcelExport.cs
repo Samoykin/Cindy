@@ -1,95 +1,92 @@
-﻿using P3.Model;
-using P3.Utils;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Excel = Microsoft.Office.Interop.Excel;
-
-namespace P3.Contacts
+﻿namespace P3.Contacts
 {
-    class ExcelExport
+    using System;
+    using System.Collections.ObjectModel;
+    using System.IO;
+    
+    using Model;
+    using Utils;
+    using Excel = Microsoft.Office.Interop.Excel;
+
+    /// <summary>Экспорт данных в Excel.</summary>
+    public class ExcelExport
     {
         private LogFile logFile = new LogFile();
-        String _filePath;
+        private string filePath;
 
-        //работа с Excel
-        private Excel.Application ExcelApp;
-        private Excel.Workbook WorkBookExcel;
-        private Excel.Worksheet WorkSheetExcel;
-        private Excel.Range RangeExcel;
+        // работа с Excel
+        private Excel.Application excelApp;
+        private Excel.Worksheet workSheetExcel;
+        private Excel.Range rangeExcel;
 
-        public ExcelExport(String filePath)
+        /// <summary>Initializes a new instance of the <see cref="ExcelExport" /> class.</summary>
+        /// <param name="filePath">Путь к файлу.</param>
+        public ExcelExport(string filePath)
         {
-            _filePath = filePath;
-
+            this.filePath = filePath;
         }
 
-        public void excelWrite(ObservableCollection<Customer> custLst)
+        /// <summary>Записать в Excel.</summary>
+        /// <param name="custLst">Коллекция контактов.</param>
+        public void ExcelWrite(ObservableCollection<Customer> custLst)
         {
-            if (File.Exists(_filePath))
+            if (File.Exists(this.filePath))
             {
-                File.Delete(_filePath);
+                File.Delete(this.filePath);
             }
 
             try
             {
-                ExcelApp = new Excel.Application();
-                ExcelApp.Visible = false;
-                //WorkBookExcel = ExcelApp.Workbooks.Open(_filePath, false); 
-                ExcelApp.Workbooks.Add();
-                WorkSheetExcel = (Excel.Worksheet)ExcelApp.ActiveSheet;
+                this.excelApp = new Excel.Application();
+                this.excelApp.Visible = false;
 
-                WorkSheetExcel.Cells[1, 1] = "ФИО";
-                WorkSheetExcel.Cells[1, 2] = "Должность";
-                WorkSheetExcel.Cells[1, 3] = "Сотовый";
-                WorkSheetExcel.Cells[1, 4] = "Рабочий";
-                WorkSheetExcel.Cells[1, 5] = "Почта";
-                WorkSheetExcel.Cells[1, 6] = "Организация";
+                this.excelApp.Workbooks.Add();
+                this.workSheetExcel = (Excel.Worksheet)this.excelApp.ActiveSheet;
+
+                this.workSheetExcel.Cells[1, 1] = "ФИО";
+                this.workSheetExcel.Cells[1, 2] = "Должность";
+                this.workSheetExcel.Cells[1, 3] = "Сотовый";
+                this.workSheetExcel.Cells[1, 4] = "Рабочий";
+                this.workSheetExcel.Cells[1, 5] = "Почта";
+                this.workSheetExcel.Cells[1, 6] = "Организация";
 
                 int i = 0;
 
                 foreach (Customer n in custLst)
                 {
-                    RangeExcel = (Excel.Range)WorkSheetExcel.Cells[i + 2, 1];
-                    RangeExcel.Value = custLst[i].FullName;
-                    RangeExcel = (Excel.Range)WorkSheetExcel.Cells[i + 2, 2];
-                    RangeExcel.Value = custLst[i].Position;
-                    RangeExcel = (Excel.Range)WorkSheetExcel.Cells[i + 2, 3];
-                    RangeExcel.Value = custLst[i].PhoneMobile;
-                    RangeExcel = (Excel.Range)WorkSheetExcel.Cells[i + 2, 4];
-                    RangeExcel.Value = custLst[i].PhoneWork;
-                    RangeExcel = (Excel.Range)WorkSheetExcel.Cells[i + 2, 5];
-                    RangeExcel.Value = custLst[i].Email;
-                    RangeExcel = (Excel.Range)WorkSheetExcel.Cells[i + 2, 6];
-                    RangeExcel.Value = custLst[i].Company;
+                    this.rangeExcel = (Excel.Range)this.workSheetExcel.Cells[i + 2, 1];
+                    this.rangeExcel.Value = custLst[i].FullName;
+                    this.rangeExcel = (Excel.Range)this.workSheetExcel.Cells[i + 2, 2];
+                    this.rangeExcel.Value = custLst[i].Position;
+                    this.rangeExcel = (Excel.Range)this.workSheetExcel.Cells[i + 2, 3];
+                    this.rangeExcel.Value = custLst[i].PhoneMobile;
+                    this.rangeExcel = (Excel.Range)this.workSheetExcel.Cells[i + 2, 4];
+                    this.rangeExcel.Value = custLst[i].PhoneWork;
+                    this.rangeExcel = (Excel.Range)this.workSheetExcel.Cells[i + 2, 5];
+                    this.rangeExcel.Value = custLst[i].Email;
+                    this.rangeExcel = (Excel.Range)this.workSheetExcel.Cells[i + 2, 6];
+                    this.rangeExcel.Value = custLst[i].Company;
 
                     i++;
                 }
 
-                WorkSheetExcel.SaveAs(_filePath);
-                //WorkBookExcel.Close(true, Type.Missing, Type.Missing);
-                ExcelApp.Quit();
+                this.workSheetExcel.SaveAs(this.filePath);
+
+                this.excelApp.Quit();
                 GC.Collect();
 
-                String logText = DateTime.Now.ToString() + "|event|ExcelExport - excelWrite|Контакты сохранены в Excel " + _filePath;
-                logFile.WriteLog(logText);
+                var logText = DateTime.Now.ToString() + "|event|ExcelExport - excelWrite|Контакты сохранены в Excel " + this.filePath;
+                this.logFile.WriteLog(logText);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                String logText = DateTime.Now.ToString() + "|fail|ExcelExport - excelWrite|" + exception.Message;
-                logFile.WriteLog(logText);
+                var logText = DateTime.Now.ToString() + "|fail|ExcelExport - excelWrite|" + ex.Message;
+                this.logFile.WriteLog(logText);
 
-                WorkSheetExcel.SaveAs(_filePath);
-                ExcelApp.Quit();
+                this.workSheetExcel.SaveAs(this.filePath);
+                this.excelApp.Quit();
                 GC.Collect();
-
             }
-
-
         }
     }
 }

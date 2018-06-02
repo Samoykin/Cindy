@@ -1,51 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace P3.Model
+﻿namespace P3.Model
 {
-    class Division : INotifyPropertyChanged
+    using System.ComponentModel;
+
+    /// <summary>Подразделение.</summary>
+    public class Division : INotifyPropertyChanged
     {
+        private string divValue;
 
-        #region Implement INotyfyPropertyChanged members
-
+        /// <summary>Событие изменения свойства.</summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
-        #endregion
-
-
-        private string _Value;
-
+        /// <summary>Значение.</summary>
         public string Value
         {
-            get { return _Value; }
+            get
+            {
+                return this.divValue;
+            }
+
             set
             {
-                if (_Value != value)
+                if (this.divValue != value)
                 {
-                    _Value = value;
-                    OnPropertyChanged("Value");
-
+                    this.divValue = value;
+                    this.OnPropertyChanged("Value");
                 }
             }
         }
 
-     
+        #region Implement INotyfyPropertyChanged members
+        
+        /// <summary>Изменения свойства.</summary>
+        /// <param name="propertyName">Имя свойства.</param>
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
 
-
-
-
-
+        #endregion       
     }
 }

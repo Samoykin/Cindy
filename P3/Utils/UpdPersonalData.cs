@@ -1,209 +1,187 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace P3.Utils
+﻿namespace P3.Utils
 {
-    class UpdPersonalData
+    using System.Collections.Generic;
+    using System.Net.NetworkInformation;
+
+    /// <summary>Обновление персональных данных.</summary>
+    public class UpdPersonalData
     {
-        DBconnect dbc = new DBconnect();
-        GetHTML ghtml = new GetHTML();
-        String address = "http://ares/Divisions/Lists/Employees/PhoneList.aspx";
-        //String address = "http://test2.ru/index.html";
-        String htmlText;
-        String text;
+        private DBconnect dbc = new DBconnect();
+        private GetHTML ghtml = new GetHTML();
+        private string address = "http://ares/Divisions/Lists/Employees/PhoneList.aspx";
+        private string htmlText;
+        private string text;
 
+        private List<string> tempID = new List<string>();
+        private List<string> tempNames = new List<string>();
+        private List<string> tempTels = new List<string>();
+        private List<string> tempTels2 = new List<string>();
+        private List<string> tempTels3 = new List<string>();
+        private List<string> tempEmail = new List<string>();
+        private List<string> tempDiv = new List<string>();
+        private List<string> tempPos = new List<string>();
+        private List<string> tempStatus = new List<string>();
 
-        List<String> tID = new List<string>();
-        List<String> tNames = new List<string>();
-        List<String> tTels = new List<string>();
-        List<String> tTels2 = new List<string>();
-        List<String> tTels3 = new List<string>();
-        List<String> tEmail = new List<string>();
-        List<String> tDiv = new List<string>();
-        List<String> tPos = new List<string>();
-        List<String> tStatus = new List<string>();
-
-
-
+        /// <summary>Распарсить HTML.</summary>
         public void ParseHTML()
         {
-            //Int16 i = 0;
-            //Int32 startPos = 0;
-
             Ping q = new Ping();
 
             try
             {
-                //PingReply an = q.Send("ares.elcom.local");
-                //if (an.Status == IPStatus.Success)
-                //{
-                htmlText = ghtml.html(address);
+                this.htmlText = this.ghtml.Html(this.address);
 
-
-
-
-                if (htmlText.IndexOf(@"Кол-во значений", 19) != -1)
+                if (this.htmlText.IndexOf(@"Кол-во значений", 19) != -1)
                 {
-
-                    text = htmlText.Substring(htmlText.IndexOf(@"Кол-во значений"));
-                    text = text.Remove(text.LastIndexOf(@"<!-- FooterBanner closes the TD") - 39);
-
-
-
-                    execValues();
-
-
-
+                    this.text = this.htmlText.Substring(this.htmlText.IndexOf(@"Кол-во значений"));
+                    this.text = this.text.Remove(this.text.LastIndexOf(@"<!-- FooterBanner closes the TD") - 39);
+                    this.ExecValues();
                 }
-
-                //}
-
             }
-            catch { }
-
+            catch
+            {
+            }
         }
 
-
-        public void execValues()
+        private void ExecValues()
         {
-            tID.Clear();
-            tNames.Clear();
-            tTels.Clear();
-            tTels2.Clear();
-            tTels3.Clear();
-            tEmail.Clear();
-            tDiv.Clear();
-            tPos.Clear();
+            this.tempID.Clear();
+            this.tempNames.Clear();
+            this.tempTels.Clear();
+            this.tempTels2.Clear();
+            this.tempTels3.Clear();
+            this.tempEmail.Clear();
+            this.tempDiv.Clear();
+            this.tempPos.Clear();
 
-            Int32 countWorcers;
-            Int32 i = 0;
+            int countWorcers;
+            int i = 0;
 
-            String id;
-            String name1;
-            String t1;
-            String t2;
-            String t3;
-            String email1;
-            String division1;
-            String position1;
+            string id;
+            string name1;
+            string t1;
+            string t2;
+            string t3;
+            string email1;
+            string division1;
+            string position1;
 
-            //int startPos = text.IndexOf(@"_self", 0);
-            Int32 startPos = text.IndexOf(@"ID", 0);
+            int startPos = this.text.IndexOf(@"ID", 0);
 
-            countWorcers = Int32.Parse(text.Substring(18, text.IndexOf(@"</B>", 19) - 18));
+            countWorcers = int.Parse(this.text.Substring(18, this.text.IndexOf(@"</B>", 19) - 18));
 
             while (i != countWorcers)
             {
-                //id
-                id = text.Substring(startPos + 3, 3);
+                id = this.text.Substring(startPos + 3, 3);
                 if (id.IndexOf("\"", 0) != -1)
                 {
-                    id = text.Substring(startPos + 3, 2);
+                    id = this.text.Substring(startPos + 3, 2);
                 }
 
-                tID.Add(id);
+                this.tempID.Add(id);
 
-                //Имя
-                name1 = subObj(@"_self", startPos);
-                tNames.Add(name1);
+                // Имя
+                name1 = this.SubObj(@"_self", startPos);
+                this.tempNames.Add(name1);
 
-                //Внутренний телефон
-                startPos = text.IndexOf(@"ms-vb2", startPos);
-                t1 = subObj(@"ms-vb2", startPos);
+                // Внутренний телефон
+                startPos = this.text.IndexOf(@"ms-vb2", startPos);
+                t1 = this.SubObj(@"ms-vb2", startPos);
                 startPos += 5;
 
-                //Мобильный телефон
-                startPos = text.IndexOf(@"ms-vb2", startPos);
-                t2 = subObj(@"ms-vb2", startPos);
+                // Мобильный телефон
+                startPos = this.text.IndexOf(@"ms-vb2", startPos);
+                t2 = this.SubObj(@"ms-vb2", startPos);
                 startPos += 5;
 
-                //Переадресация на сотовый
-                startPos = text.IndexOf(@"ms-vb2", startPos);
-                t3 = subObj(@"ms-vb2", startPos);
+                // Переадресация на сотовый
+                startPos = this.text.IndexOf(@"ms-vb2", startPos);
+                t3 = this.SubObj(@"ms-vb2", startPos);
                 startPos += 5;
 
-                //e-mail
-                startPos = text.IndexOf(@"ms-vb2", startPos);
+                // e-mail
+                startPos = this.text.IndexOf(@"ms-vb2", startPos);
                 startPos += 8;
-                Int32 checkEnd = text.IndexOf(@"</TD><TD", startPos);
+                int checkEnd = this.text.IndexOf(@"</TD><TD", startPos);
                 if (checkEnd - startPos > 5)
                 {
-                    startPos = text.IndexOf(@">", startPos) + 1;
-                    email1 = text.Substring(startPos, text.IndexOf(@"</a></TD>", startPos) - startPos);
+                    startPos = this.text.IndexOf(@">", startPos) + 1;
+                    email1 = this.text.Substring(startPos, this.text.IndexOf(@"</a></TD>", startPos) - startPos);
                 }
                 else
-                { email1 = ""; }
-                startPos += 5;
-                tEmail.Add(email1);
+                {
+                    email1 = string.Empty;
+                }
 
-                //Подразделение
-                startPos = text.IndexOf(@"ms-vb2", startPos);
+                startPos += 5;
+                this.tempEmail.Add(email1);
+
+                // Подразделение
+                startPos = this.text.IndexOf(@"ms-vb2", startPos);
                 startPos += 8;
-                startPos = text.IndexOf(@">", startPos) + 1;
-                division1 = text.Substring(startPos, text.IndexOf(@"</A></TD>", startPos) - startPos);
+                startPos = this.text.IndexOf(@">", startPos) + 1;
+                division1 = this.text.Substring(startPos, this.text.IndexOf(@"</A></TD>", startPos) - startPos);
                 startPos += 5;
-                tDiv.Add(division1);
+                this.tempDiv.Add(division1);
 
-                //Должность
-                startPos = text.IndexOf(@"ms-vb2", startPos);
-                position1 = subObj(@"ms-vb2", startPos);
-                tPos.Add(position1);
+                // Должность
+                startPos = this.text.IndexOf(@"ms-vb2", startPos);
+                position1 = this.SubObj(@"ms-vb2", startPos);
+                this.tempPos.Add(position1);
                 startPos += 5;
 
-                startPos = text.IndexOf(@"ID", startPos);
-                t1 = spaceReplase(t1);
-                tTels.Add(t1);
-                t2 = spaceReplase(t2);
-                tTels2.Add(t2);
-                t3 = spaceReplase(t3);
-                tTels3.Add(t3);
+                startPos = this.text.IndexOf(@"ID", startPos);
+                t1 = this.SpaceReplase(t1);
+                this.tempTels.Add(t1);
+                t2 = this.SpaceReplase(t2);
+                this.tempTels2.Add(t2);
+                t3 = this.SpaceReplase(t3);
+                this.tempTels3.Add(t3);
 
                 i++;
             }
 
             try
             {
-                dbc.ClearTable("employee");
+                this.dbc.ClearTable("employee");
             }
-            catch { }
+            catch
+            {
+            }
 
-            dbc.EmployeeWrite(tID, tNames, tTels, tTels2, tTels3, tEmail, tDiv, tPos);
-
-
+            this.dbc.EmployeeWrite(this.tempID, this.tempNames, this.tempTels, this.tempTels2, this.tempTels3, this.tempEmail, this.tempDiv, this.tempPos);
         }
 
-        public String spaceReplase(String str)
+        private string SpaceReplase(string str)
         {
             if (str.IndexOf(@"&nbsp;", 0) != -1)
             {
                 while (str.IndexOf(@"&nbsp;", 0) != -1)
-                { str = str.Replace(@"&nbsp;", ""); }
+                {
+                    str = str.Replace(@"&nbsp;", string.Empty);
+                }
             }
+
             return str;
         }
 
-
-        public String subObj(String sub, Int32 startPos)
+        private string SubObj(string sub, int startPos)
         {
-            Int32 len = sub.Length + 2;
-            String sub2;
+            int len = sub.Length + 2;
+            string sub2;
 
             if (sub == "_self")
-            { sub2 = @"</a>"; }
+            {
+                sub2 = @"</a>";
+            }
             else
-            { sub2 = @"</TD>"; }
+            {
+                sub2 = @"</TD>";
+            }
 
-            Int32 startNamePos = text.IndexOf(sub, startPos) + len;
-
-
-            Int32 endNamePos = text.IndexOf(sub2, startNamePos);
-
-            String subObj = text.Substring(startNamePos, endNamePos - startNamePos);
+            int startNamePos = this.text.IndexOf(sub, startPos) + len;
+            int endNamePos = this.text.IndexOf(sub2, startNamePos);
+            string subObj = this.text.Substring(startNamePos, endNamePos - startNamePos);
 
             return subObj;
         }

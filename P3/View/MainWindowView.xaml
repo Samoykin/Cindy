@@ -20,7 +20,7 @@
 
     </Window.Resources>
     <Grid>
-        <Grid Visibility="{Binding misc.AccessDeniedMess}">
+        <Grid Visibility="{Binding Misc.AccessDeniedMess}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
@@ -30,7 +30,7 @@
             <TextBlock Grid.Row="1" HorizontalAlignment="Center" FontFamily="/P3;component/Fonts/#Open Sans" FontWeight="Bold" Foreground="#FF2DADF5" FontSize="16">Обратитесь к разработчику за комментариями</TextBlock>
         </Grid>
         <!---->
-        <DockPanel Margin="0,0,0,3" Visibility="{Binding misc.AccessDenied}">
+        <DockPanel Margin="0,0,0,3" Visibility="{Binding Misc.AccessDenied}">
         <DockPanel.Background>
             <ImageBrush ImageSource="{DynamicResource ImageFon}"/>
         </DockPanel.Background>
@@ -43,30 +43,29 @@
             <Menu  FontFamily="/P3;component/Fonts/#Open Sans Light" FontSize="14">
                 <MenuItem Header="Главная" Command="{Binding ClickCommand5}"/>
                 <MenuItem Header="Контакты" Command="{Binding ClickCommand4}"/>
-                <!--<MenuItem Header="Обеды" Command="{Binding ClickCommand6}"/>-->
                 <MenuItem Header="Статистика" Command="{Binding MenuStatistic}" />
             
             </Menu>
             <Menu Grid.Column="1" FontFamily="/P3;component/Fonts/#Open Sans Light" FontSize="14">
                 <MenuItem Header="О программе" Command="{Binding ClickCommand5}">
                     <StackPanel>
-                        <TextBlock Margin="7" FontSize="11">2017, Cindy</TextBlock>
+                        <TextBlock Margin="7" FontSize="11">2018, Cindy</TextBlock>
                         <TextBlock Margin="7" FontSize="11">Самойкин Андрей</TextBlock>
-                        <TextBlock Margin="7" FontSize="11">v 3.0.1.2</TextBlock>
+                        <TextBlock Margin="7" FontSize="11">v 3.0.2.0</TextBlock>
                     </StackPanel>
                 </MenuItem>
 
             </Menu>
         </Grid>
         <!--Работники-->
-        <Grid DockPanel.Dock="Left" Visibility="{Binding misc.Page1State}" Margin="0,1,0,1">
+        <Grid DockPanel.Dock="Left" Visibility="{Binding Misc.Page1State}" Margin="0,1,0,1">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                 <controls:EmployeesView Margin="0,1,1,1"/>
             </ScrollViewer>
         </Grid>
 
         <!--Контакты-->
-        <Grid DockPanel.Dock="Left" Visibility="{Binding misc.Page2State}" Margin="0,1,1,1">
+        <Grid DockPanel.Dock="Left" Visibility="{Binding Misc.Page2State}" Margin="0,1,1,1">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                 <controls:ContactsView Margin="0,1,1,1"/>
             </ScrollViewer>
@@ -74,7 +73,7 @@
             
         
         <!--Обеды-->
-        <Grid DockPanel.Dock="Left" Visibility="{Binding misc.Page3State}" Margin="0,1,0,1">
+        <Grid DockPanel.Dock="Left" Visibility="{Binding Misc.Page3State}" Margin="0,1,0,1">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                 <controls:DinnersView Margin="0,1,0,1"/>
             </ScrollViewer>
@@ -82,7 +81,7 @@
 
         
         <!--Статистика-->
-        <Grid DockPanel.Dock="Left" Visibility="{Binding misc.PageStatistic}" Margin="0,1,1,1">
+        <Grid DockPanel.Dock="Left" Visibility="{Binding Misc.PageStatistic}" Margin="0,1,1,1">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                 <controls:StatisticsView Margin="0,1,0,1"/>
             </ScrollViewer>

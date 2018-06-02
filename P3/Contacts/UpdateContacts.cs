@@ -1,67 +1,66 @@
-﻿using P3.Model;
-using P3.Updater;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Excel = Microsoft.Office.Interop.Excel;
-
-namespace P3.Contacts
+﻿namespace P3.Contacts
 {
-    class UpdateContacts
+    using System;
+    using System.Collections.ObjectModel;
+    using System.IO;
+    using System.Text;
+    using System.Windows.Forms;
+
+    using Model;
+    using Updater;
+    using Excel = Microsoft.Office.Interop.Excel;
+
+    /// <summary>Обновить контакты.</summary>
+    public class UpdateContacts
     {
-        //String customPath = @"\\elcom.local\files\01-Deps\ДПАСУТП\05_Контакты\Контакты заказчиков.xlsx";
-        String path = @"DBTels.sqlite";
-        String pathTemp = @"DBTelsTemp.sqlite";
-        Boolean flag = false;
+        private string path = @"DBTels.sqlite";
+        private string pathTemp = @"DBTelsTemp.sqlite";
+        private bool flag = false;
 
-        private Excel.Application ExcelApp;
-        private Excel.Workbook WorkBookExcel;
-        private Excel.Workbook WorkBookExcel2;
-        private Excel.Worksheet WorkSheetExcel;
-        private Excel.Worksheet WorkSheetExcel2;
-        private Excel.Range RangeExcel;
-        string customPathTxt = @"customTel.txt";
+        private Excel.Application excelApp;
+        private Excel.Workbook workBookExcel;
+        private Excel.Worksheet workSheetExcel;
 
-        public getData getData = new getData();
+        private GetData getData = new GetData();
+        private DBconnect dbc = new DBconnect();
 
-        DBconnect dbc = new DBconnect();
-
-        public String GetPath()
+        /// <summary>Получить путь.</summary>
+        /// <returns>Путь.</returns>
+        public string GetPath()
         {
-            String customPath = "";
-            String _localPropPath = "Settings.xml";
+            var customPath = string.Empty;
+            var localPropPath = "Settings.xml";
 
-            XMLcodeContacts xmlCode = new XMLcodeContacts(_localPropPath);
+            var xmlCode = new XMLcodeContacts(localPropPath);
             customPath = xmlCode.ReadLocalPropXml();
 
             if (!File.Exists(customPath))
             {
-                customPath = "";
+                customPath = string.Empty;
             }
+
             return customPath;
         }
 
-
-        public Boolean Update(String customPath)
+        /// <summary>Обновить.</summary>
+        /// <param name="customPath">Путь к файлу.</param>
+        /// <returns>Состояние.</returns>
+        public bool Update(string customPath)
         {
-            if (customPath != "")
+            if (customPath != string.Empty)
             {
-                flag = readData(customPath);
-                File.Copy(pathTemp, path, true);
+                this.flag = this.ReadData(customPath);
+                File.Copy(this.pathTemp, this.path, true);
             }
 
-            return flag;
+            return this.flag;
         }
 
-        public String loadCustom()
+        /// <summary>Загрузить заказчиков.</summary>
+        /// <returns>Заказчики.</returns>
+        public string LoadCustom()
         {
-            String filename = "";
+            string filename = string.Empty;
             try
             {
                 OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -70,115 +69,116 @@ namespace P3.Contacts
                 openFileDialog.Filter = "Execl files (*.xlsx)|*.xlsx";
                 openFileDialog.FilterIndex = 0;
                 openFileDialog.RestoreDirectory = true;
-                //openFileDialog.CreatePrompt = true;
-                //openFileDialog.Title = "Export Excel File To";
+
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     filename = openFileDialog.FileName;
                 }
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Ошибка." + exception);
-                return "";
+                MessageBox.Show("Ошибка." + ex);
+                return string.Empty;
             }
+
             return filename;
         }
 
-
-        public Boolean readData(String customPath)
+        /// <summary>Прочитать.</summary>
+        /// <param name="customPath">Путь к файлу.</param>
+        /// <returns>Состояние.</returns>
+        public bool ReadData(string customPath)
         {
-            String name;
-            String position;
-            String tel;
-            String workTel;
-            String email;
-            String company;
+            string name;
+            string position;
+            string tel;
+            string workTel;
+            string email;
+            string company;
 
-            getData.name.Clear();
-            getData.position.Clear();
-            getData.tel.Clear();
-            getData.workTel.Clear();
+            this.getData.Name.Clear();
+            this.getData.Position.Clear();
+            this.getData.Tel.Clear();
+            this.getData.WorkTel.Clear();
 
             try
             {
+                this.excelApp = new Excel.Application();
+                this.excelApp.Visible = false;
+                this.workBookExcel = this.excelApp.Workbooks.Open(customPath, false); // открываем книгу
+                this.workSheetExcel = (Excel.Worksheet)this.workBookExcel.Sheets[1]; // Получаем ссылку на лист 1
 
-                ExcelApp = new Excel.Application();
-                ExcelApp.Visible = false;
-                WorkBookExcel = ExcelApp.Workbooks.Open(customPath, false); //открываем книгу
-                WorkSheetExcel = (Excel.Worksheet)WorkBookExcel.Sheets[1]; //Получаем ссылку на лист 1
-
-                //excelcells = excelworksheet.get_Range("D215", Type.Missing); //Выбираем ячейку для вывода A1
-                // WorkSheetExcel.Cells[i, 1].Text.ToString() != ""
-
-                for (int i = 2; WorkSheetExcel.Cells[i, 1].Text.ToString() != ""; i++)
+                for (int i = 2; this.workSheetExcel.Cells[i, 1].Text.ToString() != string.Empty; i++)
                 {
-                    name = CleanString(WorkSheetExcel.Cells[i, 1].Text.ToString());
-                    position = CleanString(WorkSheetExcel.Cells[i, 2].Text.ToString());
-                    tel = CleanString(WorkSheetExcel.Cells[i, 3].Text.ToString());
-                    workTel = CleanString(WorkSheetExcel.Cells[i, 4].Text.ToString());
-                    email = CleanString(WorkSheetExcel.Cells[i, 5].Text.ToString());
-                    company = CleanString(WorkSheetExcel.Cells[i, 6].Text.ToString());
+                    name = this.CleanString(this.workSheetExcel.Cells[i, 1].Text.ToString());
+                    position = this.CleanString(this.workSheetExcel.Cells[i, 2].Text.ToString());
+                    tel = this.CleanString(this.workSheetExcel.Cells[i, 3].Text.ToString());
+                    workTel = this.CleanString(this.workSheetExcel.Cells[i, 4].Text.ToString());
+                    email = this.CleanString(this.workSheetExcel.Cells[i, 5].Text.ToString());
+                    company = this.CleanString(this.workSheetExcel.Cells[i, 6].Text.ToString());
 
-                    getData.name.Add(name);
-                    getData.position.Add(position);
-                    getData.tel.Add(tel);
-                    getData.workTel.Add(workTel);
-                    getData.email.Add(email);
-                    getData.company.Add(company);
+                    this.getData.Name.Add(name);
+                    this.getData.Position.Add(position);
+                    this.getData.Tel.Add(tel);
+                    this.getData.WorkTel.Add(workTel);
+                    this.getData.Email.Add(email);
+                    this.getData.Company.Add(company);
                 }
 
-
-                WorkBookExcel.Close(false, Type.Missing, Type.Missing); //закрыл не сохраняя
-                ExcelApp.Quit();
+                this.workBookExcel.Close(false, Type.Missing, Type.Missing); // закрыл не сохраняя
+                this.excelApp.Quit();
                 GC.Collect();
 
-                //Запись в БД
-                dbc.ClearTable("customer");
-                dbc.CustomerWrite(getData.name, getData.position, getData.tel, getData.workTel, getData.email, getData.company);
+                // Запись в БД
+                this.dbc.ClearTable("customer");
+                this.dbc.CustomerWrite(this.getData.Name, this.getData.Position, this.getData.Tel, this.getData.WorkTel, this.getData.Email, this.getData.Company);
 
                 return true;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Ошибка." + exception);
+                MessageBox.Show("Ошибка." + ex);
                 return false;
-            }
-
-
+            }            
         }
 
-        public Boolean saveData2(String contactName, Customer contact)
+        /// <summary>Сохранить.</summary>
+        /// <param name="contactName">Имя контакта.</param>
+        /// <param name="contact">Контакт.</param>
+        /// <returns>Состояние.</returns>
+        public bool SaveData2(string contactName, Customer contact)
         {
-            String customPath = GetPath();
-            String name;
-            Boolean flag = false;
+            string customPath = this.GetPath();
+            string name;
+            bool flag = false;
             try
             {
-                if (customPath != "")
+                if (customPath != string.Empty)
                 {
-                    ExcelApp = new Excel.Application();
-                    ExcelApp.Visible = false;
-                    WorkBookExcel = ExcelApp.Workbooks.Open(customPath);
-                    WorkSheetExcel = (Excel.Worksheet)WorkBookExcel.Sheets[1];
-                    ExcelApp.DisplayAlerts = false;
+                    this.excelApp = new Excel.Application();
+                    this.excelApp.Visible = false;
+                    this.workBookExcel = this.excelApp.Workbooks.Open(customPath);
+                    this.workSheetExcel = (Excel.Worksheet)this.workBookExcel.Sheets[1];
+                    this.excelApp.DisplayAlerts = false;
                     int i = 3;
-                    for (; WorkSheetExcel.Cells[i, 1].Text.ToString() != ""; i++)
+                    for (; this.workSheetExcel.Cells[i, 1].Text.ToString() != string.Empty; i++)
                     {
-                        name = CleanString(WorkSheetExcel.Cells[i, 1].Text.ToString());
+                        name = this.CleanString(this.workSheetExcel.Cells[i, 1].Text.ToString());
                         if (name == contactName)
+                        {
                             break;
+                        }
                     }
 
-                    WorkSheetExcel.Cells[i, 1] = contact.FullName;
-                    WorkSheetExcel.Cells[i, 2] = contact.Position;
-                    WorkSheetExcel.Cells[i, 3] = contact.PhoneMobile;
-                    WorkSheetExcel.Cells[i, 4] = contact.PhoneWork;
-                    WorkSheetExcel.Cells[i, 5] = contact.Email;
-                    WorkSheetExcel.Cells[i, 6] = contact.Company;
+                    this.workSheetExcel.Cells[i, 1] = contact.FullName;
+                    this.workSheetExcel.Cells[i, 2] = contact.Position;
+                    this.workSheetExcel.Cells[i, 3] = contact.PhoneMobile;
+                    this.workSheetExcel.Cells[i, 4] = contact.PhoneWork;
+                    this.workSheetExcel.Cells[i, 5] = contact.Email;
+                    this.workSheetExcel.Cells[i, 6] = contact.Company;
 
-                    WorkSheetExcel.SaveAs(customPath);
-                    ExcelApp.Quit();
+                    this.workSheetExcel.SaveAs(customPath);
+                    this.excelApp.Quit();
                     GC.Collect();
 
                     flag = true;
@@ -186,94 +186,68 @@ namespace P3.Contacts
 
                 return flag;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Ошибка. Невозможно записать данные, возможно файл открыт другим пользователем." + exception);
+                MessageBox.Show("Ошибка. Невозможно записать данные, возможно файл открыт другим пользователем." + ex);
                 return flag;
             }
-
         }
 
-        //очищение от спецсимволов
-        static public string CleanString(string s)
+        /// <summary>Сохранить данные.</summary>
+        /// <param name="custLst">Коллекция контактов.</param>
+        public void SaveData(ObservableCollection<Customer> custLst)
         {
-            if (s != null && s.Length > 0)
-            {
-                StringBuilder sb = new StringBuilder(s.Length);
-                foreach (char c in s)
-                {
-                    if (Char.IsControl(c) == true)
-                        continue;
-                    sb.Append(c);
-                }
-                s = sb.ToString();
-            }
-            return s;
-        }
-
-
-        public void saveData(ObservableCollection<Customer> custLst)
-        {
-            Excel.Application ExcelApp;
-            Excel.Workbook WorkBookExcel;
-            Excel.Worksheet WorkSheetExcel;
-            Excel.Range RangeExcel;
-            String fileName = "";
+            var fileName = string.Empty;
 
             try
             {
-
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-
+                var saveFileDialog = new SaveFileDialog();
                 saveFileDialog.Filter = "Execl files (*.xlsx)|*.xlsx";
-
                 saveFileDialog.FilterIndex = 0;
-
                 saveFileDialog.RestoreDirectory = true;
-
                 saveFileDialog.CreatePrompt = true;
-
                 saveFileDialog.Title = "Export Excel File To";
 
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     fileName = saveFileDialog.FileName;
-
                 }
-                else goto link1;
-                //if (fileName.Length > 1)
-                //{
-                //    ExcelApp = new Excel.Application();
-                //    ExcelApp.Application.Workbooks.Add(Type.Missing);
-
-
-                //    ExcelApp.ActiveWorkbook.SaveAs(fileName);
-                //    ExcelApp.ActiveWorkbook.Saved = true;
-                //    ExcelApp.Quit();
-                //}
-                ExcelExport exEx = new ExcelExport(fileName);
-                exEx.excelWrite(custLst);
-
+                else
+                {
+                    goto link1;
+                }
+                
+                var excelEx = new ExcelExport(fileName);
+                excelEx.ExcelWrite(custLst);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Файл не создан");
-
             }
-        link1: ;
 
+        link1: ;
         }
 
-        
-    }
+        // очищение от спецсимволов
+        private string CleanString(string s)
+        {
+            if (s != null && s.Length > 0)
+            {
+                var sb = new StringBuilder(s.Length);
+                foreach (char c in s)
+                {
+                    if (char.IsControl(c) == true)
+                    {
+                        continue;
+                    }
 
-    public class getData
-    {
-        public List<string> name = new List<string>();
-        public List<string> position = new List<string>();
-        public List<string> tel = new List<string>();
-        public List<string> workTel = new List<string>();
-        public List<string> email = new List<string>();
-        public List<string> company = new List<string>();
+                    sb.Append(c);
+                }
+
+                s = sb.ToString();
+            }
+
+            return s;
+        }
     }
 }

@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace P3.Utils
+﻿namespace P3.Utils
 {
-    class LogFile
-    {
-        String path = @"log.txt";
+    using System.IO;
 
-        public void WriteLog(String str)
+    /// <summary>Логгер.</summary>
+    public class LogFile
+    {
+        private string path = @"log.txt";
+
+        /// <summary>Записать в лог.</summary>
+        /// <param name="str">Строка.</param>
+        public void WriteLog(string str)
         {
-            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.Default))
+            using (var sw = new StreamWriter(this.path, true, System.Text.Encoding.Default))
             {
                 sw.WriteLine(str);
             }
-
         }
     }
 }

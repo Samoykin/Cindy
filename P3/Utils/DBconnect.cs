@@ -1,216 +1,232 @@
-﻿using P3.Model;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data;
-using System.Data.Common;
-using System.Data.SQLite;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-
-namespace P3
+﻿namespace P3
 {
-    class DBconnect
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Data;
+    using System.Data.Common;
+    using System.Data.SQLite;
+    using System.IO;
+    using System.Linq;
+
+    using Model;
+
+    /// <summary>Подключение к БД.</summary>
+    public class DBconnect
     {
-        public String DataBaseName = "DBTels.sqlite";
-        public String DataBase2Name = "DBTelsTemp.sqlite";
-        //String DataBaseName2 = @"\\elcom.local\files\01-Deps\ДПАСУТП\01_Архив\!Common_ОРДС\Phonebook\DBTels.sqlite";
-        String pass = "Xt,ehfirf3";
-        //String pass = "";
+        private string dataBaseName = "DBTels.sqlite";
+        private string dataBase2Name = "DBTelsTemp.sqlite";
+        private string pass = "Xt,ehfirf3";
 
-        public ObservableCollection<Employee> employeeLst { get; set; }
-        public ObservableCollection<Customer> customerLst { get; set; }
+        private List<string> idVal = new List<string>();
+        private List<string> namesVal = new List<string>();
+        private List<string> telsVal = new List<string>();
+        private List<string> tels2Val = new List<string>();
+        private List<string> tels3Val = new List<string>();
+        private List<string> emailVal = new List<string>();
+        private List<string> divVal = new List<string>();
+        private List<string> posVal = new List<string>();
+        private List<string> statusVal = new List<string>();
+        private List<DateTime> birthDayVal = new List<DateTime>();
 
-        public ObservableCollection<DinnerList> dinnerList { get; set; }
+        private List<string> vacationVal = new List<string>();
+        private List<string> sickVal = new List<string>();
+        private List<string> btripVal = new List<string>();
+        private List<string> otherVal = new List<string>();
 
-        //m_dbConnection.SetPassword("password");
-        //m_dbConnection.ChangePassword("aaa");
-
-        List<String> tIDVal = new List<string>();
-        List<String> tNamesVal = new List<string>();
-        List<String> tTelsVal = new List<string>();
-        List<String> tTels2Val = new List<string>();
-        List<String> tTels3Val = new List<string>();
-        List<String> tEmailVal = new List<string>();
-        List<String> tDivVal = new List<string>();
-        List<String> tPosVal = new List<string>();
-        List<String> tStatusVal = new List<string>();
-        List<DateTime> tBirthDayVal = new List<DateTime>();
-
-        public List<String> tID
+        /// <summary>ID.</summary>
+        public List<string> ID
         {
-            get { return tIDVal; }
-            set { tIDVal = value; }
+            get { return this.idVal; }
+            set { this.idVal = value; }
         }
 
-        public List<String> tNames
+        /// <summary>Имя.</summary>
+        public List<string> Names
         {
-            get { return tNamesVal; }
-            set { tNamesVal = value; }
+            get { return this.namesVal; }
+            set { this.namesVal = value; }
         }
 
-        public List<String> tTels
+        /// <summary>Телефон 1.</summary>
+        public List<string> Tels
         {
-            get { return tTelsVal; }
-            set { tTelsVal = value; }
+            get { return this.telsVal; }
+            set { this.telsVal = value; }
         }
 
-        public List<String> tTels2
+        /// <summary>Телефон 2.</summary>
+        public List<string> Tels2
         {
-            get { return tTels2Val; }
-            set { tTels2Val = value; }
+            get { return this.tels2Val; }
+            set { this.tels2Val = value; }
         }
 
-        public List<String> tTels3
+        /// <summary>Телефон 3.</summary>
+        public List<string> Tels3
         {
-            get { return tTels3Val; }
-            set { tTels3Val = value; }
+            get { return this.tels3Val; }
+            set { this.tels3Val = value; }
         }
 
-        public List<String> tEmail
+        /// <summary>Email.</summary>
+        public List<string> Email
         {
-            get { return tEmailVal; }
-            set { tEmailVal = value; }
+            get { return this.emailVal; }
+            set { this.emailVal = value; }
         }
 
-        public List<String> tDiv
+        /// <summary>Подразделение.</summary>
+        public List<string> Div
         {
-            get { return tDivVal; }
-            set { tDivVal = value; }
+            get { return this.divVal; }
+            set { this.divVal = value; }
         }
 
-        public List<String> tPos
+        /// <summary>Должность.</summary>
+        public List<string> Pos
         {
-            get { return tPosVal; }
-            set { tPosVal = value; }
+            get { return this.posVal; }
+            set { this.posVal = value; }
         }
 
-        public List<String> tStatus
+        /// <summary>Статус.</summary>
+        public List<string> Status
         {
-            get { return tStatusVal; }
-            set { tStatusVal = value; }
+            get { return this.statusVal; }
+            set { this.statusVal = value; }
         }
 
-        public List<DateTime> tBirthDay
+        /// <summary>День рождения.</summary>
+        public List<DateTime> BirthDay
         {
-            get { return tBirthDayVal; }
-            set { tBirthDayVal = value; }
+            get { return this.birthDayVal; }
+            set { this.birthDayVal = value; }
         }
 
-
-
-        List<String> tVacationVal = new List<string>();
-        List<String> tSickVal = new List<string>();
-        List<String> tBTripVal = new List<string>();
-        List<String> tOtherVal = new List<string>();
-
-        public List<String> tVacation
+        /// <summary>Отпуск.</summary>
+        public List<string> Vacation
         {
-            get { return tVacationVal; }
-            set { tVacationVal = value; }
+            get { return this.vacationVal; }
+            set { this.vacationVal = value; }
         }
 
-        public List<String> tSick
+        /// <summary>Болезнь.</summary>
+        public List<string> Sick
         {
-            get { return tSickVal; }
-            set { tSickVal = value; }
+            get { return this.sickVal; }
+            set { this.sickVal = value; }
         }
 
-        public List<String> tBTrip
+        /// <summary>Командировка.</summary>
+        public List<string> BTrip
         {
-            get { return tBTripVal; }
-            set { tBTripVal = value; }
+            get { return this.btripVal; }
+            set { this.btripVal = value; }
         }
 
-        public List<String> tOther
+        /// <summary>Другое.</summary>
+        public List<string> Other
         {
-            get { return tOtherVal; }
-            set { tOtherVal = value; }
+            get { return this.otherVal; }
+            set { this.otherVal = value; }
         }
 
-        //public List<String> tVacation { get; set; }
-        //public List<String> tSick { get; set; }
-        //public List<String> tBTrip { get; set; }
+        private ObservableCollection<Employee> EmployeeLst { get; set; }
 
+        private ObservableCollection<Customer> CustomerLst { get; set; }
+
+        /// <summary>Создать БД.</summary>
         public void CreateBase()
         {
-            if (!File.Exists(DataBaseName))
+            if (!File.Exists(this.dataBaseName))
             {
-                SQLiteConnection.CreateFile(DataBaseName);
-                SQLiteConnection m_dbConnection = new SQLiteConnection("Data Source=DBTels.sqlite;Version=3;");
-                m_dbConnection.SetPassword(pass);
-
+                SQLiteConnection.CreateFile(this.dataBaseName);
+                SQLiteConnection connection = new SQLiteConnection("Data Source=DBTels.sqlite;Version=3;");
+                connection.SetPassword(this.pass);
             }
-
         }
 
+        /// <summary>Создать таблицу сотрудников.</summary>
         public void EmployeeCreateTable()
         {
-            String Command = "CREATE TABLE employee (id INTEGER PRIMARY KEY UNIQUE, tID VARCHAR, tNames VARCHAR, tTels VARCHAR, tTels2 VARCHAR, tTels3 VARCHAR, tEmail VARCHAR, tDiv VARCHAR, tPos VARCHAR, tStatus VARCHAR, tActStatus VARCHAR, tBirthDay VARCHAR, tStartDay VARCHAR);";
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", DataBaseName, pass));
+            string command = "CREATE TABLE employee (id INTEGER PRIMARY KEY UNIQUE, tID VARCHAR, tNames VARCHAR, tTels VARCHAR, tTels2 VARCHAR, tTels3 VARCHAR, tEmail VARCHAR, tDiv VARCHAR, tPos VARCHAR, tStatus VARCHAR, tActStatus VARCHAR, tBirthDay VARCHAR, tStartDay VARCHAR);";
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", this.dataBaseName, this.pass));
 
-            SQLiteCommand sqlitecommand = new SQLiteCommand(Command, connection);
+            SQLiteCommand sqlitecommand = new SQLiteCommand(command, connection);
             connection.Open();
             sqlitecommand.ExecuteNonQuery();
             connection.Close();
         }
 
+        /// <summary>Создать таблицу заказчиков.</summary>
         public void CustomerCreateTable()
         {
-            String Command = "CREATE TABLE customer (id INTEGER PRIMARY KEY UNIQUE, custNames VARCHAR, custPos VARCHAR, custTels VARCHAR, custTels2 VARCHAR, custEmail VARCHAR, custComp VARCHAR);";
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", DataBaseName, pass));
+            string command = "CREATE TABLE customer (id INTEGER PRIMARY KEY UNIQUE, custNames VARCHAR, custPos VARCHAR, custTels VARCHAR, custTels2 VARCHAR, custEmail VARCHAR, custComp VARCHAR);";
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", this.dataBaseName, this.pass));
 
-            SQLiteCommand sqlitecommand = new SQLiteCommand(Command, connection);
+            SQLiteCommand sqlitecommand = new SQLiteCommand(command, connection);
             connection.Open();
             sqlitecommand.ExecuteNonQuery();
             connection.Close();
         }
 
+        /// <summary>Создать таблицу информации.</summary>
         public void InfoCreateTable()
         {
-            String Command = "CREATE TABLE info (id INTEGER PRIMARY KEY UNIQUE, date VARCHAR, name VARCHAR, pcName VARCHAR, ip VARCHAR, remoteBD VARCHAR);";
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", DataBaseName, pass));
+            string command = "CREATE TABLE info (id INTEGER PRIMARY KEY UNIQUE, date VARCHAR, name VARCHAR, pcName VARCHAR, ip VARCHAR, remoteBD VARCHAR);";
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", this.dataBaseName, this.pass));
 
-            SQLiteCommand sqlitecommand = new SQLiteCommand(Command, connection);
+            SQLiteCommand sqlitecommand = new SQLiteCommand(command, connection);
             connection.Open();
             sqlitecommand.ExecuteNonQuery();
             connection.Close();
         }
-
+        
+        /// <summary>Создать таблицу статусов.</summary>
         public void StatusCreateTable()
         {
-            String Command = "CREATE TABLE status (id INTEGER PRIMARY KEY UNIQUE, statusVal VARCHAR);";
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", DataBaseName, pass));
+            string command = "CREATE TABLE status (id INTEGER PRIMARY KEY UNIQUE, statusVal VARCHAR);";
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", this.dataBaseName, this.pass));
 
-            SQLiteCommand sqlitecommand = new SQLiteCommand(Command, connection);
+            SQLiteCommand sqlitecommand = new SQLiteCommand(command, connection);
             connection.Open();
             sqlitecommand.ExecuteNonQuery();
             connection.Close();
         }
 
-        public void EmployeeWrite(List<String> tID, List<String> tNames, List<String> tTels, List<String> tTels2, List<String> tTels3, List<String> tEmail, List<String> tDiv, List<String> tPos)
+        /// <summary>Записать в таблицу сотрудника.</summary>
+        /// <param name="id">ID.</param>
+        /// <param name="names">Имя.</param>
+        /// <param name="tels">Телефон.</param>
+        /// <param name="tels2">Телефон2.</param>
+        /// <param name="tels3">Телефон3.</param>
+        /// <param name="email">Email.</param>
+        /// <param name="div">Подразделение.</param>
+        /// <param name="pos">Должность.</param>
+        public void EmployeeWrite(List<string> id, List<string> names, List<string> tels, List<string> tels2, List<string> tels3, List<string> email, List<string> div, List<string> pos)
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
 
             connection.Open();
             SQLiteCommand command;
 
-            for (int i = 0; i < tNames.Count(); i++)
+            for (int i = 0; i < this.Names.Count(); i++)
             {
-                command = new SQLiteCommand("INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos') VALUES ('" + tID[i] + "', '" + tNames[i] + "', '" + tTels[i] + "', '" + tTels2[i] + "', '" + tTels3[i] + "', '" + tEmail[i] + "', '" + tDiv[i] + "', '" + tPos[i] + "');", connection);
+                command = new SQLiteCommand("INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos') VALUES ('" + id[i] + "', '" + names[i] + "', '" + tels[i] + "', '" + tels2[i] + "', '" + tels3[i] + "', '" + email[i] + "', '" + div[i] + "', '" + pos[i] + "');", connection);
                 command.ExecuteNonQuery();
             }
 
             connection.Close();
 
-            File.Copy(DataBase2Name, DataBaseName, true);
+            File.Copy(this.dataBase2Name, this.dataBaseName, true);
         }
-
+        
+        /// <summary>Записать в таблицу сотрудника2.</summary>
+        /// <param name="employeeLst">Коллекция сотрудников.</param>
         public void EmployeeWrite2(List<Employee> employeeLst) 
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
 
             connection.Open();
             SQLiteCommand command;
@@ -223,12 +239,19 @@ namespace P3
 
             connection.Close();
 
-            File.Copy(DataBase2Name, DataBaseName, true);
+            File.Copy(this.dataBase2Name, this.dataBaseName, true);
         }
 
-        public void CustomerWrite(List<String> custNames, List<String> custPos, List<String> custTels, List<String> custTels2, List<String> custEmail, List<String> custComp)
+        /// <summary>Записать в таблицу заказчика.</summary>
+        /// <param name="custNames">Имя.</param>
+        /// <param name="custPos">Должность.</param>
+        /// <param name="custTels">Телефон.</param>
+        /// <param name="custTels2">Телефон2.</param>
+        /// <param name="custEmail">Email.</param>
+        /// <param name="custComp">Компания.</param>
+        public void CustomerWrite(List<string> custNames, List<string> custPos, List<string> custTels, List<string> custTels2, List<string> custEmail, List<string> custComp)
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
             connection.Open();
             SQLiteCommand command;
 
@@ -241,57 +264,58 @@ namespace P3
             connection.Close();
         }
 
+        /// <summary>Обновить данные о заказчике.</summary>
+        /// <param name="contact">Заказчик.</param>
         public void CustomerUpdatePerson(Customer contact)
         {
-
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
             connection.Open();
-            SQLiteCommand command;
-
-            //command = new SQLiteCommand("INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('" + contact[0] + "', '" + contact[1] + "', '" + contact[2] + "', '" + contact[3] + "', '" + contact[4] + "', '" + contact[5] + "');", connection);
-            command = new SQLiteCommand("UPDATE customer SET custNames = '" + contact.FullName + "', custPos = '" + contact.Position + "', custTels = '" + contact.PhoneMobile + "', custTels2 = '" + contact.PhoneWork + "', custEmail = '" + contact.Email + "', custComp = '" + contact.Company + "' WHERE custNames Like '" + contact.FullName + "';", connection);
+            SQLiteCommand command = new SQLiteCommand("UPDATE customer SET custNames = '" + contact.FullName + "', custPos = '" + contact.Position + "', custTels = '" + contact.PhoneMobile + "', custTels2 = '" + contact.PhoneWork + "', custEmail = '" + contact.Email + "', custComp = '" + contact.Company + "' WHERE custNames Like '" + contact.FullName + "';", connection);
                 
             command.ExecuteNonQuery();            
 
             connection.Close();
 
-            File.Copy(DataBase2Name, DataBaseName, true);
+            File.Copy(this.dataBase2Name, this.dataBaseName, true);
         }
-
+        
+        /// <summary>Записать контакты в таблицу заказчика.</summary>
+        /// <param name="contact">Заказчик.</param>
         public void CustomerWritePerson(Customer contact)
         {
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
+            connection.Open();
+            SQLiteCommand command = new SQLiteCommand("INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('" + contact.FullName + "', '" + contact.Position + "', '" + contact.PhoneMobile + "', '" + contact.PhoneWork + "', '" + contact.Email + "', '" + contact.Company + "');", connection);
+            
+            command.ExecuteNonQuery();
+            connection.Close();
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
+            File.Copy(this.dataBase2Name, this.dataBaseName, true);
+        }
+
+        /// <summary>Записать в таблицу информации.</summary>
+        /// <param name="date">Дата.</param>
+        /// <param name="name">Имя.</param>
+        /// <param name="computerName">Имя компьютера.</param>
+        /// <param name="ip">IP.</param>
+        /// <param name="remoteBD">Удаленная БД.</param>
+        public void InfoWrite(DateTime date, string name, string computerName, string ip, string remoteBD)
+        {
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
             connection.Open();
             SQLiteCommand command;
 
-            command = new SQLiteCommand("INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('" + contact.FullName + "', '" + contact.Position + "', '" + contact.PhoneMobile + "', '" + contact.PhoneWork + "', '" + contact.Email + "', '" + contact.Company + "');", connection);
-            //command = new SQLiteCommand("UPDATE customer SET custNames = '" + contact[0] + "', custPos = '" + contact[1] + "', custTels = '" + contact[2] + "', custTels2 = '" + contact[3] + "', custEmail = '" + contact[4] + "', custComp = '" + contact[5] + "' WHERE custNames Like '" + contact[0] + "';", connection);
-
-            command.ExecuteNonQuery();
-
-            connection.Close();
-
-            File.Copy(DataBase2Name, DataBaseName, true);
-        }
-
-
-        public void InfoWrite(DateTime date, String name, String pcName, String ip, String remoteBD)
-        {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
-            connection.Open();
-            SQLiteCommand command;
-
-            command = new SQLiteCommand("INSERT INTO 'info' ('date', 'name', 'pcName', 'ip', 'remoteBD') VALUES ('" + date + "', '" + name + "', '" + pcName + "', '" + ip + "', '" + remoteBD + "');", connection);
+            command = new SQLiteCommand("INSERT INTO 'info' ('date', 'name', 'pcName', 'ip', 'remoteBD') VALUES ('" + date + "', '" + name + "', '" + computerName + "', '" + ip + "', '" + remoteBD + "');", connection);
             command.ExecuteNonQuery();
 
             connection.Close();
         }
-
-        public void StatusWrite(List<String> status)
+        
+        /// <summary>Записать в таблицу статусов.</summary>
+        /// <param name="status">Статусы.</param>
+        public void StatusWrite(List<string> status)
         {
-
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
             connection.Open();
             SQLiteCommand command;
 
@@ -307,15 +331,18 @@ namespace P3
             connection.Close();
         }
 
-        public void EployeeStatusWrite(List<String> status, List<String> names, List<String> act) 
+        /// <summary>Записать в таблицу сотрудников.</summary>
+        /// <param name="status">Состояния.</param>
+        /// <param name="names">Статусы.</param>
+        /// <param name="act">Действия.</param>
+        public void EployeeStatusWrite(List<string> status, List<string> names, List<string> act) 
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
             connection.Open();
             SQLiteCommand command;
 
             command = new SQLiteCommand("UPDATE employee SET tStatus = '';", connection);
             command.ExecuteNonQuery();
-
 
             for (int i = 0; i < status.Count(); i++)
             {
@@ -324,19 +351,19 @@ namespace P3
             }
 
             connection.Close();
-
-            File.Copy(DataBase2Name, DataBaseName, true);
+            
+            File.Copy(this.dataBase2Name, this.dataBaseName, true);
         }
 
-        public void EployeeBirthDayWrite(List<String> birthDay, List<String> startDay, List<String> birthDayID)
+        /// <summary>Записать в таблицу дни рождения сотрудников.</summary>
+        /// <param name="birthDay">Дни рождения.</param>
+        /// <param name="startDay">Даты устройства на работу.</param>
+        /// <param name="birthDayID">Дни рождения ID.</param>
+        public void EployeeBirthDayWrite(List<string> birthDay, List<string> startDay, List<string> birthDayID)
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
             connection.Open();
             SQLiteCommand command;
-
-            //command = new SQLiteCommand("UPDATE employee SET tBirthDay = '';", connection);
-            //command.ExecuteNonQuery();
-
 
             for (int i = 0; i < birthDayID.Count(); i++)
             {
@@ -350,49 +377,48 @@ namespace P3
             connection.Close();
         }
 
+        /// <summary>Прочитать из таблицы сотрудников.</summary>
+        /// <returns>Сотрудники.</returns>
         public ObservableCollection<Employee> EmployeeRead()
         {
             Employee empl;
-            employeeLst = new ObservableCollection<Employee> { };
+            this.EmployeeLst = new ObservableCollection<Employee> { };
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBaseName, this.pass));
 
             connection.Open();
             SQLiteCommand command = new SQLiteCommand("SELECT * FROM 'employee';", connection);
             SQLiteDataReader reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
-                var format = "dd.MM.yyyy";
-                String dtime;
-                String dtime2;
+                string dtime;
+                string dtime2;
                 DateTime dateValue;
                 
-                String tBirthDayTemp = record["tBirthDay"].ToString();
-                String tStartDayTemp = record["tStartDay"].ToString();
+                string birthDayTemp = record["tBirthDay"].ToString();
+                string startDayTemp = record["tStartDay"].ToString();
                 
-                //День рождения
-                if (tBirthDayTemp.Length > 0 && DateTime.TryParse(tBirthDayTemp,out dateValue))
+                // День рождения
+                if (birthDayTemp.Length > 0 && DateTime.TryParse(birthDayTemp, out dateValue))
                 {
-                    dtime = tBirthDayTemp;
-                    //DateTime.ParseExact(tBirthDayTemp, format, CultureInfo.CurrentCulture)
+                    dtime = birthDayTemp;
                 }
                 else
                 {
                     dtime = "21.12.1994";
                 }
 
-                //Дата прихода
-                if (tStartDayTemp.Length > 0 && DateTime.TryParse(tStartDayTemp, out dateValue))
+                // Дата прихода
+                if (startDayTemp.Length > 0 && DateTime.TryParse(startDayTemp, out dateValue))
                 {
-                    dtime2 = tStartDayTemp;
-                    //DateTime.ParseExact(tStartDayTemp, format, CultureInfo.CurrentCulture)
+                    dtime2 = startDayTemp;
                 }
                 else
                 {
                     dtime2 = "21.12.1994";
                 }
 
-                DateTime tdTemp = DateTime.Now;
+                DateTime dateTemp = DateTime.Now;
 
                 empl = new Employee();
 
@@ -406,93 +432,99 @@ namespace P3
                 empl.ID = record["tID"].ToString();
                 empl.Status = record["tStatus"].ToString();
                 empl.BirthDay = Convert.ToDateTime(dtime);
-                //-------------------------------
-                //Возраст
-                empl.Age = tdTemp.Year - empl.BirthDay.Year;
-                if (tdTemp.Month < empl.BirthDay.Month )
+
+                // -------------------------------
+                // Возраст
+                empl.Age = dateTemp.Year - empl.BirthDay.Year;
+                if (dateTemp.Month < empl.BirthDay.Month)
                 {
                     empl.Age = empl.Age - 1;
                 }
-                else if (tdTemp.Month == empl.BirthDay.Month && tdTemp.Day < empl.BirthDay.Day)
+                else if (dateTemp.Month == empl.BirthDay.Month && dateTemp.Day < empl.BirthDay.Day)
                 {
                     empl.Age = empl.Age - 1;
                 }                
 
-                //-------------------------------
-                //День рождения
-                String monthTemp = empl.BirthDay.Month.ToString();
-                String dayTemp = empl.BirthDay.Day.ToString(); 
+                // -------------------------------
+                // День рождения
+                string monthTemp = empl.BirthDay.Month.ToString();
+                string dayTemp = empl.BirthDay.Day.ToString();
                 if (empl.BirthDay.Month < 10)
+                {
                     monthTemp = "0" + empl.BirthDay.Month.ToString();
-                if (empl.BirthDay.Day<10)
+                }
+
+                if (empl.BirthDay.Day < 10)
+                {
                     dayTemp = "0" + empl.BirthDay.Day.ToString();
+                }
+
                 empl.BirthDayShort = monthTemp + "." + dayTemp + "." + empl.BirthDay.Year.ToString();
 
-                //-------------------------------
-                //Стаж
+                // -------------------------------
+                // Стаж
                 empl.StartDay = Convert.ToDateTime(dtime2);
 
-                Int32 timeRecordTmp = tdTemp.Year - empl.StartDay.Year;
+                int timeRecordTmp = dateTemp.Year - empl.StartDay.Year;
 
                 if (timeRecordTmp == 0)
                 {
                     empl.TimeRecord = "менее года";
                 }
-                else if (tdTemp.Month < empl.StartDay.Month)
+                else if (dateTemp.Month < empl.StartDay.Month)
                 {
                     empl.TimeRecord = (timeRecordTmp - 1).ToString();
                 }
-                else if (tdTemp.Month == empl.StartDay.Month && tdTemp.Day < empl.StartDay.Day)
+                else if (dateTemp.Month == empl.StartDay.Month && dateTemp.Day < empl.StartDay.Day)
                 {
                     empl.TimeRecord = (timeRecordTmp - 1).ToString();
                 }
                 else
+                {
                     empl.TimeRecord = timeRecordTmp.ToString();
+                }
 
                 if (empl.TimeRecord == "0")
                 {
                     empl.TimeRecord = "менее года";
                 }
 
-                //-------------------------------
-                //Дата начала работы 
+                // -------------------------------
+                // Дата начала работы 
                 monthTemp = empl.StartDay.Month.ToString();
                 dayTemp = empl.StartDay.Day.ToString();
                 if (empl.StartDay.Month < 10)
+                {
                     monthTemp = "0" + empl.StartDay.Month.ToString();
+                }
+
                 if (empl.StartDay.Day < 10)
+                {
                     dayTemp = "0" + empl.StartDay.Day.ToString();
+                }
+
                 empl.StartDayShort = monthTemp + "." + dayTemp + "." + empl.StartDay.Year.ToString();
-                //-------------------------------
-                //фото
+                
+                // -------------------------------
+                // фото
                 empl.Image = AppDomain.CurrentDomain.BaseDirectory + @"\img\" + empl.ID + ".jpg";
 
-                employeeLst.Add(empl);
-
+                this.EmployeeLst.Add(empl);
             }
+
             connection.Close();
 
-            return employeeLst;
+            return this.EmployeeLst;
         }
 
+        /// <summary>Прочитать из таблицы заказчиков.</summary>
+        /// <returns>Заказчики.</returns>
         public ObservableCollection<Customer> CustomerRead()
         {
-
             Customer cust;
-            customerLst = new ObservableCollection<Customer> { };
-
-            //Телефоны заказчиков
-            //dt.Columns.Add("ФИО");
-            //dt.Columns.Add("Должность");
-            //dt.Columns.Add("Мобильный");
-            //dt.Columns.Add("Рабочий");
-            //dt.Columns.Add("e-mail");
-            //dt.Columns.Add("Организация");
-
-
-            //dt.Rows.Clear();
-
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, pass));
+            this.CustomerLst = new ObservableCollection<Customer> { };
+            
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBaseName, this.pass));
             connection.Open();
             SQLiteCommand command = new SQLiteCommand("SELECT * FROM 'customer';", connection);
             SQLiteDataReader reader = command.ExecuteReader();
@@ -507,46 +539,51 @@ namespace P3
                 cust.Position = record["custPos"].ToString();
                 cust.Company = record["custComp"].ToString();
 
-                customerLst.Add(cust);
-                //dt.Rows.Add(record["custNames"].ToString(), record["custPos"].ToString(), record["custTels"].ToString(), record["custTels2"].ToString(), record["custEmail"].ToString(), record["custComp"].ToString());
-
+                this.CustomerLst.Add(cust);                
             }
+
             connection.Close();
 
-            return customerLst;
+            return this.CustomerLst;
         }
 
-        public void ClearTable(String table)
+        /// <summary>Очистить таблицу.</summary>
+        /// <param name="table">Таблица.</param>
+        public void ClearTable(string table)
         {
-            String Command = "DELETE FROM '" + table + "';";
+            string command = "DELETE FROM '" + table + "';";
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", DataBase2Name, pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", this.dataBase2Name, this.pass));
 
-            SQLiteCommand sqlitecommand = new SQLiteCommand(Command, connection);
+            SQLiteCommand sqlitecommand = new SQLiteCommand(command, connection);
             connection.Open();
             sqlitecommand.ExecuteNonQuery();
             connection.Close();
         }
 
+        /// <summary>Прочитать ID сотрудников.</summary>
         public void EmployeeReadID()
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBaseName, this.pass));
 
             connection.Open();
             SQLiteCommand command = new SQLiteCommand("SELECT tID FROM 'employee';", connection);
             SQLiteDataReader reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
-                tIDVal.Add(record["tID"].ToString());
+                this.idVal.Add(record["tID"].ToString());
             }
+
             connection.Close();
         }
 
-        public List<String> EmployeeReadStatus()
+        /// <summary>Прочитать статусы сотрудников.</summary>
+        /// <returns>Статусы.</returns>
+        public List<string> EmployeeReadStatus()
         {
-            List<String> status = new List<string>();
+            List<string> status = new List<string>();
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBaseName, this.pass));
 
             connection.Open();
             SQLiteCommand command = new SQLiteCommand("SELECT statusVal FROM 'status';", connection);
@@ -555,26 +592,25 @@ namespace P3
             {
                 status.Add(record["statusVal"].ToString());
             }
+
             connection.Close();
 
             return status;
         }
 
-
-
+        /// <summary>Прочитать дни рождения сотрудников.</summary>
+        /// <returns>Дни рождения.</returns>
         public DataTable EmployeeReadBirthDays()
         {
-            String prepDate;
-            String prepDay;
-            String prepMonth;
+            string prepDay;
+            string prepMonth;
             DataTable dt = new DataTable();
             dt.Columns.Add("ФИО");
             dt.Columns.Add("Дата");
-            //dt.Columns.Add("Дата", typeof(DateTime));
 
             dt.Rows.Clear();
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBaseName, this.pass));
 
             connection.Open();
             SQLiteCommand command = new SQLiteCommand("SELECT tNames, tBirthDay FROM 'employee';", connection);
@@ -588,156 +624,102 @@ namespace P3
                     prepDay = record["tBirthDay"].ToString().Remove(2);
                     prepMonth = record["tBirthDay"].ToString().Substring(3, 2);
 
-
                     if (Convert.ToInt32(prepMonth) == dtime2.Month)
                     {
-
                         if (Convert.ToInt32(prepDay) > dtime2.Day - 3 && Convert.ToInt32(prepDay) < dtime2.Day + 3)
+                        {
                             dt.Rows.Add(record["tNames"].ToString(), prepDay + "." + prepMonth);
+                        }
                     }
                 }
-
             }
+
             connection.Close();
 
             return dt;
         }
 
-
-
-
+        /// <summary>Скопировать таблицу сотрудников.</summary>
         public void EmployeeCopyTables()
         {
-            List<String> tName = new List<string>();
-            List<String> tTel = new List<string>();
-            List<String> tTel2 = new List<string>();
-            List<String> tTel3 = new List<string>();
-            List<String> tEm = new List<string>();
-            List<String> tDi = new List<string>();
-            List<String> tPo = new List<string>();
-            List<String> tID = new List<string>();
+            List<string> tempName = new List<string>();
+            List<string> tempTel = new List<string>();
+            List<string> tempTel2 = new List<string>();
+            List<string> tempTel3 = new List<string>();
+            List<string> tempEm = new List<string>();
+            List<string> tempDi = new List<string>();
+            List<string> tempPo = new List<string>();
+            List<string> tempID = new List<string>();
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", "DBTels2.sqlite", pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", "DBTels2.sqlite", this.pass));
             connection.Open();
             SQLiteCommand command = new SQLiteCommand("SELECT * FROM 'employee';", connection);
             SQLiteDataReader reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
-                tName.Add(record["tNames"].ToString());
-                tTel.Add(record["tTels"].ToString());
-                tTel2.Add(record["tTels2"].ToString());
-                tTel3.Add(record["tTels3"].ToString());
-                tEm.Add(record["tEmail"].ToString());
-                tDi.Add(record["tDiv"].ToString());
-                tPo.Add(record["tPos"].ToString());
-                tID.Add(record["tID"].ToString());
+                tempName.Add(record["tNames"].ToString());
+                tempTel.Add(record["tTels"].ToString());
+                tempTel2.Add(record["tTels2"].ToString());
+                tempTel3.Add(record["tTels3"].ToString());
+                tempEm.Add(record["tEmail"].ToString());
+                tempDi.Add(record["tDiv"].ToString());
+                tempPo.Add(record["tPos"].ToString());
+                tempID.Add(record["tID"].ToString());
             }
+
             connection.Close();
 
-
-            SQLiteConnection connection2 = new SQLiteConnection(string.Format("Data Source={0};Password={1};", "DBTels.sqlite", pass));
+            SQLiteConnection connection2 = new SQLiteConnection(string.Format("Data Source={0};Password={1};", "DBTels.sqlite", this.pass));
             connection2.Open();
             SQLiteCommand command2;
 
-            for (int i = 0; i < tName.Count(); i++)
+            for (int i = 0; i < tempName.Count(); i++)
             {
-                command2 = new SQLiteCommand("INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos') VALUES ('" + tID[i] + "', '" + tName[i] + "', '" + tTel[i] + "', '" + tTel2[i] + "', '" + tTel3[i] + "', '" + tEm[i] + "', '" + tDi[i] + "', '" + tPo[i] + "');", connection2);
+                command2 = new SQLiteCommand("INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos') VALUES ('" + tempID[i] + "', '" + tempName[i] + "', '" + tempTel[i] + "', '" + tempTel2[i] + "', '" + tempTel3[i] + "', '" + tempEm[i] + "', '" + tempDi[i] + "', '" + tempPo[i] + "');", connection2);
                 command2.ExecuteNonQuery();
             }
 
             connection2.Close();
         }
 
+        /// <summary>Посчитать кол-во статусов.</summary>
         public void EmployeeReadStatusCount()
         {
-            List<String> status = new List<string>();
+            List<string> status = new List<string>();
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, pass));
+            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBaseName, this.pass));
 
             connection.Open();
-            //command = new SQLiteCommand("UPDATE employee SET tStatus = '" + status[i] + "' WHERE tNames Like '" + names[i] + "%';", connection);
 
             SQLiteCommand command = new SQLiteCommand("SELECT tID FROM employee WHERE tStatus LIKE 'в отпуске%' AND tActStatus = '1';", connection);
             SQLiteDataReader reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
-                this.tVacation.Add(record["tID"].ToString());
+                this.Vacation.Add(record["tID"].ToString());
             }
 
             SQLiteCommand command2 = new SQLiteCommand("SELECT tID FROM 'employee' WHERE tStatus LIKE 'в командировке%' AND tActStatus = '1';", connection);
             SQLiteDataReader reader2 = command2.ExecuteReader();
             foreach (DbDataRecord record in reader2)
             {
-                this.tBTrip.Add(record["tID"].ToString());
+                this.BTrip.Add(record["tID"].ToString());
             }
 
             SQLiteCommand command3 = new SQLiteCommand("SELECT tID FROM 'employee' WHERE tStatus LIKE 'на больничном%' AND tActStatus = '1';", connection);
             SQLiteDataReader reader3 = command3.ExecuteReader();
             foreach (DbDataRecord record in reader3)
             {
-                this.tSick.Add(record["tID"].ToString());
+                this.Sick.Add(record["tID"].ToString());
             }
 
             SQLiteCommand command4 = new SQLiteCommand("SELECT tID FROM 'employee' WHERE (tStatus LIKE 'на обуч%' OR tStatus LIKE 'не будет%') AND tActStatus = '1';", connection);
             SQLiteDataReader reader4 = command4.ExecuteReader();
             foreach (DbDataRecord record in reader4)
             {
-                this.tOther.Add(record["tID"].ToString());
+                this.Other.Add(record["tID"].ToString());
             }
 
             connection.Close();
-        }
-
-
-
-
-        public ObservableCollection<DinnerList> DinnerListRead()
-        {
-            DinnerList dinner;
-            dinnerList = new ObservableCollection<DinnerList> { };
-
-            DateTime dt = new DateTime();
-            String tableName = "dinner" + DateTime.Today.ToString("yy") + "_" + DateTime.Today.ToString("MM");
-
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, pass));
-
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand("SELECT * FROM '" + tableName + "' as t1 INNER JOIN 'employee' as t2 ON t1.idEmpl = t2.tID ;", connection);
-            SQLiteDataReader reader = command.ExecuteReader();
-            foreach (DbDataRecord record in reader)
-            {
-                dinner = new DinnerList();
-
-                dinner.ID = record["tNames"].ToString();
-                dinner.Day1 = record["day1"].ToString();
-                dinner.Day2 = record["day2"].ToString();
-                dinner.Day3 = record["day3"].ToString();
-
-                dinnerList.Add(dinner);
-
-            }
-            connection.Close();
-
-            return dinnerList;
-        }
-
-        public void DinnerPersonAdd(String id)
-        {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, pass));
-            connection.Open();
-            SQLiteCommand command;
-
-            //command = new SQLiteCommand("INSERT INTO 'dinner16_11' ('idEmpl', 'day1', 'day2', 'day3') VALUES ('" + date + "', '" + name + "', '" + pcName + "', '" + ip + "', '" + remoteBD + "');", connection);
-            //command.ExecuteNonQuery();
-
-            connection.Close();
-        }
-
-
-
-
-
+        }        
     }
-
-
 }

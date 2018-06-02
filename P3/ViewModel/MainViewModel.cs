@@ -1,338 +1,161 @@
-﻿using P3.Contacts;
-using P3.DataUpd;
-using P3.Model;
-using P3.Updater;
-using P3.Utils;
-using P3.View;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Windows.Threading;
-
-namespace P3.ViewModel
+﻿namespace P3.ViewModel
 {
-    class MainViewModel 
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.IO;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
+    using System.Windows.Threading;
+
+    using Contacts;
+    using DataUpd;
+    using Model;
+    using Updater;
+    using Utils;
+
+    /// <summary>Главная ViewModel.</summary>
+    public class MainViewModel 
     {
+        private DBconnect dbc = new DBconnect();
+        private UpdateContacts updCont = new UpdateContacts();
+        private string path = @"DBTels.sqlite";
+        private string pathTemp = "DBTelsTemp.sqlite";
 
-        DBconnect dbc = new DBconnect();
-        DBDinnerConnect dbDinner = new DBDinnerConnect();
-        UpdateContacts updCont = new UpdateContacts();
-        String path = @"DBTels.sqlite";
-        String pathTemp = "DBTelsTemp.sqlite";
+        private LogFile logFile = new LogFile();
+        private LogInfo logInfo = new LogInfo();
 
-        LogFile logFile = new LogFile();
-        LogInfo logInfo = new LogInfo();
+        private System.Windows.Forms.Timer timerForUpd = new System.Windows.Forms.Timer();
+        private DispatcherTimer timer1 = new DispatcherTimer();
+        private IDData upd = new IDData();
 
-        System.Windows.Forms.Timer timerForUpd = new System.Windows.Forms.Timer();
-        DispatcherTimer t1 = new DispatcherTimer();
-        IDData upd = new IDData();
+        private string localPropPath = "LocalProp.xml";
 
-        #region Settings
-        String _localPropPath = "LocalProp.xml";
-        #endregion
+        // Статусы сотрудников
+        private List<string> vacation = new List<string>();
+        private List<string> sick = new List<string>();
+        private List<string> btrip = new List<string>();
+        private List<string> other = new List<string>();
 
-        #region Properties
-        //public People person { get; set; }
-        public Misc misc { get; set; }
+        private bool contactUpd = true;
+        private EmplStatistic emplStat;
+        private ICommand sendMail;
+        private ICommand saveData;
 
-        public ObservableCollection<New> news2 { get; set; }
-        public ObservableCollection<New> futureNews2 { get; set; } 
-
-        public ObservableCollection<Division> news { get; set; } //новости (не обращаем внимания на Division
-        public ObservableCollection<Division> futureNews { get; set; } //предстоящие события
-        public Statistic statistic { get; set; }
-        public Customer newContact { get; set; }
-        public ObservableCollection<Division> div { get; set; }
-        //public ObservableCollection<People> people { get; set; }
-
-        public ObservableCollection<Employee> employeeLst { get; set; }
-        public ObservableCollection<Employee> employeeLstT { get; set; }
-        public ObservableCollection<Employee> employeeNewLst { get; set; }
-
-        public ObservableCollection<Customer> customerLst { get; set; }
-        public ObservableCollection<Customer> customerLstT { get; set; }
-
-        public ObservableCollection<DinnerList> dinnerLst { get; set; }
-        public Employee selectedDiv { get; set; }
-
-        public ObservableCollection<Division> listDinner { get; set; }
-
-        EmplStatistic emplStat;
-        #endregion
-
-        #region Commands
-        public ICommand FutureNewsCommand { get; set; }
-        public ICommand DataUpdCommand { get; set; }
-        public ICommand ClickCommand { get; set; }
-        public ICommand ClickCommandCust { get; set; }
-        public ICommand ClickCommand2 { get; set; }        
-        public ICommand ClickCommand3 { get; set; }
-        public ICommand ClickCommandAddPerson { get; set; }
-
-        public ICommand UpdateNewersCommand { get; set; }
-
-        public ICommand ListSelChangCommand { get; set; }
-
-        //Контакты
-        public ICommand ClickCommand2Cust { get; set; } //сброс фильтра
-        public ICommand UpdCustCommand { get; set; }
-        public ICommand SaveCustCommand { get; set; }
-        public ICommand SaveNewCust { get; set; }
-        public ICommand SortNameContAscCommand { get; set; } //сортировка по имени
-        public ICommand SortNameContDescCommand { get; set; } //сортировка по имени
-
-        //Меню
-        public ICommand ClickCommand4 { get; set; }
-        public ICommand ClickCommand5 { get; set; }
-        public ICommand ClickCommand6 { get; set; }
-        public ICommand MenuStatistic { get; set; }
-
-        //Сортировка сотрудников
-        public ICommand SortNameAscCommand { get; set; }
-        public ICommand SortNameDescCommand { get; set; }
-        public ICommand SortBirthAscCommand { get; set; }
-        public ICommand SortBirthDescCommand { get; set; }
-        public ICommand SortStartAscCommand { get; set; }
-        public ICommand SortStartDescCommand { get; set; }
-
-
-        //Отправка E-mail
-        private ICommand _sendMail;
-        public ICommand SendMail
-        {
-            get
-            {
-                if (_sendMail == null)
-                { _sendMail = new RelayCommand<object>(this.SendMail_Execute); }
-                return _sendMail;
-            }
-        }
-
-
-        //private ICommand _myCommand;
-        //public ICommand MyCommand
-        //{
-        //    get
-        //    {
-        //        if (_myCommand == null)
-        //        { _myCommand = new RelayCommand<object>(this.MyCommand_Execute); }
-        //        return _myCommand;
-        //    }
-        //}
-
-        //Сохранение контакта
-        private ICommand _saveData;
-        public ICommand SaveData
-        {
-            get
-            {
-                if (_saveData == null)
-                { _saveData = new RelayCommand<object>(this.SaveData_Execute); }
-                return _saveData;
-            }
-        }
-
-        private void SaveData_Execute(object parameter)
-        {
-            String name = parameter.ToString();
-            Customer chageContact = new Customer();
-            Boolean flag = false;
-
-            foreach(Customer c in customerLst)
-            {
-                if (c.FullName == name)
-                {
-                    chageContact.FullName = c.FullName;
-                    chageContact.Position = c.Position;
-                    chageContact.PhoneMobile = c.PhoneMobile;
-                    chageContact.PhoneWork = c.PhoneWork;
-                    chageContact.Email = c.Email;
-                    chageContact.Company = c.Company;
-
-                }
-            }
-            //сохранение в Excel
-            flag = updCont.saveData2(parameter.ToString(), chageContact);
-            //сохранение в БД
-            dbc.CustomerUpdatePerson(chageContact);
-
-            if (flag == true) 
-            {
-                misc.SaveStatus = "Данные контакта обновлены";
-            }
-            else
-            {
-                misc.SaveStatus = "Данные не обновлены";
-            }
-            
-
-            timerForUpd.Interval = 2000;
-            timerForUpd.Tick += new EventHandler(timer_Tick);
-            timerForUpd.Start();
-
-        }
-
-        void timer_Tick(object sender, EventArgs e)
-        {
-            misc.SaveStatus = "";
-            timerForUpd.Stop();
-        }
-
-
-        #endregion
-
-        private void SendMail_Execute(object parameter)
-        {
-            SendMail sm = new SendMail();
-            sm.SendMailOutlook(parameter.ToString());
-        }
-
-        
-
-        //private void MyCommand_Execute(object parameter)
-        //{
-        //    String aa = parameter.ToString();
-        //    //MessageDialog msg = new MessageDialog(String.Format("Parameter: {0}", parameter));
-        //    //await aa.ShowAsync();
-        //}
-
-
-
-
-
+        /// <summary>Initializes a new instance of the <see cref="MainViewModel" /> class.</summary>
         public MainViewModel()
         {
-            
+            this.logInfo.SaveInfo(); // сохранение информации о запустившем программу
 
-            logInfo.saveInfo(); //сохранение информации о запустившем программу
+            var logText = DateTime.Now.ToString() + "|event| |Запуск приложения Phonebook 3 Cindy";
+            this.logFile.WriteLog(logText);
 
-            String logText = DateTime.Now.ToString() + "|event| |Запуск приложения Phonebook 3 Cindy";
-            logFile.WriteLog(logText);
-
-            XMLcode xml = new XMLcode(_localPropPath); ;
-            if (!File.Exists(_localPropPath))
+            var xml = new XMLcode(this.localPropPath);
+            if (!File.Exists(this.localPropPath))
             {
                 xml.CreateXml();
-                xml.CreateNodesXml();
-                
+                xml.CreateNodesXml();                
             }
-            misc = new Misc { };
-            //(Environment.UserDomainName) == "ELCOM"
-            if ((Environment.UserDomainName) == "ELCOM")
-            {
-                
 
+            this.Misc = new Misc { };
+
+            // (Environment.UserDomainName) == "ELCOM"      
+            if (true) 
+            { 
                 try
                 {
                     SoftUpdater upd = new SoftUpdater(xml);
                     upd.UpdateSoft();
                 }
-                catch { }
-
-                if (!File.Exists(path))
+                catch
                 {
-                    dbc.CreateBase();
-                    dbc.EmployeeCreateTable();
-                    dbc.CustomerCreateTable();
-                    dbc.InfoCreateTable();
-                    dbc.StatusCreateTable();
-
                 }
-                File.Copy(path, pathTemp, true);
 
-                employeeLst = new ObservableCollection<Employee> { };
-                employeeLstT = new ObservableCollection<Employee> { };
-                employeeNewLst = new ObservableCollection<Employee> { };
+                if (!File.Exists(this.path))
+                {
+                    this.dbc.CreateBase();
+                    this.dbc.EmployeeCreateTable();
+                    this.dbc.CustomerCreateTable();
+                    this.dbc.InfoCreateTable();
+                    this.dbc.StatusCreateTable();
+                }
 
-                customerLst = new ObservableCollection<Customer> { };
-                customerLstT = new ObservableCollection<Customer> { };
+                File.Copy(this.path, this.pathTemp, true);
 
-                dinnerLst = new ObservableCollection<DinnerList> { };
+                this.EmployeeLst = new ObservableCollection<Employee> { };
+                this.EmployeeLstT = new ObservableCollection<Employee> { };
+                this.EmployeeNewLst = new ObservableCollection<Employee> { };
 
-                //people = new ObservableCollection<People>{};
-                
-                newContact = new Customer { };
+                this.CustomerLst = new ObservableCollection<Customer> { };
+                this.CustomerLstT = new ObservableCollection<Customer> { };
 
-                news = new ObservableCollection<Division> { };  //новости
-                futureNews = new ObservableCollection<Division> { };  //предстоящие события
-                news2 = new ObservableCollection<New> { };
-                futureNews2 = new ObservableCollection<New> { };  //предстоящие события
+                this.NewContact = new Customer { };
 
-                statistic = new Statistic { };
+                this.News = new ObservableCollection<Division> { };  // новости
+                this.FutureNews = new ObservableCollection<Division> { };  // предстоящие события
+                this.News2 = new ObservableCollection<New> { };
+                this.FutureNews2 = new ObservableCollection<New> { };  // предстоящие события
 
-                div = new ObservableCollection<Division> { };
-                listDinner = new ObservableCollection<Division> { };
-                selectedDiv = new Employee { };
+                this.Statistic = new Statistic { };
 
-                FutureNewsCommand = new Command(arg => FutureNewsMethod());
-                DataUpdCommand = new Command(arg => DataUpd()); //обновление данных с сайта
+                this.Divisions = new ObservableCollection<Division> { };
+                this.SelectedDiv = new Employee { };
 
-                ClickCommand = new Command(arg => ClickMethod());
-                ClickCommandCust = new Command(arg => ClickMethodCust());
-                ClickCommand2 = new Command(arg => ClickMethod2());
+                this.FutureNewsCommand = new Command(arg => this.FutureNewsMethod());
+                this.DataUpdCommand = new Command(arg => this.DataUpd()); // обновление данных с сайта
+                this.ClickCommand = new Command(arg => this.ClickMethod());
+                this.ClickCommandCust = new Command(arg => this.ClickMethodCust());
+                this.ClickCommand2 = new Command(arg => this.ClickMethod2());
+                this.ClickCommand3 = new Command(arg => this.ClickMethod3());
+                this.UpdateNewersCommand = new Command(arg => this.ClickMethodUpdateNewers());
+                this.ListSelChangCommand = new Command(arg => this.ClickMethodListSelChangCommand());
 
-                ClickCommand3 = new Command(arg => ClickMethod3());
+                // Контакты
+                this.ClickCommand2Cust = new Command(arg => this.ClickMethod2Cust());
+                this.UpdCustCommand = new Command(arg => this.ClickMethodUpdCust());
+                this.SaveCustCommand = new Command(arg => this.ClickMethodSaveCust());
+                this.SaveNewCust = new Command(arg => this.ClickMethodSaveNewCust());
+                this.SortNameContAscCommand = new Command(arg => this.ClickMethodSortNameContAsc());
+                this.SortNameContDescCommand = new Command(arg => this.ClickMethodSortNameContDesc());
 
-                UpdateNewersCommand = new Command(arg => ClickMethodUpdateNewers());
+                // Меню
+                this.ClickCommand4 = new Command(arg => this.ClickMethod4());
+                this.ClickCommand5 = new Command(arg => this.ClickMethod5());
+                this.MenuStatistic = new Command(arg => this.ClickMethodMenuStatistic());
 
-                ListSelChangCommand = new Command(arg => ClickMethodListSelChangCommand());
+                // Сортировка
+                this.SortNameAscCommand = new Command(arg => this.ClickMethodSortNameAsc());
+                this.SortNameDescCommand = new Command(arg => this.ClickMethodSortNameDesc());
+                this.SortBirthAscCommand = new Command(arg => this.ClickMethodSortBirthAsc());
+                this.SortBirthDescCommand = new Command(arg => this.ClickMethodSortBirthDesc());
+                this.SortStartAscCommand = new Command(arg => this.ClickMethodSortStartAsc());
+                this.SortStartDescCommand = new Command(arg => this.ClickMethodSortStartDesc());
 
-                ClickCommandAddPerson = new Command(arg => ClickMethodAddPerson());
+                var tempEmpl = this.dbc.EmployeeRead();
+                this.EmployeeLst = tempEmpl;
 
-                //Контакты
-                ClickCommand2Cust = new Command(arg => ClickMethod2Cust());
-                UpdCustCommand = new Command(arg => ClickMethodUpdCust());
-                SaveCustCommand = new Command(arg => ClickMethodSaveCust());
-                SaveNewCust = new Command(arg => ClickMethodSaveNewCust());
-                SortNameContAscCommand = new Command(arg => ClickMethodSortNameContAsc());
-                SortNameContDescCommand = new Command(arg => ClickMethodSortNameContDesc());
+                // видимость стартовой страницы
+                this.Misc.StartPageVisible = "Visible";
+                this.Misc.FilterPageVisible = "Collapsed";
 
-                //Меню
-                ClickCommand4 = new Command(arg => ClickMethod4());
-                ClickCommand5 = new Command(arg => ClickMethod5());
-                ClickCommand6 = new Command(arg => ClickMethod6());
-                MenuStatistic = new Command(arg => ClickMethodMenuStatistic());
+                // -----------------------------------------------------
+                // Новости
+                var newsData = new NewsData();
 
-                //Сортировка
-                SortNameAscCommand = new Command(arg => ClickMethodSortNameAsc());
-                SortNameDescCommand = new Command(arg => ClickMethodSortNameDesc());
-                SortBirthAscCommand = new Command(arg => ClickMethodSortBirthAsc());
-                SortBirthDescCommand = new Command(arg => ClickMethodSortBirthDesc());
-                SortStartAscCommand = new Command(arg => ClickMethodSortStartAsc());
-                SortStartDescCommand = new Command(arg => ClickMethodSortStartDesc());
+                var newsList = new NewsList();
+                var newsT = new List<New>();
+                var futureNewsT = new List<New>();
+                newsList = newsData.GetNews(this.EmployeeLst);
 
-                //SortClear();
-                //emplSort.SortNameAsc = true;
-
-                var tempEmpl = dbc.EmployeeRead();
-                employeeLst = tempEmpl;
-
-                //видимость стартовой страницы
-                misc.StartPageVisible = "Visible";
-                misc.FilterPageVisible = "Collapsed";
-
-                //-----------------------------------------------------
-                //Новости
-                NewsData nData = new NewsData();
-
-                NewsList nList = new NewsList();
-                List<New> newsT = new List<New>();
-                List<New> futureNewsT = new List<New>();
-                nList = nData.GetNews(employeeLst);
-
-                newsT = nList.news;
-                futureNewsT = nList.futureNews;
+                newsT = newsList.News;
+                futureNewsT = newsList.FutureNews;
 
                 if (newsT != null && newsT.Count != 0)
                 {
                     foreach (New n in newsT.OrderBy(a => a.Date))
                     {
-                        news2.Add(n);
+                        this.News2.Add(n);
                     }
                 }
                 else
@@ -340,65 +163,49 @@ namespace P3.ViewModel
                     New newT = new New();
                     newT.Prefix = "На данный момент количество новостей ";
                     newT.Postfix = " штук";
-                    news2.Add(newT);
+                    this.News2.Add(newT);
                 }
 
                 if (futureNewsT != null)
                 {
                     foreach (New n in futureNewsT.OrderBy(a => a.Date))
                     {
-                        futureNews2.Add(n);
+                        this.FutureNews2.Add(n);
                     }
                 }
 
-                              
-
-
-
-
-                //-----------------------------------------------------
-                //Обеды
-
-                //Division temp22 = new Division();
-                //DinnerType dtype = new DinnerType();
-                //temp22.Value = "Не обедает";
-                //listDinner.Add(temp22);
-                //temp22.Value = "Половинка";
-                //listDinner.Add(temp22);
-                //temp22.Value = "Полная";
-                //listDinner.Add(temp22);
-
-                //dinnerLst = dbDinner.DinnerListRead();
-
-                //-----------------------------------------------------
-
-                misc.EmployeeCount = employeeLst.Count() - 10; //количество сотрудников кроме Корпорат номера сотр Логистика, Офис в Иркутсе, Офис в Красноярске, Офис в Москве, Офис в США, Офис в ТВЗ, Офис в Томске, Охранник, Столовая
+                this.Misc.EmployeeCount = this.EmployeeLst.Count() - 10; // количество сотрудников кроме Корпорат номера сотр Логистика, Офис в Иркутсе, Офис в Красноярске, Офис в Москве, Офис в США, Офис в ТВЗ, Офис в Томске, Охранник, Столовая
 
                 int age = 0;
                 int timeRec = 0;
 
-                foreach (Employee em in employeeLst)
+                foreach (Employee em in this.EmployeeLst)
                 {
                     age += em.Age;
 
                     int timeRecT = 0;
                     if (em.TimeRecord == "менее года")
+                    {
                         timeRecT = 0;
+                    }
                     else
-                        timeRecT = Convert.ToInt32(em.TimeRecord);                    
+                    {
+                        timeRecT = Convert.ToInt32(em.TimeRecord);
+                    }
 
                     timeRec += timeRecT;
                 }
-                misc.MiddleAge = age / misc.EmployeeCount;
-                misc.MiddleTimeRecord = timeRec / misc.EmployeeCount;
 
-                //---подразделения---
-                List<String> divList = new List<string>();
+                this.Misc.MiddleAge = age / this.Misc.EmployeeCount;
+                this.Misc.MiddleTimeRecord = timeRec / this.Misc.EmployeeCount;
+
+                // ---подразделения---
+                var divList = new List<string>();
                 Division temp;
 
-                foreach (Employee ee in employeeLst)
+                foreach (Employee ee in this.EmployeeLst)
                 {
-                    employeeLstT.Add(ee);
+                    this.EmployeeLstT.Add(ee);
                     divList.Add(ee.Division);
                 }
 
@@ -408,554 +215,663 @@ namespace P3.ViewModel
 
                 temp = new Division();
                 temp.Value = "1. Все";
-                div.Add(temp);
+                this.Divisions.Add(temp);
 
                 foreach (var s in result)
                 {
                     temp = new Division();
                     temp.Value = s;
-                    div.Add(temp);
+                    this.Divisions.Add(temp);
                 }
 
-                selectedDiv.Division = "1. Все";
-                //----------------------
-                emplStat = new EmplStatistic(employeeLst, statistic);
-                statistic = emplStat.CalcCount();
+                this.SelectedDiv.Division = "1. Все";
 
-                DateTime dtTemp = DateTime.Now;
-                var employeeNewLstT = emplStat.Newers(statistic.StartNewers, dtTemp);
+                // ----------------------
+                this.emplStat = new EmplStatistic(this.EmployeeLst, this.Statistic);
+                this.Statistic = this.emplStat.CalcCount();
 
-                employeeNewLst.Clear();
+                var employeeNewLstT = this.emplStat.Newers(this.Statistic.StartNewers, DateTime.Now);
 
-                foreach (Employee ee in employeeNewLstT)
+                this.EmployeeNewLst.Clear();
+
+                foreach (var ee in employeeNewLstT)
                 {
-                    employeeNewLst.Add(ee);
+                    this.EmployeeNewLst.Add(ee);
                 }
 
-                //DateTime dtTemp = DateTime.Now;
-                ////новички за месяц 
-                //Newers(new DateTime(dtTemp.Year, dtTemp.Month, 1));
-                //statistic.NewersCountMonth = employeeNewLst.Count();
+                this.UpdateContacts();
+                this.Misc.ContactsCount = this.CustomerLst.Count();
+                this.ClickMethodSortNameContAsc();
 
-                ////новички за квартал            
-                //Newers(DateTime.Now.AddDays(-92));
-                //statistic.NewersCountQuarter = employeeNewLst.Count();
-
-                ////новички за год            
-                //Newers(new DateTime(dtTemp.Year, 1, 1));
-                //statistic.NewersCountYear = employeeNewLst.Count();
-
-                ////Новички
-                //statistic.StartNewers = new DateTime(2016, 09, 01);
-
-                //Newers(statistic.StartNewers);
-                //statistic.NewersCount = employeeNewLst.Count();
-
-                UpdateContacts();
-                misc.ContactsCount = customerLst.Count();
-                ClickMethodSortNameContAsc();
-
-                ClickMethod5();
-
-                VacCount();
-                //employeeLst.Where(x => x.FullName == "анд");
-
-                //misc.onCount += Filter;
-
-
-                //employeeLst[0].FullName
-
-
-                DataUpd();
-
+                this.ClickMethod5();
+                this.VacCount();
+                this.DataUpd();
             }
             else
             {
-                misc.AccessDenied = "Collapsed";
-                misc.AccessDeniedMess = "Visible";
+                this.Misc.AccessDenied = "Collapsed";
+                this.Misc.AccessDeniedMess = "Visible";
             }
-
         }
 
+        #region Properties
+
+        /// <summary>Параметры.</summary>
+        public Misc Misc { get; set; }
+
+        /// <summary>Новости 2.</summary>
+        public ObservableCollection<New> News2 { get; set; }
+
+        /// <summary>Анонсы событий 2.</summary>
+        public ObservableCollection<New> FutureNews2 { get; set; }
+
+        /// <summary>Новости.</summary>
+        public ObservableCollection<Division> News { get; set; }
+
+        /// <summary>Анонсы событий.</summary>
+        public ObservableCollection<Division> FutureNews { get; set; } 
+
+        /// <summary>Статистика.</summary>
+        public Statistic Statistic { get; set; }
+
+        /// <summary>Новый контакт.</summary>
+        public Customer NewContact { get; set; }
+
+        /// <summary>Подразделения.</summary>
+        public ObservableCollection<Division> Divisions { get; set; }
+
+        /// <summary>Сотрудники.</summary>
+        public ObservableCollection<Employee> EmployeeLst { get; set; }
+
+        /// <summary>Сотрудники темп.</summary>
+        public ObservableCollection<Employee> EmployeeLstT { get; set; }
+
+        /// <summary>Сотрудники темп2.</summary>
+        public ObservableCollection<Employee> EmployeeNewLst { get; set; }
+
+        /// <summary>Заказчики.</summary>
+        public ObservableCollection<Customer> CustomerLst { get; set; }
+
+        /// <summary>Заказчики темп.</summary>
+        public ObservableCollection<Customer> CustomerLstT { get; set; }
+
+        /// <summary>Выбранное подразделение.</summary>
+        public Employee SelectedDiv { get; set; }
         
+        #endregion
 
-        //Статусы сотрудников
-        List<String> tVacation = new List<string>();
-        List<String> tSick = new List<string>();
-        List<String> tBTrip = new List<string>();
-        List<String> tOther = new List<string>();
+        #region Commands
 
-        public void VacCount()
+        /// <summary>Анонс предстоящих событий.</summary>
+        public ICommand FutureNewsCommand { get; set; }
+
+        /// <summary>Обновить данные.</summary>
+        public ICommand DataUpdCommand { get; set; }
+
+        /// <summary>О программе.</summary>
+        public ICommand ClickCommand { get; set; }
+
+        /// <summary>Заказчики.</summary>
+        public ICommand ClickCommandCust { get; set; }
+
+        /// <summary>Тестовая2.</summary>
+        public ICommand ClickCommand2 { get; set; }
+
+        /// <summary>Тестовая3.</summary>
+        public ICommand ClickCommand3 { get; set; }
+
+        /// <summary>Добавить контакт.</summary>
+        public ICommand ClickCommandAddPerson { get; set; }
+
+        /// <summary>Обновить новости.</summary>
+        public ICommand UpdateNewersCommand { get; set; }
+
+        /// <summary>Тестовая4.</summary>
+        public ICommand ListSelChangCommand { get; set; }
+
+        /// <summary>Сбросить фильтр.</summary> // Контакты
+        public ICommand ClickCommand2Cust { get; set; }
+
+        /// <summary>Обновить контакты.</summary>
+        public ICommand UpdCustCommand { get; set; }
+
+        /// <summary>Сохранить контакт.</summary>
+        public ICommand SaveCustCommand { get; set; }
+
+        /// <summary>Сохранить нового заказчика.</summary>
+        public ICommand SaveNewCust { get; set; }
+
+        /// <summary>Сортировка по имени по возрастанию.</summary>
+        public ICommand SortNameContAscCommand { get; set; }
+
+        /// <summary>Сортировка по имени по убыванию.</summary>
+        public ICommand SortNameContDescCommand { get; set; }
+
+        /// <summary>Контакты.</summary> // Меню
+        public ICommand ClickCommand4 { get; set; }
+
+        /// <summary>Главная.</summary>
+        public ICommand ClickCommand5 { get; set; }
+
+        /// <summary>Статистика.</summary>
+        public ICommand MenuStatistic { get; set; }
+        
+        /// <summary>Сортировка по имени по возрастанию.</summary> // Сортировка сотрудников
+        public ICommand SortNameAscCommand { get; set; }
+
+        /// <summary>Сортировка по имени по убыванию.</summary>
+        public ICommand SortNameDescCommand { get; set; }
+
+        /// <summary>Сортировка по дню рождения по возрастанию.</summary>
+        public ICommand SortBirthAscCommand { get; set; }
+
+        /// <summary>Сортировка по дню рождения по убыванию.</summary>
+        public ICommand SortBirthDescCommand { get; set; }
+
+        /// <summary>Сортировка по дате прихода по возрастанию.</summary>
+        public ICommand SortStartAscCommand { get; set; }
+
+        /// <summary>Сортировка по дате прихода по убыванию.</summary>
+        public ICommand SortStartDescCommand { get; set; }
+
+        /// <summary>Отправить E-mail.</summary>
+        public ICommand SendMail
         {
-            tSick.Clear();
-            tVacation.Clear();
-            tBTrip.Clear();
-            tOther.Clear();
-            dbc.EmployeeReadStatusCount();
-            tSick = dbc.tSick;
-            tVacation = dbc.tVacation;
-            tBTrip = dbc.tBTrip;
-            tOther = dbc.tOther;
-            misc.Vacation = tVacation.Count;
-            misc.BTrip = tBTrip.Count;
-            misc.Sick = tSick.Count;
-        }
-
-        //Фильтр по имени
-        private void ClickMethod()
-        {
-           employeeLst.Clear();
-            foreach(Employee ee in employeeLstT)
+            get
             {
-                if (ee.FullName.IndexOf(misc.TextChange, StringComparison.OrdinalIgnoreCase) != -1)
-                    employeeLst.Add(ee);
-            }
-
-            misc.SelectedIndex = 0;
-        }
-
-
-        private void Newers(DateTime startDay)
-        {
-            //DateTime dateValue;
-            employeeNewLst.Clear();            
-
-            foreach (Employee ee in employeeLst)
-            {
-
-                //DateTime.TryParse(ee.StartDay, out dateValue);
-                if (ee.StartDay >= startDay)
+                if (this.sendMail == null)
                 {
-                    employeeNewLst.Add(ee);
+                    this.sendMail = new RelayCommand<object>(this.SendMail_Execute);
                 }
 
+                return this.sendMail;
             }
-
-            //employeeNewLst.Sort(delegate(Employee em1, Employee em2)
-            //{ return em1.StartDay.CompareTo(em1.StartDay); });
-
-            
         }
 
-        //-----------------------------------------------------------
-        //Контакты
-        //Обновление списка контактов
-        public void UpdateContacts()
+        /// <summary>Сохранить.</summary>
+        public ICommand SaveData
         {
-            customerLstT.Clear();
-            customerLst.Clear();
-            customerLstT = dbc.CustomerRead();
-
-            foreach (Customer ee in customerLstT)
+            get
             {
-                customerLst.Add(ee);
-            }
+                if (this.saveData == null)
+                {
+                    this.saveData = new RelayCommand<object>(this.SaveData_Execute);
+                }
 
-            misc.TextChangeCust = "";
+                return this.saveData;
+            }
         }
 
-        //поисковая строка
+        private void SaveData_Execute(object parameter)
+        {
+            string name = parameter.ToString();
+            Customer chageContact = new Customer();
+            bool flag = false;
+
+            foreach (Customer c in this.CustomerLst)
+            {
+                if (c.FullName == name)
+                {
+                    chageContact.FullName = c.FullName;
+                    chageContact.Position = c.Position;
+                    chageContact.PhoneMobile = c.PhoneMobile;
+                    chageContact.PhoneWork = c.PhoneWork;
+                    chageContact.Email = c.Email;
+                    chageContact.Company = c.Company;
+                }
+            }
+
+            // сохранение в Excel
+            flag = this.updCont.SaveData2(parameter.ToString(), chageContact);
+
+            // сохранение в БД
+            this.dbc.CustomerUpdatePerson(chageContact);
+
+            if (flag == true)
+            {
+                this.Misc.SaveStatus = "Данные контакта обновлены";
+            }
+            else
+            {
+                this.Misc.SaveStatus = "Данные не обновлены";
+            }
+
+            this.timerForUpd.Interval = 2000;
+            this.timerForUpd.Tick += new EventHandler(this.Timer_Tick);
+            this.timerForUpd.Start();
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            this.Misc.SaveStatus = string.Empty;
+            this.timerForUpd.Stop();
+        }
+
+        #endregion
+
+        private void SendMail_Execute(object parameter)
+        {
+            var sm = new SendMail();
+            sm.SendMailOutlook(parameter.ToString());
+        }
+
+        private void VacCount()
+        {
+            this.sick.Clear();
+            this.vacation.Clear();
+            this.btrip.Clear();
+            this.other.Clear();
+            this.dbc.EmployeeReadStatusCount();
+            this.sick = this.dbc.Sick;
+            this.vacation = this.dbc.Vacation;
+            this.btrip = this.dbc.BTrip;
+            this.other = this.dbc.Other;
+            this.Misc.Vacation = this.vacation.Count;
+            this.Misc.BTrip = this.btrip.Count;
+            this.Misc.Sick = this.sick.Count;
+        }
+
+        // Фильтр по имени
+        private void ClickMethod()
+        {
+           this.EmployeeLst.Clear();
+            foreach (Employee ee in this.EmployeeLstT)
+            {
+                if (ee.FullName.IndexOf(this.Misc.TextChange, StringComparison.OrdinalIgnoreCase) != -1)
+                {
+                    this.EmployeeLst.Add(ee);
+                }
+            }
+
+            this.Misc.SelectedIndex = 0;
+        }
+        
+        private void Newers(DateTime startDay)
+        {
+            this.EmployeeNewLst.Clear();            
+
+            foreach (Employee ee in this.EmployeeLst)
+            {
+                if (ee.StartDay >= startDay)
+                {
+                    this.EmployeeNewLst.Add(ee);
+                }
+            }
+        }
+
+        // -----------------------------------------------------------
+        // Контакты
+        // Обновление списка контактов
+        private void UpdateContacts()
+        {
+            this.CustomerLstT.Clear();
+            this.CustomerLst.Clear();
+            this.CustomerLstT = this.dbc.CustomerRead();
+
+            foreach (Customer ee in this.CustomerLstT)
+            {
+                this.CustomerLst.Add(ee);
+            }
+
+            this.Misc.TextChangeCust = string.Empty;
+        }
+
+        // поисковая строка
         private void ClickMethodCust()
         {
-            customerLst.Clear();
-            foreach (Customer ee in customerLstT)
+            this.CustomerLst.Clear();
+            foreach (Customer ee in this.CustomerLstT)
             {
-                if (ee.FullName.IndexOf(misc.TextChangeCust, StringComparison.OrdinalIgnoreCase) != -1)
-                    customerLst.Add(ee);
+                if (ee.FullName.IndexOf(this.Misc.TextChangeCust, StringComparison.OrdinalIgnoreCase) != -1)
+                {
+                    this.CustomerLst.Add(ee);
+                }
             }
 
-            misc.SelectedIndexCust = 0;
+            this.Misc.SelectedIndexCust = 0;
         }
 
-        //Сброс фильтра
+        // Сброс фильтра
         private void ClickMethod2Cust()
         {
-            customerLst.Clear();
-            foreach (Customer ee in customerLstT)
+            this.CustomerLst.Clear();
+            foreach (var ee in this.CustomerLstT)
             {
-                customerLst.Add(ee);
+                this.CustomerLst.Add(ee);
             }    
 
-            misc.TextChangeCust = "";
+            this.Misc.TextChangeCust = string.Empty;
 
-            ClickMethodSortNameContAsc();
+            this.ClickMethodSortNameContAsc();
         }
 
-        //загрузка данных о контактах
+        // загрузка данных о контактах
         private void ClickMethodUpdCust()
         {
-            
-            String customPath = "";
-            customPath = updCont.loadCustom();
+            var customPath = string.Empty;
+            customPath = this.updCont.LoadCustom();
 
-            Preparer(customPath);
+            this.Preparer(customPath);
 
+            var localPropPath = "Settings.xml";
 
-            String _localPropPath = "Settings.xml";
-
-            XMLcodeContacts xmlCode = new XMLcodeContacts(_localPropPath);
-            xmlCode.WriteXml(customPath);
-            
-                       
+            var xmlCode = new XMLcodeContacts(localPropPath);
+            xmlCode.WriteXml(customPath); 
         }
-
-        public async void Preparer(String customPath)
+        
+        private async void Preparer(string customPath)
         {
-            Boolean flag;
-            flag = await Task<Boolean>.Factory.StartNew(() =>
+            bool flag;
+            flag = await Task<bool>.Factory.StartNew(() =>
             {
-                return updCont.Update(customPath);
+                return this.updCont.Update(customPath);
             });
 
-            UpdateContacts();
-            ClickMethodSortNameContAsc(); 
+            this.UpdateContacts();
+            this.ClickMethodSortNameContAsc(); 
         }
 
-        //Сохранить данные контактов в файл
+        // Сохранить данные контактов в файл
         private void ClickMethodSaveCust()
         {            
-            updCont.saveData(customerLst);
+            this.updCont.SaveData(this.CustomerLst);
         }
 
-        //Добавить новый контакт
+        // Добавить новый контакт
         private void ClickMethodSaveNewCust()
         {
-            customerLst.Add(newContact);
-            //сохранение в Excel
-            updCont.saveData2(newContact.FullName, newContact);
-            //сохранение в БД
-            dbc.CustomerWritePerson(newContact);
-            ClickMethodSortNameContAsc();
-            //newContact.Clear();
+            this.CustomerLst.Add(this.NewContact);            
+            this.updCont.SaveData2(this.NewContact.FullName, this.NewContact); // сохранение в Excel            
+            this.dbc.CustomerWritePerson(this.NewContact); // сохранение в БД
+            this.ClickMethodSortNameContAsc();
         }
 
-        //Сортировка по имени по возрастанию
+        // Сортировка по имени по возрастанию
         private void ClickMethodSortNameContAsc()
         {
             ObservableCollection<Customer> customerLstTemp;
 
-            customerLstTemp = customerLst;
+            customerLstTemp = this.CustomerLst;
             customerLstTemp = new ObservableCollection<Customer>(customerLstTemp.OrderBy(a => a.FullName));
-            customerLst.Clear();
+            this.CustomerLst.Clear();
             foreach (Customer ee in customerLstTemp)
             {
-                customerLst.Add(ee);
+                this.CustomerLst.Add(ee);
             }
 
-            misc.SelectedIndexCust = 0;
+            this.Misc.SelectedIndexCust = 0;
         }
 
-        //Сортировка по имени по убыванию
+        // Сортировка по имени по убыванию
         private void ClickMethodSortNameContDesc()
         {
             ObservableCollection<Customer> customerLstTemp;
 
-            customerLstTemp = customerLst;
+            customerLstTemp = this.CustomerLst;
             customerLstTemp = new ObservableCollection<Customer>(customerLstTemp.OrderByDescending(a => a.FullName));
-            customerLst.Clear();
+            this.CustomerLst.Clear();
             foreach (Customer ee in customerLstTemp)
             {
-                customerLst.Add(ee);
+                this.CustomerLst.Add(ee);
             }
 
-            misc.SelectedIndexCust = 0;
+            this.Misc.SelectedIndexCust = 0;
         }
 
-
-        //-----------------------------------------------------------
-        //Фильтр по подразделениям
-
-        //Сброс фильтра
+        // -----------------------------------------------------------
+        // Фильтр по подразделениям
+        // Сброс фильтра
         private void ClickMethod2()
         {
-            employeeLst.Clear();
-            foreach (Employee ee in employeeLstT)
+            this.EmployeeLst.Clear();
+            foreach (Employee ee in this.EmployeeLstT)
             {
-                employeeLst.Add(ee);
+                this.EmployeeLst.Add(ee);
             }
 
-            misc.SelectedIndex = 0;
+            this.Misc.SelectedIndex = 0;
 
-            misc.TextChange = "";
-            selectedDiv.Division = "1. Все";
+            this.Misc.TextChange = string.Empty;
+            this.SelectedDiv.Division = "1. Все";
 
-
-            //видимость стартовой страницы
-            misc.StartPageVisible = "Visible";
-            misc.FilterPageVisible = "Collapsed";
-
+            // видимость стартовой страницы
+            this.Misc.StartPageVisible = "Visible";
+            this.Misc.FilterPageVisible = "Collapsed";
         }
+
         private void ClickMethod3()
         {
-            employeeLst.Clear();
-            if (selectedDiv.Division == "1. Все")
+            this.EmployeeLst.Clear();
+            if (this.SelectedDiv.Division == "1. Все")
             {
-                foreach (Employee ee in employeeLstT)
+                foreach (Employee ee in this.EmployeeLstT)
                 {
-                    employeeLst.Add(ee);
+                    this.EmployeeLst.Add(ee);
                 }
-
             }
             else
             {
-                foreach (Employee ee in employeeLstT)
+                foreach (Employee ee in this.EmployeeLstT)
                 {
-                    if (ee.Division.IndexOf(selectedDiv.Division, StringComparison.OrdinalIgnoreCase) != -1)
-                        employeeLst.Add(ee);
+                    if (ee.Division.IndexOf(this.SelectedDiv.Division, StringComparison.OrdinalIgnoreCase) != -1)
+                    {
+                        this.EmployeeLst.Add(ee);
+                    }
                 }
             }            
 
-            misc.SelectedIndex = 0;
-        }
-
-        
+            this.Misc.SelectedIndex = 0;
+        }        
 
         private void Filter()
         {
-            employeeLst.Clear();            
+            this.EmployeeLst.Clear();            
         }
 
         private void ClickMethodUpdateNewers()
         {
-            DateTime dtTemp = DateTime.Now;
+            var employeeNewLstT = this.emplStat.Newers(this.Statistic.StartNewers, DateTime.Now);
 
-            var employeeNewLstT = emplStat.Newers(statistic.StartNewers, dtTemp);
+            this.EmployeeNewLst.Clear();
 
-            employeeNewLst.Clear();
-
-            foreach (Employee ee in employeeNewLstT)
+            foreach (var ee in employeeNewLstT)
             {
-                employeeNewLst.Add(ee);
+                this.EmployeeNewLst.Add(ee);
             }
-            //Newers(statistic.StartNewers);
-            statistic.NewersCount = employeeNewLst.Count();
+
+            this.Statistic.NewersCount = this.EmployeeNewLst.Count();
         }
 
         private void ClickMethodListSelChangCommand()
         {
-            misc.StartPageVisible = "Collapsed";
-            misc.FilterPageVisible = "Visible";
-        }
-
-        Boolean contactUpd = true;
+            this.Misc.StartPageVisible = "Collapsed";
+            this.Misc.FilterPageVisible = "Visible";
+        }               
 
         private void ClickMethod4()
         {
-            misc.Page1State = "Collapsed";
-            misc.Page2State = "Visible";
-            misc.Page3State = "Collapsed";
-            misc.PageStatistic = "Collapsed";
+            this.Misc.Page1State = "Collapsed";
+            this.Misc.Page2State = "Visible";
+            this.Misc.Page3State = "Collapsed";
+            this.Misc.PageStatistic = "Collapsed";
 
-            //Контакты
-            if (contactUpd == true)
+            // Контакты
+            if (this.contactUpd == true)
             {
-                String customPath = updCont.GetPath();
-                if (customPath == "")
+                string customPath = this.updCont.GetPath();
+                if (customPath == string.Empty)
                 {
-                    Preparer(customPath);
+                    this.Preparer(customPath);
                 }
-                contactUpd = false;
+
+                this.contactUpd = false;
             }
-            
         }
 
         private void ClickMethod5()
         {
-            misc.Page2State = "Collapsed";
-            misc.Page1State = "Visible";
-            misc.Page3State = "Collapsed";
-            misc.PageStatistic = "Collapsed";
+            this.Misc.Page2State = "Collapsed";
+            this.Misc.Page1State = "Visible";
+            this.Misc.Page3State = "Collapsed";
+            this.Misc.PageStatistic = "Collapsed";
 
-            //видимость стартовой страницы
-            misc.StartPageVisible = "Visible";
-            misc.FilterPageVisible = "Collapsed";
+            // видимость стартовой страницы
+            this.Misc.StartPageVisible = "Visible";
+            this.Misc.FilterPageVisible = "Collapsed";
         }
 
         private void ClickMethod6()
         {
-            misc.Page2State = "Collapsed";
-            misc.Page1State = "Collapsed";
-            misc.Page3State = "Visible";
-            misc.PageStatistic = "Collapsed";
+            this.Misc.Page2State = "Collapsed";
+            this.Misc.Page1State = "Collapsed";
+            this.Misc.Page3State = "Visible";
+            this.Misc.PageStatistic = "Collapsed";
         }
 
         private void ClickMethodMenuStatistic()
         {
-            misc.Page2State = "Collapsed";
-            misc.Page1State = "Collapsed";
-            misc.Page3State = "Collapsed";
-            misc.PageStatistic = "Visible";
+            this.Misc.Page2State = "Collapsed";
+            this.Misc.Page1State = "Collapsed";
+            this.Misc.Page3State = "Collapsed";
+            this.Misc.PageStatistic = "Visible";
         }
 
-        //-----------------------------------------------------------
-        //Обеды
-        private void ClickMethodAddPerson()
-        {
-
-        }
-
-        
-
-        //Сортировка
+        // Сортировка
         private void ClickMethodSortNameAsc()
         {
+            ObservableCollection<Employee> sortedEmployees;
 
-            ObservableCollection<Employee> employeeLstTemp;
-            
-            employeeLstTemp = employeeLst;
-            employeeLstTemp = new ObservableCollection<Employee>(employeeLstTemp.OrderBy(a => a.FullName));
-            employeeLst.Clear();
-            foreach (Employee ee in employeeLstTemp)
+            sortedEmployees = this.EmployeeLst;
+            sortedEmployees = new ObservableCollection<Employee>(sortedEmployees.OrderBy(a => a.FullName));
+            this.EmployeeLst.Clear();
+            foreach (Employee ee in sortedEmployees)
             {
-                employeeLst.Add(ee);
+                this.EmployeeLst.Add(ee);
             }
             
-            misc.SelectedIndex = 0;
+            this.Misc.SelectedIndex = 0;
         }
 
         private void ClickMethodSortNameDesc()
         {
+            ObservableCollection<Employee> sortedEmployees;
 
-            ObservableCollection<Employee> employeeLstTemp;
-
-            employeeLstTemp = employeeLst;
-            employeeLstTemp = new ObservableCollection<Employee>(employeeLstTemp.OrderByDescending(a => a.FullName));
-            employeeLst.Clear();
-            foreach (Employee ee in employeeLstTemp)
+            sortedEmployees = this.EmployeeLst;
+            sortedEmployees = new ObservableCollection<Employee>(sortedEmployees.OrderByDescending(a => a.FullName));
+            this.EmployeeLst.Clear();
+            foreach (Employee ee in sortedEmployees)
             {
-                employeeLst.Add(ee);
-            }
+                this.EmployeeLst.Add(ee);
+            }            
 
-            
-
-            misc.SelectedIndex = 0;
+            this.Misc.SelectedIndex = 0;
         }
 
         private void ClickMethodSortBirthAsc()
         {
+            ObservableCollection<Employee> sortedEmployees;
 
-            ObservableCollection<Employee> employeeLstTemp;
-
-            employeeLstTemp = employeeLst;
-            employeeLstTemp = new ObservableCollection<Employee>(employeeLstTemp.OrderBy(a => a.BirthDayShort));
-            employeeLst.Clear();
-            foreach (Employee ee in employeeLstTemp)
+            sortedEmployees = this.EmployeeLst;
+            sortedEmployees = new ObservableCollection<Employee>(sortedEmployees.OrderBy(a => a.BirthDayShort));
+            this.EmployeeLst.Clear();
+            foreach (Employee ee in sortedEmployees)
             {
-                employeeLst.Add(ee);
+                this.EmployeeLst.Add(ee);
             }
             
-            misc.SelectedIndex = 0;
+            this.Misc.SelectedIndex = 0;
         }
 
         private void ClickMethodSortBirthDesc()
         {
+            ObservableCollection<Employee> sortedEmployees;
 
-            ObservableCollection<Employee> employeeLstTemp;
-
-            employeeLstTemp = employeeLst;
-            employeeLstTemp = new ObservableCollection<Employee>(employeeLstTemp.OrderByDescending(a => a.BirthDayShort));
-            employeeLst.Clear();
-            foreach (Employee ee in employeeLstTemp)
+            sortedEmployees = this.EmployeeLst;
+            sortedEmployees = new ObservableCollection<Employee>(sortedEmployees.OrderByDescending(a => a.BirthDayShort));
+            this.EmployeeLst.Clear();
+            foreach (Employee ee in sortedEmployees)
             {
-                employeeLst.Add(ee);
+                this.EmployeeLst.Add(ee);
             }
             
-            misc.SelectedIndex = 0;
+            this.Misc.SelectedIndex = 0;
         }
 
         private void ClickMethodSortStartAsc()
         {
+            ObservableCollection<Employee> sortedEmployees;
 
-            ObservableCollection<Employee> employeeLstTemp;
-
-            employeeLstTemp = employeeLst;
-            employeeLstTemp = new ObservableCollection<Employee>(employeeLstTemp.OrderBy(a => a.StartDayShort));
-            employeeLst.Clear();
-            foreach (Employee ee in employeeLstTemp)
+            sortedEmployees = this.EmployeeLst;
+            sortedEmployees = new ObservableCollection<Employee>(sortedEmployees.OrderBy(a => a.StartDayShort));
+            this.EmployeeLst.Clear();
+            foreach (Employee ee in sortedEmployees)
             {
-                employeeLst.Add(ee);
+                this.EmployeeLst.Add(ee);
             }
             
-            misc.SelectedIndex = 0;
+            this.Misc.SelectedIndex = 0;
         }
 
         private void ClickMethodSortStartDesc()
         {
+            ObservableCollection<Employee> sortedEmployees;
 
-            ObservableCollection<Employee> employeeLstTemp;
-
-            employeeLstTemp = employeeLst;
-            employeeLstTemp = new ObservableCollection<Employee>(employeeLstTemp.OrderByDescending(a => a.StartDayShort));
-            employeeLst.Clear();
-            foreach (Employee ee in employeeLstTemp)
+            sortedEmployees = this.EmployeeLst;
+            sortedEmployees = new ObservableCollection<Employee>(sortedEmployees.OrderByDescending(a => a.StartDayShort));
+            this.EmployeeLst.Clear();
+            foreach (Employee ee in sortedEmployees)
             {
-                employeeLst.Add(ee);
+                this.EmployeeLst.Add(ee);
             }
             
-            misc.SelectedIndex = 0;
+            this.Misc.SelectedIndex = 0;
         }
 
-        //Окно с предстоящими событиями
+        // Окно с предстоящими событиями
         private void FutureNewsMethod()
         {
-            ViewShower.Show(0, futureNews, false, b => { });
-            
+            ViewShower.Show(0, this.FutureNews, false, b => { });            
         }
 
-        //обновление данных с сайта
+        // обновление данных с сайта
         private void DataUpd()
         {
-            Boolean flag = false;
-            misc.UpdStatus = "Обновление данных";
+            this.Misc.UpdStatus = "Обновление данных";            
+            this.upd.ParseHTML();
 
-            
-
-            //flag = await Task<Boolean>.Factory.StartNew(() =>
-            //{
-            //    return upd.ParseHTML();
-            //});
-
-            upd.ParseHTML();
-            //if (flag == true) misc.UpdStatus = "";
-
-            t1.Interval = new TimeSpan(0, 0, 0, 5);
-            t1.Tick += new EventHandler(timer_Tick1);
-            t1.Start();
-
-            
-            
+            this.timer1.Interval = new TimeSpan(0, 0, 0, 5);
+            this.timer1.Tick += new EventHandler(this.Timer_Tick1);
+            this.timer1.Start();  
         }
 
-        void timer_Tick1(object sender, EventArgs e)
+        private void Timer_Tick1(object sender, EventArgs e)
         {
-
-            Boolean flag = upd.flag;
+            var flag = this.upd.Flag;
             if (flag == true)
             {
-                DataUpdCalc();
+                this.DataUpdCalc();
             }
-
         }
 
         private void DataUpdCalc()
         {
-            misc.UpdStatus = "";
+            this.Misc.UpdStatus = string.Empty;
 
-            var tempEmpl = dbc.EmployeeRead();
+            var tempEmpl = this.dbc.EmployeeRead();
 
-            employeeLst.Clear();
+            this.EmployeeLst.Clear();
 
-            foreach (Employee ee in tempEmpl)
+            foreach (var ee in tempEmpl)
             {
-                employeeLst.Add(ee);
+                this.EmployeeLst.Add(ee);
             }
-            misc.EmployeeCount = employeeLst.Count() - 10;
 
-            VacCount(); //статусы количество
+            this.Misc.EmployeeCount = this.EmployeeLst.Count() - 10;
 
-            misc.SelectedIndex = 0;
+            this.VacCount(); // статусы количество
 
-            t1.Stop();
+            this.Misc.SelectedIndex = 0;
+            this.timer1.Stop();
         }
     }
 }

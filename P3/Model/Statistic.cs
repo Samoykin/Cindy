@@ -1,141 +1,187 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace P3.Model
+﻿namespace P3.Model
 {
-    class Statistic : INotifyPropertyChanged
-    {
-        #region Implement INotyfyPropertyChanged members
+    using System;
+    using System.ComponentModel;
 
+    /// <summary>Статистика.</summary>
+    public class Statistic : INotifyPropertyChanged
+    {
+        #region Fields
+
+        private DateTime startNewers;
+        private int newersCount;
+        private int newersCountMonth;
+        private int newersCountQuarter1;
+        private int newersCountQuarter2;
+        private int newersCountQuarter3;
+        private int newersCountQuarter4;
+        private int newersCountYear;
+
+        #endregion
+
+        /// <summary>Событие изменения свойства.</summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged(string propertyName)
+        #region Properties
+
+        /// <summary>Дата выборки новиньких.</summary>
+        public DateTime StartNewers
         {
-            if (PropertyChanged != null)
+            get
             {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                return this.startNewers;
+            }
+
+            set
+            {
+                if (this.startNewers != value)
+                {
+                    this.startNewers = value;
+                    this.OnPropertyChanged("StartNewers");
+                }
+            }
+        }
+
+        /// <summary>Количество новичков.</summary>
+        public int NewersCount
+        {
+            get
+            {
+                return this.newersCount;
+            }
+
+            set
+            {
+                if (this.newersCount != value)
+                {
+                    this.newersCount = value;
+                    this.OnPropertyChanged("NewersCount");
+                }
+            }
+        }
+
+        /// <summary>Количество новичков за месяц.</summary>
+        public int NewersCountMonth
+        {
+            get
+            {
+                return this.newersCountMonth;
+            }
+
+            set
+            {
+                if (this.newersCountMonth != value)
+                {
+                    this.newersCountMonth = value;
+                    this.OnPropertyChanged("NewersCountMonth");
+                }
+            }
+        }
+
+        /// <summary>Количество новичков за 1 квартал.</summary>
+        public int NewersCountQuarter1
+        {
+            get
+            {
+                return this.newersCountQuarter1;
+            }
+
+            set
+            {
+                if (this.newersCountQuarter1 != value)
+                {
+                    this.newersCountQuarter1 = value;
+                    this.OnPropertyChanged("NewersCountQuarter1");
+                }
+            }
+        }
+
+        /// <summary>Количество новичков за 2 квартал.</summary>
+        public int NewersCountQuarter2
+        {
+            get
+            {
+                return this.newersCountQuarter2;
+            }
+
+            set
+            {
+                if (this.newersCountQuarter2 != value)
+                {
+                    this.newersCountQuarter2 = value;
+                    this.OnPropertyChanged("NewersCountQuarter2");
+                }
+            }
+        }
+
+        /// <summary>Количество новичков за 3 квартал.</summary>
+        public int NewersCountQuarter3
+        {
+            get
+            {
+                return this.newersCountQuarter3;
+            }
+
+            set
+            {
+                if (this.newersCountQuarter3 != value)
+                {
+                    this.newersCountQuarter3 = value;
+                    this.OnPropertyChanged("NewersCountQuarter3");
+                }
+            }
+        }
+
+        /// <summary>Количество новичков за 4 квартал.</summary>
+        public int NewersCountQuarter4
+        {
+            get
+            {
+                return this.newersCountQuarter4;
+            }
+
+            set
+            {
+                if (this.newersCountQuarter4 != value)
+                {
+                    this.newersCountQuarter4 = value;
+                    this.OnPropertyChanged("NewersCountQuarter4");
+                }
+            }
+        }
+
+        /// <summary>Количество новичков за год.</summary>
+        public int NewersCountYear
+        {
+            get
+            {
+                return this.newersCountYear;
+            }
+
+            set
+            {
+                if (this.newersCountYear != value)
+                {
+                    this.newersCountYear = value;
+                    this.OnPropertyChanged("NewersCountYear");
+                }
             }
         }
 
         #endregion
 
+        #region Implement INotyfyPropertyChanged members
 
-        private DateTime _StartNewers; //Дата выборки новиньких
-        private Int32 _NewersCount; //Количество новичков
-        private Int32 _NewersCountMonth; //Количество новичков за месяц
-        private Int32 _NewersCountQuarter1; //Количество новичков за 1 квартал
-        private Int32 _NewersCountQuarter2; //Количество новичков за 2 квартал
-        private Int32 _NewersCountQuarter3; //Количество новичков за 3 квартал
-        private Int32 _NewersCountQuarter4; //Количество новичков за 4 квартал
-        private Int32 _NewersCountYear; //Количество новичков за год
-
-        public DateTime StartNewers
+        /// <summary>Изменения свойства.</summary>
+        /// <param name="propertyName">Имя свойства.</param>
+        protected virtual void OnPropertyChanged(string propertyName)
         {
-            get { return _StartNewers; }
-            set
+            if (this.PropertyChanged != null)
             {
-                if (_StartNewers != value)
-                {
-                    _StartNewers = value;
-                    OnPropertyChanged("StartNewers");
-                    //onCount();
-                }
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 
-        public Int32 NewersCount
-        {
-            get { return _NewersCount; }
-            set
-            {
-                if (_NewersCount != value)
-                {
-                    _NewersCount = value;
-                    OnPropertyChanged("NewersCount");
-                }
-            }
-        }
-
-        public Int32 NewersCountMonth
-        {
-            get { return _NewersCountMonth; }
-            set
-            {
-                if (_NewersCountMonth != value)
-                {
-                    _NewersCountMonth = value;
-                    OnPropertyChanged("NewersCountMonth");
-                }
-            }
-        }
-
-        public Int32 NewersCountQuarter1
-        {
-            get { return _NewersCountQuarter1; }
-            set
-            {
-                if (_NewersCountQuarter1 != value)
-                {
-                    _NewersCountQuarter1 = value;
-                    OnPropertyChanged("NewersCountQuarter1");
-                }
-            }
-        }
-
-        public Int32 NewersCountQuarter2
-        {
-            get { return _NewersCountQuarter2; }
-            set
-            {
-                if (_NewersCountQuarter2 != value)
-                {
-                    _NewersCountQuarter2 = value;
-                    OnPropertyChanged("NewersCountQuarter2");
-                }
-            }
-        }
-
-        public Int32 NewersCountQuarter3
-        {
-            get { return _NewersCountQuarter3; }
-            set
-            {
-                if (_NewersCountQuarter3 != value)
-                {
-                    _NewersCountQuarter3 = value;
-                    OnPropertyChanged("NewersCountQuarter3");
-                }
-            }
-        }
-
-        public Int32 NewersCountQuarter4
-        {
-            get { return _NewersCountQuarter4; }
-            set
-            {
-                if (_NewersCountQuarter4 != value)
-                {
-                    _NewersCountQuarter4 = value;
-                    OnPropertyChanged("NewersCountQuarter4");
-                }
-            }
-        }
-
-        public Int32 NewersCountYear
-        {
-            get { return _NewersCountYear; }
-            set
-            {
-                if (_NewersCountYear != value)
-                {
-                    _NewersCountYear = value;
-                    OnPropertyChanged("NewersCountYear");
-                }
-            }
-        }
+        #endregion
     }
 }

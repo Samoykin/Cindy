@@ -1,92 +1,109 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace P3.Model
+﻿namespace P3.Model
 {
-    class People : INotifyPropertyChanged
+    using System.ComponentModel;
+
+    /// <summary>Человек.</summary>
+    public class People : INotifyPropertyChanged
     {
-        #region Implement INotyfyPropertyChanged members
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
-        #endregion
-
         #region Fields
 
-        private string _Name;
-        private string _Phone;
-        private string _Age;
-        private string _Descr;
+        private string name;
+        private string phone;
+        private string age;
+        private string descr;
 
         #endregion
+
+        /// <summary>Событие изменения свойства.</summary>
+        public event PropertyChangedEventHandler PropertyChanged;
 
         #region Properties
 
-
+        /// <summary>Имя.</summary>
         public string Name
         {
-            get { return _Name; }
+            get
+            {
+                return this.name;
+            }
+
             set
             {
-                if (_Name != value)
+                if (this.name != value)
                 {
-                    _Name = value;
-                    OnPropertyChanged("Name");
+                    this.name = value;
+                    this.OnPropertyChanged("Name");
                 }
             }
         }
 
+        /// <summary>Телефон.</summary>
         public string Phone
         {
-            get { return _Phone; }
+            get
+            {
+                return this.phone;
+            }
+
             set
             {
-                if (_Phone != value)
+                if (this.phone != value)
                 {
-                    _Phone = value;
-                    OnPropertyChanged("Phone");
+                    this.phone = value;
+                    this.OnPropertyChanged("Phone");
                 }
             }
         }
 
+        /// <summary>Возраст.</summary>
         public string Age
         {
-            get { return _Age; }
+            get
+            {
+                return this.age;
+            }
+
             set
             {
-                if (_Age != value)
+                if (this.age != value)
                 {
-                    _Age = value;
-                    OnPropertyChanged("Age");
+                    this.age = value;
+                    this.OnPropertyChanged("Age");
                 }
             }
         }
 
+        /// <summary>Описание.</summary>
         public string Descr
         {
-            get { return _Descr; }
+            get
+            {
+                return this.descr;
+            }
+
             set
             {
-                if (_Descr != value)
+                if (this.descr != value)
                 {
-                    _Descr = value;
-                    OnPropertyChanged("Descr");
+                    this.descr = value;
+                    this.OnPropertyChanged("Descr");
                 }
             }
         }
 
+        #endregion
+
+        #region Implement INotyfyPropertyChanged members
+        
+        /// <summary>Изменения свойства.</summary>
+        /// <param name="propertyName">Имя свойства.</param>
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
 
         #endregion
     }

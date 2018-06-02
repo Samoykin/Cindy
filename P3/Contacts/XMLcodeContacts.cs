@@ -1,36 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-
-namespace P3.Updater
+﻿namespace P3.Updater
 {
-    class XMLcodeContacts
-    {
-        private string _localPropPath;
+    using System.Text;
+    using System.Xml;
 
-        public XMLcodeContacts(String localPropPath)
+    /// <summary>Параметры XML контактов.</summary>
+    public class XMLcodeContacts
+    {
+        private string localPropPath;
+
+        /// <summary>Initializes a new instance of the <see cref="XMLcodeContacts" /> class.</summary>
+        /// <param name="localPropPath">Путь к файлу.</param>
+        public XMLcodeContacts(string localPropPath)
         {
-            _localPropPath = localPropPath;
+            this.localPropPath = localPropPath;
         }
 
+        /// <summary>Создать XML.</summary>
         public void CreateXml()
         {
-            XmlTextWriter textWritter = new XmlTextWriter(_localPropPath, Encoding.UTF8);
+            var textWritter = new XmlTextWriter(this.localPropPath, Encoding.UTF8);
             textWritter.WriteStartDocument();
             textWritter.WriteStartElement("head");
             textWritter.WriteEndElement();
             textWritter.Close();
         }
 
+        /// <summary>Создать узлы XML.</summary>
         public void CreateNodesXml()
         {
-            XmlDocument document = new XmlDocument();
-            document.Load(_localPropPath);
+            var document = new XmlDocument();
+            document.Load(this.localPropPath);
 
-            //Путь до файла с настройками обновления
+            // Путь до файла с настройками обновления
             XmlNode upd = document.CreateElement("Contacts");
             document.DocumentElement.AppendChild(upd);
 
@@ -38,50 +39,54 @@ namespace P3.Updater
             upd1.InnerText = "1";
             upd.AppendChild(upd1);
 
-            document.Save(_localPropPath);
-
+            document.Save(this.localPropPath);
         }
 
-        public void WriteXml(String XmlForUpdate)
+        /// <summary>Записать в XML.</summary>
+        /// <param name="xmlForUpdate">Параметры.</param>
+        public void WriteXml(string xmlForUpdate)
         {
+            var document = new XmlDocument();
+            document.Load(this.localPropPath);
 
-            XmlDocument document = new XmlDocument();
-            document.Load(_localPropPath);
-
-            XmlElement xRoot = document.DocumentElement;
+            var xRoot = document.DocumentElement;
             foreach (XmlElement xnode in xRoot)
             {
                 foreach (XmlNode childnode in xnode.ChildNodes)
                 {
-                    //Путь к PhonebookUpdater
+                    // Путь к PhonebookUpdater
                     if (childnode.Name == "Path")
-                        childnode.InnerText = XmlForUpdate;
+                    {
+                        childnode.InnerText = xmlForUpdate;
+                    }
                 }
             }
-            document.Save(_localPropPath);
+
+            document.Save(this.localPropPath);
         }
 
-        public String ReadLocalPropXml()
+        /// <summary>Прочитать из локального XML.</summary>
+        /// <returns>Параметры.</returns>
+        public string ReadLocalPropXml()
         {
-            String _remotePropPath = "";
-            XmlDocument document = new XmlDocument();
-            document.Load(_localPropPath);
+            string remotePropPath = string.Empty;
+            var document = new XmlDocument();
+            document.Load(this.localPropPath);
 
-            XmlElement xRoot = document.DocumentElement;
+            var xRoot = document.DocumentElement;
             foreach (XmlElement xnode in xRoot)
             {
                 foreach (XmlNode childnode in xnode.ChildNodes)
                 {
-                    //Путь к PhonebookUpdater
+                    // Путь к PhonebookUpdater
                     if (childnode.Name == "Path")
-                        _remotePropPath = childnode.InnerText;
+                    {
+                        remotePropPath = childnode.InnerText;
+                    }
                 }
             }
-            return _remotePropPath;
+
+            return remotePropPath;
         }
-
-        
-
-    
     }
 }

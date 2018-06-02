@@ -1,29 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace P3.Utils
+﻿namespace P3.Utils
 {
-    class LogInfo
+    using System;
+    using System.IO;
+    using System.Windows.Forms;
+
+    /// <summary>Лог информация.</summary>
+    public class LogInfo
     {
-        String infoPath = @"\\elcom.local\files\01-Deps\ДПАСУТП\00_TEMP\Samoykin\log\";
+        private string infoPath = @"\\elcom.local\files\01-Deps\ДПАСУТП\00_TEMP\Samoykin\log\";
 
-        public void saveInfo()
+        /// <summary>Сохранить информацию.</summary>
+        public void SaveInfo()
         {
+            var infoPathFile = this.infoPath + "\\log_" + DateTime.Now.ToString("yyy.MM.dd") + ".txt";
 
-            String infoPathFile = infoPath + "\\log_" + DateTime.Now.ToString("yyy.MM.dd") + ".txt";
+            var date = DateTime.Now;
+            var name = Environment.UserName;
+            var computerName = Environment.MachineName;
+            var ip = System.Net.Dns.GetHostByName(Environment.MachineName).AddressList[0].ToString();
+            string remoteBD = "0";
 
-            DateTime date = DateTime.Now;
-            String name = Environment.UserName;
-            String pcName = Environment.MachineName;
-            String ip = System.Net.Dns.GetHostByName(Environment.MachineName).AddressList[0].ToString();
-            String remoteBD = "0";
-
-            if (Directory.Exists(infoPath))
+            if (Directory.Exists(this.infoPath))
             {
                 if (!File.Exists(infoPathFile))
                 {
@@ -31,17 +28,14 @@ namespace P3.Utils
                     fs.Close();
                 }
 
-                logInfoWriteFile(infoPathFile, date.ToString(), name, pcName, ip);
+                this.LogInfoWriteFile(infoPathFile, date.ToString(), name, computerName, ip);
                 remoteBD = "1";
             }
-
-            //dbc.InfoWrite(date, name, pcName, ip, remoteBD);
         }
 
-
-        public void logInfoWriteFile(String infoPathFile, String date, String name, String pcName, String ip)
+        private void LogInfoWriteFile(string infoPathFile, string date, string name, string computerName, string ip)
         {
-            String line = date + "|" + name + "|" + pcName + "|" + ip + "|" + Application.ProductVersion;
+            var line = date + "|" + name + "|" + computerName + "|" + ip + "|" + Application.ProductVersion;
             File.AppendAllText(infoPathFile, line + Environment.NewLine, System.Text.Encoding.Default);
         }
     }

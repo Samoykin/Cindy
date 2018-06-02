@@ -1,25 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace P3.Utils
+﻿namespace P3.Utils
 {
-    class GetHTML
-    {
-        public String html(String address)
-        {
-            StringBuilder sb = new StringBuilder();
-            byte[] buf = new byte[8192];
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(address);
-            request.Credentials = CredentialCache.DefaultCredentials;
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+    using System.Net;
+    using System.Text;
 
-            Stream resStream = response.GetResponseStream();
-            int count = 0;
+    /// <summary>Получение HTML.</summary>
+    public class GetHTML
+    {
+        /// <summary>HTML.</summary>
+        /// <param name="address">Адрес.</param>
+        /// <returns>Строка.</returns>
+        public string Html(string address)
+        {
+            var sb = new StringBuilder();
+            byte[] buf = new byte[8192];
+            var request = (HttpWebRequest)WebRequest.Create(address);
+            request.Credentials = CredentialCache.DefaultCredentials;
+            var response = (HttpWebResponse)request.GetResponse();
+
+            var resStream = response.GetResponseStream();
+            var count = 0;
+
             do
             {
                 count = resStream.Read(buf, 0, buf.Length);
@@ -29,6 +29,7 @@ namespace P3.Utils
                 }
             }
             while (count > 0);
+
             return sb.ToString();
         }
     }

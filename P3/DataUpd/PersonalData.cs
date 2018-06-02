@@ -1,50 +1,32 @@
-﻿using P3.Model;
-using P3.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace P3.DataUpd
+﻿namespace P3.DataUpd
 {
-    class PersonalData
+    using System.Collections.Generic;
+    using System.Net.NetworkInformation;
+
+    using Model;
+    using Utils;
+
+    /// <summary>Данные сотрудников.</summary>
+    public class PersonalData
     {
-        DBconnect dbc = new DBconnect();
-        GetHTML ghtml = new GetHTML();
-        String address = "";
-        String htmlText;
-        String text;
-        List<Employee> employeeLst = new List<Employee>();
+        private DBconnect dbc = new DBconnect();
+        private GetHTML ghtml = new GetHTML();
+        private string address = string.Empty;
+        private string htmlText;
+        private string text;
+        private List<Employee> employeeLst = new List<Employee>();
+        private List<string> idValue = new List<string>();
 
-        List<String> _tIDVal = new List<string>();
-        //List<String> tNames = new List<string>();
-        //List<String> tTels = new List<string>();
-        //List<String> tTels2 = new List<string>();
-        //List<String> tTels3 = new List<string>();
-        //List<String> tEmail = new List<string>();
-        //List<String> tDiv = new List<string>();
-        //List<String> tPos = new List<string>();
-        List<String> tBirthDay = new List<string>();
-        List<String> tBirthID = new List<string>();
-        List<String> tStartDay = new List<string>();
-        String idTemp;
-
-        //public List<String> tID
-        //{
-        //    get { return tIDVal; }
-        //    set { tIDVal = value; }
-        //}
-
-        public PersonalData(List<String> tIDVal)
+        /// <summary>Initializes a new instance of the <see cref="PersonalData" /> class.</summary>
+        /// <param name="idValue">Коллекция Id.</param>
+        public PersonalData(List<string> idValue)
         {
-            _tIDVal = tIDVal;
+            this.idValue = idValue;
         }
 
+        /// <summary>Распарсить HTML.</summary>
         public void ParseHTML()
         {
-
             Ping q = new Ping();
 
             try
@@ -52,142 +34,112 @@ namespace P3.DataUpd
                 PingReply an = q.Send("ares.elcom.local");
                 if (an.Status == IPStatus.Success)
                 {
-
-                    for (Int16 i = 0; i < _tIDVal.Count; i++)
+                    for (short i = 0; i < this.idValue.Count; i++)
                     {
+                        this.address = "http://ares/Divisions/Lists/Employees/DispForm.aspx?ID=" + this.idValue[i] + "&Source=http%3A%2F%2Fares%2FDivisions%2FLists%2FEmployees%2FPhoneList%2Easpx";
 
-                        //idTemp = _tIDVal[i];
-
-                        address = "http://ares/Divisions/Lists/Employees/DispForm.aspx?ID=" + _tIDVal[i] + "&Source=http%3A%2F%2Fares%2FDivisions%2FLists%2FEmployees%2FPhoneList%2Easpx";
-
-                        execValues(_tIDVal[i]);
-
+                        this.ExecValues(this.idValue[i]);
                     }
 
                     try
                     {
-                        dbc.ClearTable("employee");
+                        this.dbc.ClearTable("employee");
                     }
-                    catch { }
+                    catch
+                    {
+                    }
 
-                    dbc.EmployeeWrite2(employeeLst);
-
-                    //dbc.EployeeBirthDayWrite(tBirthDay, tStartDay, tBirthID);
-
+                    this.dbc.EmployeeWrite2(this.employeeLst);
                 }
-
             }
-            catch { }
-
+            catch
+            {
+            }
         }
 
-
-        private void execValues(String id)
+        /// <summary>Извлечь значения.</summary>
+        /// <param name="id">ID.</param>
+        private void ExecValues(string id)
         {
-            htmlText = ghtml.html(address);
+            this.htmlText = this.ghtml.Html(this.address);
             Employee emplTemp = new Employee();
 
-            if (htmlText.IndexOf(@"Фото:", 19) != -1)
+            if (this.htmlText.IndexOf(@"Фото:", 19) != -1)
             {
+                this.text = this.htmlText.Substring(this.htmlText.IndexOf(@"Фото:"));
 
-
-
-
-
-
-
-                text = htmlText.Substring(htmlText.IndexOf(@"Фото:"));
-
-                //Int32 startP = text.IndexOf("SRC", 0);
-                //if (startP < 300 && startP != -1)
-                //{
-                    //startP += 5;
                     emplTemp.ID = id;
-                    //ФИО
-                    text = text.Substring(text.IndexOf("ФИО"));
-                    Int32 startD = text.IndexOf("ms-formbody", 110);
 
-                    emplTemp.FullName = subObj(@"ms-formbody", 110, "</td");
+                // ФИО
+                this.text = this.text.Substring(this.text.IndexOf("ФИО"));
+                var startD = this.text.IndexOf("ms-formbody", 110);
 
-                    //Подразделение
-                    text = text.Substring(text.IndexOf("Подразделение"));
-                    startD = text.IndexOf("ID", 10);
-                    //startD = text.IndexOf(@">", 10);
-                    String idTemp;
-                    idTemp = text.Substring(startD + 3, 3);
+                    emplTemp.FullName = this.SubObj(@"ms-formbody", 110, "</td");
+
+                // Подразделение
+                this.text = this.text.Substring(this.text.IndexOf("Подразделение"));
+                    startD = this.text.IndexOf("ID", 10);
+
+                    string idTemp;
+                    idTemp = this.text.Substring(startD + 3, 3);
                     if (idTemp.IndexOf("\"", 0) != -1)
                     {
-                        idTemp = text.Substring(startD + 3, 2);
+                        idTemp = this.text.Substring(startD + 3, 2);
                     }
+
                     if (idTemp.IndexOf("\"", 0) != -1)
                     {
-                        idTemp = text.Substring(startD + 3, 1);
+                        idTemp = this.text.Substring(startD + 3, 1);
                     }
-                    String divTemp = subObj(idTemp, 160, "</A");
-                    emplTemp.Division = ReplaceStr(divTemp, @"&quot;", "");
 
-                    //День рождения
-                    text = text.Substring(text.IndexOf("Дата рождения"));
-                    //startD = text.IndexOf("ms-formbody", 70);
-                    emplTemp.BirthDayShort = subObj("ms-formbody", 70, "</td");
-                    //tBirthDay.Add(text.Substring(startD + 13, 10));
+                var divTemp = this.SubObj(idTemp, 160, "</A");
+                    emplTemp.Division = this.ReplaceStr(divTemp, @"&quot;", string.Empty);
 
-                    //Должность
-                    text = text.Substring(text.IndexOf("Должность"));
-                    emplTemp.Position = subObj("ms-formbody", 70, "</td");
+                // День рождения
+                this.text = this.text.Substring(this.text.IndexOf("Дата рождения"));
+                    emplTemp.BirthDayShort = this.SubObj("ms-formbody", 70, "</td");
 
-                    //Email
-                    text = text.Substring(text.IndexOf("Email"));
-                    String temp = subObj("mailt", 70, "\">");
+                // Должность
+                this.text = this.text.Substring(this.text.IndexOf("Должность"));
+                    emplTemp.Position = this.SubObj("ms-formbody", 70, "</td");
+
+                // Email
+                this.text = this.text.Substring(this.text.IndexOf("Email"));
+                    var temp = this.SubObj("mailt", 70, "\">");
                     if (temp.IndexOf("</TH", 0) != -1)
                     {
-                        emplTemp.Email = "";
+                        emplTemp.Email = string.Empty;
                     }
                     else
                     {
                         emplTemp.Email = temp;
                     }
 
-                    //Внутр тел
-                    text = text.Substring(text.IndexOf("Внутр. тлф"));
+                // Внутр тел
+                this.text = this.text.Substring(this.text.IndexOf("Внутр. тлф"));
 
-                    String phoneTemp = subObj("ms-formbody", 70, "</td");
-                    emplTemp.PhoneWork = ReplaceStr(phoneTemp, @"&nbsp;", "");
+                    var phoneTemp = this.SubObj("ms-formbody", 70, "</td");
+                    emplTemp.PhoneWork = this.ReplaceStr(phoneTemp, @"&nbsp;", string.Empty);
 
+                // Сотовый тел
+                this.text = this.text.Substring(this.text.IndexOf("Сотовый тлф"));
+                var phoneMobileTemp = this.SubObj("ms-formbody", 70, "</td");
+                    emplTemp.PhoneMobile = this.ReplaceStr(phoneMobileTemp, @"&nbsp;", string.Empty);
 
-                    //emplTemp.PhoneWork = subObj("ms-formbody", 70, "</td");
+                // Переадрес тел
+                this.text = this.text.Substring(this.text.IndexOf("Переадр.на"));
+                    emplTemp.PhoneExch = this.SubObj("ms-formbody", 70, "</td");
 
-                    //Сотовый тел
-                    text = text.Substring(text.IndexOf("Сотовый тлф"));
-                    String phoneMobileTemp = subObj("ms-formbody", 70, "</td");
-                    emplTemp.PhoneMobile = ReplaceStr(phoneMobileTemp, @"&nbsp;", "");
+                // Дата прихода в Элком+
+                this.text = this.text.Substring(this.text.IndexOf("Дата прихода"));
 
-                    //Переадрес тел
-                    text = text.Substring(text.IndexOf("Переадр.на"));
-                    emplTemp.PhoneExch = subObj("ms-formbody", 70, "</td");
-                    
-                    //Дата прихода в Элком+
-                    text = text.Substring(text.IndexOf("Дата прихода"));
-                    //startD = text.IndexOf("ms-formbody", 70);
-                    //tStartDay.Add(text.Substring(startD + 13, 10));
-                    emplTemp.StartDayShort = subObj("ms-formbody", 70, "</td");
+                    emplTemp.StartDayShort = this.SubObj("ms-formbody", 70, "</td");
 
-
-                    employeeLst.Add(emplTemp);
-                    //tBirthID.Add(idTemp);
-
-
-
-                //}
-
-
+                this.employeeLst.Add(emplTemp);
             }
-
-
-
         }
 
-        public String ReplaceStr(String text, String oldValue, String newValue)
+        private string ReplaceStr(string text, string oldValue, string newValue)
         {
             while (text.IndexOf(oldValue, 0) != -1)
             {
@@ -195,31 +147,29 @@ namespace P3.DataUpd
             }           
 
             return text;
-
         }
 
-        public String subObj(String sub, Int32 startPos, String endText)
+        private string SubObj(string sub, int startPos, string endText)
         {
-            Int32 len = sub.Length + 2;
-            String sub2;
+            int len = sub.Length + 2;
+            string sub2;
 
             if (sub == "_self")
-            { sub2 = @"</a>"; }
+            {
+                sub2 = @"</a>";
+            }
             else
-            { sub2 = endText; }
+            {
+                sub2 = endText;
+            }
 
-            //@"</td>"
+            int startNamePos = this.text.IndexOf(sub, startPos) + len;
 
-            Int32 startNamePos = text.IndexOf(sub, startPos) + len;
+            int endNamePos = this.text.IndexOf(sub2, startNamePos);
 
-
-            Int32 endNamePos = text.IndexOf(sub2, startNamePos);
-
-            String subObj = text.Substring(startNamePos, endNamePos - startNamePos);
+            string subObj = this.text.Substring(startNamePos, endNamePos - startNamePos);
 
             return subObj;
         }
-
-
     }
 }
