@@ -25,14 +25,14 @@
         public void ParseHTML()
         {
             short i = 0;
-            int startPos = 0;
+            var startPos = 0;
 
-            var q = new Ping();
+            var ping = new Ping();
 
             try
             {
-                var an = q.Send("ares.elcom.local");
-                if (an.Status == IPStatus.Success)
+                var pingReply = ping.Send("ares.elcom.local");
+                if (pingReply.Status == IPStatus.Success)
                 {
                     this.htmlText = this.ghtml.Html(this.address);
 

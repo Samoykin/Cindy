@@ -5,15 +5,14 @@
     using System.Diagnostics;
     using System.IO;
     using System.Windows.Forms;
-
-    using Utils;
+    using NLog;
 
     /// <summary>Обновление ПО.</summary>
     public class SoftUpdater
     {
+        private Logger logger = LogManager.GetCurrentClassLogger();
         private string remotePropPath = string.Empty;
         private XMLcode xml;
-        private LogFile logFile = new LogFile();
         private List<string> remoteProp = new List<string>();
         private string updVer, tempFolderPath = Environment.CurrentDirectory + @"\Temp\";
         private string updFolderPath = Environment.CurrentDirectory + @"\Updater\";
@@ -57,8 +56,7 @@
                         this.CopyDir(this.tempFolderPath, this.updFolderPath);
                         this.DelDir(this.tempFolderPath);
 
-                        var logText2 = DateTime.Now.ToString() + "|event|SoftUpdater - UpdateSoft| Обновление Phonebook Updater завершено";
-                        this.logFile.WriteLog(logText2);
+                        this.logger.Info("Обновление Phonebook Updater завершено");
                     }                
                 }
                 else
@@ -66,14 +64,11 @@
                     if (Directory.Exists(this.remoteProp[3]))
                     {
                         this.CopyDir(this.remoteProp[3], this.updFolderPath);
-
-                        var logText2 = DateTime.Now.ToString() + "|event|SoftUpdater - UpdateSoft| Обновление Phonebook Updater завершено";
-                        this.logFile.WriteLog(logText2);
+                        this.logger.Info("Обновление Phonebook Updater завершено");
                     }
                     else
                     {
-                        var logText = DateTime.Now.ToString() + "|warning|SoftUpdater - UpdateSoft| Отсутствует папка" + this.remoteProp[3];
-                        this.logFile.WriteLog(logText);
+                        this.logger.Warn("Отсутствует папка" + this.remoteProp[3]);
                     }                
                 } 
 
@@ -88,8 +83,7 @@
             }
             catch (Exception ex)
             {
-                var logText = DateTime.Now.ToString() + "|fail|SoftUpdater - UpdateSoft|" + ex.Message;
-                this.logFile.WriteLog(logText);
+                this.logger.Error(ex.Message);
             }
         }       
 
@@ -104,13 +98,11 @@
                     File.Copy(s1, s2);
                 }
 
-                var logText = DateTime.Now.ToString() + "|event|SoftUpdater - CopyDir| Копирование файлов Updaytera завершено";
-                this.logFile.WriteLog(logText);
+                this.logger.Info("Копирование файлов Updaytera завершено");
             }
             catch (Exception ex)
             {
-                var logText = DateTime.Now.ToString() + "|fail|SoftUpdater - CopyDir|" + ex.Message;
-                this.logFile.WriteLog(logText);
+                this.logger.Error(ex.Message);
             }
         }
 
@@ -130,13 +122,11 @@
                     subDirectory.Delete(true);
                 }
 
-                var logText = DateTime.Now.ToString() + "|event|SoftUpdater - DelDir| Удаление содержимого папки " + dirPath + " завершено";
-                this.logFile.WriteLog(logText);
+                this.logger.Info($"Удаление содержимого папки {dirPath} завершено");
             }
             catch (Exception ex)
             {
-                var logText = DateTime.Now.ToString() + "|fail|SoftUpdater - DelDir|" + ex.Message;
-                this.logFile.WriteLog(logText);
+                this.logger.Error(ex.Message);
             }
         }
     }

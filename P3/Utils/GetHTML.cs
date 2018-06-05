@@ -12,7 +12,7 @@
         public string Html(string address)
         {
             var sb = new StringBuilder();
-            byte[] buf = new byte[8192];
+            var buf = new byte[8192];
             var request = (HttpWebRequest)WebRequest.Create(address);
             request.Credentials = CredentialCache.DefaultCredentials;
             var response = (HttpWebResponse)request.GetResponse();

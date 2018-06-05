@@ -65,7 +65,7 @@
             { 
                 try
                 {
-                    SoftUpdater upd = new SoftUpdater(xml);
+                    var upd = new SoftUpdater(xml);
                     upd.UpdateSoft();
                 }
                 catch

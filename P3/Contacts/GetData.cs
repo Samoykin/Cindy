@@ -5,15 +5,6 @@
     /// <summary>Получить данные.</summary>
     public class GetData
     {
-        /*
-        public List<string> name = new List<string>();
-        public List<string> position = new List<string>();
-        public List<string> tel = new List<string>();
-        public List<string> workTel = new List<string>();
-        public List<string> email = new List<string>();
-        public List<string> company = new List<string>();
-        */
-
         /// <summary>Имя.</summary>
         public List<string> Name { get; set; }
 

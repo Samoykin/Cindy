@@ -5,16 +5,18 @@
     using System.IO;
     using System.Text;
     using System.Windows.Forms;
-
     using Model;
+    using NLog;
     using Updater;
     using Excel = Microsoft.Office.Interop.Excel;
 
     /// <summary>Обновить контакты.</summary>
     public class UpdateContacts
     {
-        private string path = @"DBTels.sqlite";
-        private string pathTemp = @"DBTelsTemp.sqlite";
+        private const string Path = "DBTels.sqlite";
+        private const string PathTemp = "DBTelsTemp.sqlite";
+        private const string LocalPropPath = "Settings.xml";
+        private Logger logger = LogManager.GetCurrentClassLogger();
         private bool flag = false;
 
         private Excel.Application excelApp;
@@ -29,9 +31,8 @@
         public string GetPath()
         {
             var customPath = string.Empty;
-            var localPropPath = "Settings.xml";
 
-            var xmlCode = new XMLcodeContacts(localPropPath);
+            var xmlCode = new XMLcodeContacts(LocalPropPath);
             customPath = xmlCode.ReadLocalPropXml();
 
             if (!File.Exists(customPath))
@@ -50,7 +51,7 @@
             if (customPath != string.Empty)
             {
                 this.flag = this.ReadData(customPath);
-                File.Copy(this.pathTemp, this.path, true);
+                File.Copy(PathTemp, Path, true);
             }
 
             return this.flag;
@@ -63,7 +64,7 @@
             string filename = string.Empty;
             try
             {
-                OpenFileDialog openFileDialog = new OpenFileDialog();
+                var openFileDialog = new OpenFileDialog();
 
                 openFileDialog.InitialDirectory = "c:\\";
                 openFileDialog.Filter = "Execl files (*.xlsx)|*.xlsx";
@@ -138,6 +139,7 @@
             catch (Exception ex)
             {
                 MessageBox.Show("Ошибка." + ex);
+                this.logger.Error(ex.Message);
                 return false;
             }            
         }
@@ -189,6 +191,7 @@
             catch (Exception ex)
             {
                 MessageBox.Show("Ошибка. Невозможно записать данные, возможно файл открыт другим пользователем." + ex);
+                this.logger.Error(ex.Message);
                 return flag;
             }
         }
@@ -223,6 +226,7 @@
             catch (Exception ex)
             {
                 MessageBox.Show("Файл не создан");
+                this.logger.Error(ex.Message);
             }
 
         link1: ;

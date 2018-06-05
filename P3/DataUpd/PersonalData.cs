@@ -9,6 +9,7 @@
     /// <summary>Данные сотрудников.</summary>
     public class PersonalData
     {
+        private const string CheckSite = "ares.elcom.local";
         private DBconnect dbc = new DBconnect();
         private GetHTML ghtml = new GetHTML();
         private string address = string.Empty;
@@ -27,11 +28,11 @@
         /// <summary>Распарсить HTML.</summary>
         public void ParseHTML()
         {
-            Ping q = new Ping();
+            var q = new Ping();
 
             try
             {
-                PingReply an = q.Send("ares.elcom.local");
+                var an = q.Send(CheckSite);
                 if (an.Status == IPStatus.Success)
                 {
                     for (short i = 0; i < this.idValue.Count; i++)
@@ -62,7 +63,7 @@
         private void ExecValues(string id)
         {
             this.htmlText = this.ghtml.Html(this.address);
-            Employee emplTemp = new Employee();
+            var emplTemp = new Employee();
 
             if (this.htmlText.IndexOf(@"Фото:", 19) != -1)
             {
@@ -151,7 +152,7 @@
 
         private string SubObj(string sub, int startPos, string endText)
         {
-            int len = sub.Length + 2;
+            var len = sub.Length + 2;
             string sub2;
 
             if (sub == "_self")
@@ -167,9 +168,7 @@
 
             int endNamePos = this.text.IndexOf(sub2, startNamePos);
 
-            string subObj = this.text.Substring(startNamePos, endNamePos - startNamePos);
-
-            return subObj;
+            return this.text.Substring(startNamePos, endNamePos - startNamePos);
         }
     }
 }

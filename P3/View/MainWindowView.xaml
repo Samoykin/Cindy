@@ -51,7 +51,7 @@
                     <StackPanel>
                         <TextBlock Margin="7" FontSize="11">2018, Cindy</TextBlock>
                         <TextBlock Margin="7" FontSize="11">Самойкин Андрей</TextBlock>
-                        <TextBlock Margin="7" FontSize="11">v 3.0.2.1</TextBlock>
+                        <TextBlock Margin="7" FontSize="11">v 3.0.3.0</TextBlock>
                     </StackPanel>
                 </MenuItem>
 

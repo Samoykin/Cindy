@@ -2,16 +2,15 @@
 {
     using System;
     using System.Collections.ObjectModel;
-    using System.IO;
-    
+    using System.IO;    
     using Model;
-    using Utils;
+    using NLog;
     using Excel = Microsoft.Office.Interop.Excel;
 
     /// <summary>Экспорт данных в Excel.</summary>
     public class ExcelExport
     {
-        private LogFile logFile = new LogFile();
+        private Logger logger = LogManager.GetCurrentClassLogger();
         private string filePath;
 
         // работа с Excel
@@ -52,7 +51,7 @@
 
                 int i = 0;
 
-                foreach (Customer n in custLst)
+                foreach (var n in custLst)
                 {
                     this.rangeExcel = (Excel.Range)this.workSheetExcel.Cells[i + 2, 1];
                     this.rangeExcel.Value = custLst[i].FullName;
@@ -75,13 +74,11 @@
                 this.excelApp.Quit();
                 GC.Collect();
 
-                var logText = DateTime.Now.ToString() + "|event|ExcelExport - excelWrite|Контакты сохранены в Excel " + this.filePath;
-                this.logFile.WriteLog(logText);
+                this.logger.Info("Контакты сохранены в Excel " + this.filePath);
             }
             catch (Exception ex)
             {
-                var logText = DateTime.Now.ToString() + "|fail|ExcelExport - excelWrite|" + ex.Message;
-                this.logFile.WriteLog(logText);
+                this.logger.Error(ex.Message);
 
                 this.workSheetExcel.SaveAs(this.filePath);
                 this.excelApp.Quit();

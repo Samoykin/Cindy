@@ -27,12 +27,12 @@
         /// <summary>Распарсить.</summary>
         public void ParseHTML()
         {
-            var q = new Ping();
+            var ping = new Ping();
 
             try
             {
-                PingReply an = q.Send("ares.elcom.local");
-                if (an.Status == IPStatus.Success)
+                var pingReply = ping.Send("ares.elcom.local");
+                if (pingReply.Status == IPStatus.Success)
                 {
                     for (short i = 0; i < this.tempID.Count; i++)
                     {

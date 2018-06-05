@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-
     using Model;
 
     /// <summary>Новости.</summary>
@@ -14,15 +13,15 @@
         /// <returns>Список.</returns>
         public NewsList GetNews(ObservableCollection<Employee> employeeLst)
         {
-            NewsList newsList = new NewsList();
+            var newsList = new NewsList();
             newsList.News = new List<New>();
             newsList.FutureNews = new List<New>();
 
-            foreach (Employee e in employeeLst)
+            foreach (var e in employeeLst)
             {
                 if (e.BirthDay.Month == DateTime.Now.Month && e.BirthDay.Day == DateTime.Now.Day)
                 {
-                    New item = new New();
+                    var item = new New();
 
                     if (Convert.ToInt32(e.Age) % 5 == 0)
                     {
@@ -44,7 +43,7 @@
 
                 if (e.StartDay.Month == DateTime.Now.Month && e.StartDay.Day == DateTime.Now.Day)
                 {
-                    New item = new New();
+                    var item = new New();
 
                     if (e.TimeRecord != "менее года")
                     {
@@ -70,8 +69,8 @@
 
                 // ----------------------------------------------------------
                 // Предстоящие события
-                DateTime dt1 = DateTime.Now;
-                DateTime dt2 = e.BirthDay;
+                var dt1 = DateTime.Now;
+                var dt2 = e.BirthDay;
                 int diff = dt1.Year - dt2.Year;
 
                 dt2 = e.BirthDay.AddYears(diff);
@@ -79,7 +78,7 @@
                 // день рождения
                 if (dt2 > dt1 && dt2 < dt1.AddDays(7))
                 {
-                    New item = new New();
+                    var item = new New();
 
                     item.Date = new DateTime(DateTime.Now.Year, e.BirthDay.Month, e.BirthDay.Day);
                     item.FullName = e.FullName;
@@ -100,15 +99,15 @@
                 }
 
                 // годовщина работы
-                DateTime dt3 = DateTime.Now;
-                DateTime dt4 = e.StartDay;
+                var dt3 = DateTime.Now;
+                var dt4 = e.StartDay;
                 int diff2 = dt3.Year - dt4.Year;
 
                 dt2 = e.StartDay.AddYears(diff2);
 
                 if (dt2 > dt1 && dt2 < dt1.AddDays(7))
                 {
-                    New item = new New();
+                    var item = new New();
                     item.Date = new DateTime(DateTime.Now.Year, e.StartDay.Month, e.StartDay.Day);
                     item.FullName = e.FullName;
 

@@ -8,15 +8,14 @@
     using System.Data.SQLite;
     using System.IO;
     using System.Linq;
-
     using Model;
 
     /// <summary>Подключение к БД.</summary>
     public class DBconnect
     {
-        private string dataBaseName = "DBTels.sqlite";
-        private string dataBase2Name = "DBTelsTemp.sqlite";
-        private string pass = "Xt,ehfirf3";
+        private const string DataBaseName = "DBTels.sqlite";
+        private const string DataBase2Name = "DBTelsTemp.sqlite";
+        private const string Pass = "Xt,ehfirf3";
 
         private List<string> idVal = new List<string>();
         private List<string> namesVal = new List<string>();
@@ -139,21 +138,21 @@
         /// <summary>Создать БД.</summary>
         public void CreateBase()
         {
-            if (!File.Exists(this.dataBaseName))
+            if (!File.Exists(DataBaseName))
             {
-                SQLiteConnection.CreateFile(this.dataBaseName);
+                SQLiteConnection.CreateFile(DataBaseName);
                 SQLiteConnection connection = new SQLiteConnection("Data Source=DBTels.sqlite;Version=3;");
-                connection.SetPassword(this.pass);
+                connection.SetPassword(Pass);
             }
         }
 
         /// <summary>Создать таблицу сотрудников.</summary>
         public void EmployeeCreateTable()
         {
-            string command = "CREATE TABLE employee (id INTEGER PRIMARY KEY UNIQUE, tID VARCHAR, tNames VARCHAR, tTels VARCHAR, tTels2 VARCHAR, tTels3 VARCHAR, tEmail VARCHAR, tDiv VARCHAR, tPos VARCHAR, tStatus VARCHAR, tActStatus VARCHAR, tBirthDay VARCHAR, tStartDay VARCHAR);";
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", this.dataBaseName, this.pass));
+            var command = "CREATE TABLE employee (id INTEGER PRIMARY KEY UNIQUE, tID VARCHAR, tNames VARCHAR, tTels VARCHAR, tTels2 VARCHAR, tTels3 VARCHAR, tEmail VARCHAR, tDiv VARCHAR, tPos VARCHAR, tStatus VARCHAR, tActStatus VARCHAR, tBirthDay VARCHAR, tStartDay VARCHAR);";
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", DataBaseName, Pass));
 
-            SQLiteCommand sqlitecommand = new SQLiteCommand(command, connection);
+            var sqlitecommand = new SQLiteCommand(command, connection);
             connection.Open();
             sqlitecommand.ExecuteNonQuery();
             connection.Close();
@@ -162,10 +161,10 @@
         /// <summary>Создать таблицу заказчиков.</summary>
         public void CustomerCreateTable()
         {
-            string command = "CREATE TABLE customer (id INTEGER PRIMARY KEY UNIQUE, custNames VARCHAR, custPos VARCHAR, custTels VARCHAR, custTels2 VARCHAR, custEmail VARCHAR, custComp VARCHAR);";
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", this.dataBaseName, this.pass));
+            var command = "CREATE TABLE customer (id INTEGER PRIMARY KEY UNIQUE, custNames VARCHAR, custPos VARCHAR, custTels VARCHAR, custTels2 VARCHAR, custEmail VARCHAR, custComp VARCHAR);";
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", DataBaseName, Pass));
 
-            SQLiteCommand sqlitecommand = new SQLiteCommand(command, connection);
+            var sqlitecommand = new SQLiteCommand(command, connection);
             connection.Open();
             sqlitecommand.ExecuteNonQuery();
             connection.Close();
@@ -174,10 +173,10 @@
         /// <summary>Создать таблицу информации.</summary>
         public void InfoCreateTable()
         {
-            string command = "CREATE TABLE info (id INTEGER PRIMARY KEY UNIQUE, date VARCHAR, name VARCHAR, pcName VARCHAR, ip VARCHAR, remoteBD VARCHAR);";
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", this.dataBaseName, this.pass));
+            var command = "CREATE TABLE info (id INTEGER PRIMARY KEY UNIQUE, date VARCHAR, name VARCHAR, pcName VARCHAR, ip VARCHAR, remoteBD VARCHAR);";
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", DataBaseName, Pass));
 
-            SQLiteCommand sqlitecommand = new SQLiteCommand(command, connection);
+            var sqlitecommand = new SQLiteCommand(command, connection);
             connection.Open();
             sqlitecommand.ExecuteNonQuery();
             connection.Close();
@@ -186,10 +185,10 @@
         /// <summary>Создать таблицу статусов.</summary>
         public void StatusCreateTable()
         {
-            string command = "CREATE TABLE status (id INTEGER PRIMARY KEY UNIQUE, statusVal VARCHAR);";
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", this.dataBaseName, this.pass));
+            var command = "CREATE TABLE status (id INTEGER PRIMARY KEY UNIQUE, statusVal VARCHAR);";
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", DataBaseName, Pass));
 
-            SQLiteCommand sqlitecommand = new SQLiteCommand(command, connection);
+            var sqlitecommand = new SQLiteCommand(command, connection);
             connection.Open();
             sqlitecommand.ExecuteNonQuery();
             connection.Close();
@@ -206,7 +205,7 @@
         /// <param name="pos">Должность.</param>
         public void EmployeeWrite(List<string> id, List<string> names, List<string> tels, List<string> tels2, List<string> tels3, List<string> email, List<string> div, List<string> pos)
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
 
             connection.Open();
             SQLiteCommand command;
@@ -219,14 +218,14 @@
 
             connection.Close();
 
-            File.Copy(this.dataBase2Name, this.dataBaseName, true);
+            File.Copy(DataBase2Name, DataBaseName, true);
         }
         
         /// <summary>Записать в таблицу сотрудника2.</summary>
         /// <param name="employeeLst">Коллекция сотрудников.</param>
         public void EmployeeWrite2(List<Employee> employeeLst) 
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
 
             connection.Open();
             SQLiteCommand command;
@@ -239,7 +238,7 @@
 
             connection.Close();
 
-            File.Copy(this.dataBase2Name, this.dataBaseName, true);
+            File.Copy(DataBase2Name, DataBaseName, true);
         }
 
         /// <summary>Записать в таблицу заказчика.</summary>
@@ -251,7 +250,7 @@
         /// <param name="custComp">Компания.</param>
         public void CustomerWrite(List<string> custNames, List<string> custPos, List<string> custTels, List<string> custTels2, List<string> custEmail, List<string> custComp)
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
             connection.Open();
             SQLiteCommand command;
 
@@ -268,7 +267,7 @@
         /// <param name="contact">Заказчик.</param>
         public void CustomerUpdatePerson(Customer contact)
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
             connection.Open();
             SQLiteCommand command = new SQLiteCommand("UPDATE customer SET custNames = '" + contact.FullName + "', custPos = '" + contact.Position + "', custTels = '" + contact.PhoneMobile + "', custTels2 = '" + contact.PhoneWork + "', custEmail = '" + contact.Email + "', custComp = '" + contact.Company + "' WHERE custNames Like '" + contact.FullName + "';", connection);
                 
@@ -276,21 +275,21 @@
 
             connection.Close();
 
-            File.Copy(this.dataBase2Name, this.dataBaseName, true);
+            File.Copy(DataBase2Name, DataBaseName, true);
         }
         
         /// <summary>Записать контакты в таблицу заказчика.</summary>
         /// <param name="contact">Заказчик.</param>
         public void CustomerWritePerson(Customer contact)
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
             connection.Open();
             SQLiteCommand command = new SQLiteCommand("INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('" + contact.FullName + "', '" + contact.Position + "', '" + contact.PhoneMobile + "', '" + contact.PhoneWork + "', '" + contact.Email + "', '" + contact.Company + "');", connection);
             
             command.ExecuteNonQuery();
             connection.Close();
 
-            File.Copy(this.dataBase2Name, this.dataBaseName, true);
+            File.Copy(DataBase2Name, DataBaseName, true);
         }
 
         /// <summary>Записать в таблицу информации.</summary>
@@ -301,7 +300,7 @@
         /// <param name="remoteBD">Удаленная БД.</param>
         public void InfoWrite(DateTime date, string name, string computerName, string ip, string remoteBD)
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
             connection.Open();
             SQLiteCommand command;
 
@@ -315,7 +314,7 @@
         /// <param name="status">Статусы.</param>
         public void StatusWrite(List<string> status)
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
             connection.Open();
             SQLiteCommand command;
 
@@ -337,7 +336,7 @@
         /// <param name="act">Действия.</param>
         public void EployeeStatusWrite(List<string> status, List<string> names, List<string> act) 
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
             connection.Open();
             SQLiteCommand command;
 
@@ -352,7 +351,7 @@
 
             connection.Close();
             
-            File.Copy(this.dataBase2Name, this.dataBaseName, true);
+            File.Copy(DataBase2Name, DataBaseName, true);
         }
 
         /// <summary>Записать в таблицу дни рождения сотрудников.</summary>
@@ -361,7 +360,7 @@
         /// <param name="birthDayID">Дни рождения ID.</param>
         public void EployeeBirthDayWrite(List<string> birthDay, List<string> startDay, List<string> birthDayID)
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBase2Name, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
             connection.Open();
             SQLiteCommand command;
 
@@ -384,19 +383,19 @@
             Employee empl;
             this.EmployeeLst = new ObservableCollection<Employee> { };
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBaseName, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, Pass));
 
             connection.Open();
-            SQLiteCommand command = new SQLiteCommand("SELECT * FROM 'employee';", connection);
-            SQLiteDataReader reader = command.ExecuteReader();
+            var command = new SQLiteCommand("SELECT * FROM 'employee';", connection);
+            var reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
                 string dtime;
                 string dtime2;
                 DateTime dateValue;
-                
-                string birthDayTemp = record["tBirthDay"].ToString();
-                string startDayTemp = record["tStartDay"].ToString();
+
+                var birthDayTemp = record["tBirthDay"].ToString();
+                var startDayTemp = record["tStartDay"].ToString();
                 
                 // День рождения
                 if (birthDayTemp.Length > 0 && DateTime.TryParse(birthDayTemp, out dateValue))
@@ -418,7 +417,7 @@
                     dtime2 = "21.12.1994";
                 }
 
-                DateTime dateTemp = DateTime.Now;
+                var dateTemp = DateTime.Now;
 
                 empl = new Employee();
 
@@ -443,12 +442,12 @@
                 else if (dateTemp.Month == empl.BirthDay.Month && dateTemp.Day < empl.BirthDay.Day)
                 {
                     empl.Age = empl.Age - 1;
-                }                
+                }
 
                 // -------------------------------
                 // День рождения
-                string monthTemp = empl.BirthDay.Month.ToString();
-                string dayTemp = empl.BirthDay.Day.ToString();
+                var monthTemp = empl.BirthDay.Month.ToString();
+                var dayTemp = empl.BirthDay.Day.ToString();
                 if (empl.BirthDay.Month < 10)
                 {
                     monthTemp = "0" + empl.BirthDay.Month.ToString();
@@ -465,7 +464,7 @@
                 // Стаж
                 empl.StartDay = Convert.ToDateTime(dtime2);
 
-                int timeRecordTmp = dateTemp.Year - empl.StartDay.Year;
+                var timeRecordTmp = dateTemp.Year - empl.StartDay.Year;
 
                 if (timeRecordTmp == 0)
                 {
@@ -523,11 +522,11 @@
         {
             Customer cust;
             this.CustomerLst = new ObservableCollection<Customer> { };
-            
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBaseName, this.pass));
+
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, Pass));
             connection.Open();
-            SQLiteCommand command = new SQLiteCommand("SELECT * FROM 'customer';", connection);
-            SQLiteDataReader reader = command.ExecuteReader();
+            var command = new SQLiteCommand("SELECT * FROM 'customer';", connection);
+            var reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
                 cust = new Customer();
@@ -551,11 +550,11 @@
         /// <param name="table">Таблица.</param>
         public void ClearTable(string table)
         {
-            string command = "DELETE FROM '" + table + "';";
+            var command = "DELETE FROM '" + table + "';";
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", this.dataBase2Name, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Version=3;Password={1};", DataBase2Name, Pass));
 
-            SQLiteCommand sqlitecommand = new SQLiteCommand(command, connection);
+            var sqlitecommand = new SQLiteCommand(command, connection);
             connection.Open();
             sqlitecommand.ExecuteNonQuery();
             connection.Close();
@@ -564,11 +563,11 @@
         /// <summary>Прочитать ID сотрудников.</summary>
         public void EmployeeReadID()
         {
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBaseName, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, Pass));
 
             connection.Open();
-            SQLiteCommand command = new SQLiteCommand("SELECT tID FROM 'employee';", connection);
-            SQLiteDataReader reader = command.ExecuteReader();
+            var command = new SQLiteCommand("SELECT tID FROM 'employee';", connection);
+            var reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
                 this.idVal.Add(record["tID"].ToString());
@@ -581,13 +580,13 @@
         /// <returns>Статусы.</returns>
         public List<string> EmployeeReadStatus()
         {
-            List<string> status = new List<string>();
+            var status = new List<string>();
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBaseName, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, Pass));
 
             connection.Open();
-            SQLiteCommand command = new SQLiteCommand("SELECT statusVal FROM 'status';", connection);
-            SQLiteDataReader reader = command.ExecuteReader();
+            var command = new SQLiteCommand("SELECT statusVal FROM 'status';", connection);
+            var reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
                 status.Add(record["statusVal"].ToString());
@@ -604,20 +603,20 @@
         {
             string prepDay;
             string prepMonth;
-            DataTable dt = new DataTable();
+            var dt = new DataTable();
             dt.Columns.Add("ФИО");
             dt.Columns.Add("Дата");
 
             dt.Rows.Clear();
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBaseName, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, Pass));
 
             connection.Open();
-            SQLiteCommand command = new SQLiteCommand("SELECT tNames, tBirthDay FROM 'employee';", connection);
-            SQLiteDataReader reader = command.ExecuteReader();
+            var command = new SQLiteCommand("SELECT tNames, tBirthDay FROM 'employee';", connection);
+            var reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
-                DateTime dtime2 = DateTime.Today;
+                var dtime2 = DateTime.Today;
 
                 if (record["tBirthDay"].ToString().Length > 0)
                 {
@@ -642,19 +641,19 @@
         /// <summary>Скопировать таблицу сотрудников.</summary>
         public void EmployeeCopyTables()
         {
-            List<string> tempName = new List<string>();
-            List<string> tempTel = new List<string>();
-            List<string> tempTel2 = new List<string>();
-            List<string> tempTel3 = new List<string>();
-            List<string> tempEm = new List<string>();
-            List<string> tempDi = new List<string>();
-            List<string> tempPo = new List<string>();
-            List<string> tempID = new List<string>();
+            var tempName = new List<string>();
+            var tempTel = new List<string>();
+            var tempTel2 = new List<string>();
+            var tempTel3 = new List<string>();
+            var tempEm = new List<string>();
+            var tempDi = new List<string>();
+            var tempPo = new List<string>();
+            var tempID = new List<string>();
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", "DBTels2.sqlite", this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", "DBTels2.sqlite", Pass));
             connection.Open();
-            SQLiteCommand command = new SQLiteCommand("SELECT * FROM 'employee';", connection);
-            SQLiteDataReader reader = command.ExecuteReader();
+            var command = new SQLiteCommand("SELECT * FROM 'employee';", connection);
+            var reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
                 tempName.Add(record["tNames"].ToString());
@@ -669,7 +668,7 @@
 
             connection.Close();
 
-            SQLiteConnection connection2 = new SQLiteConnection(string.Format("Data Source={0};Password={1};", "DBTels.sqlite", this.pass));
+            var connection2 = new SQLiteConnection(string.Format("Data Source={0};Password={1};", "DBTels.sqlite", Pass));
             connection2.Open();
             SQLiteCommand command2;
 
@@ -685,35 +684,35 @@
         /// <summary>Посчитать кол-во статусов.</summary>
         public void EmployeeReadStatusCount()
         {
-            List<string> status = new List<string>();
+            var status = new List<string>();
 
-            SQLiteConnection connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", this.dataBaseName, this.pass));
+            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBaseName, Pass));
 
             connection.Open();
 
-            SQLiteCommand command = new SQLiteCommand("SELECT tID FROM employee WHERE tStatus LIKE 'в отпуске%' AND tActStatus = '1';", connection);
-            SQLiteDataReader reader = command.ExecuteReader();
+            var command = new SQLiteCommand("SELECT tID FROM employee WHERE tStatus LIKE 'в отпуске%' AND tActStatus = '1';", connection);
+            var reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
                 this.Vacation.Add(record["tID"].ToString());
             }
 
-            SQLiteCommand command2 = new SQLiteCommand("SELECT tID FROM 'employee' WHERE tStatus LIKE 'в командировке%' AND tActStatus = '1';", connection);
-            SQLiteDataReader reader2 = command2.ExecuteReader();
+            var command2 = new SQLiteCommand("SELECT tID FROM 'employee' WHERE tStatus LIKE 'в командировке%' AND tActStatus = '1';", connection);
+            var reader2 = command2.ExecuteReader();
             foreach (DbDataRecord record in reader2)
             {
                 this.BTrip.Add(record["tID"].ToString());
             }
 
-            SQLiteCommand command3 = new SQLiteCommand("SELECT tID FROM 'employee' WHERE tStatus LIKE 'на больничном%' AND tActStatus = '1';", connection);
-            SQLiteDataReader reader3 = command3.ExecuteReader();
+            var command3 = new SQLiteCommand("SELECT tID FROM 'employee' WHERE tStatus LIKE 'на больничном%' AND tActStatus = '1';", connection);
+            var reader3 = command3.ExecuteReader();
             foreach (DbDataRecord record in reader3)
             {
                 this.Sick.Add(record["tID"].ToString());
             }
 
-            SQLiteCommand command4 = new SQLiteCommand("SELECT tID FROM 'employee' WHERE (tStatus LIKE 'на обуч%' OR tStatus LIKE 'не будет%') AND tActStatus = '1';", connection);
-            SQLiteDataReader reader4 = command4.ExecuteReader();
+            var command4 = new SQLiteCommand("SELECT tID FROM 'employee' WHERE (tStatus LIKE 'на обуч%' OR tStatus LIKE 'не будет%') AND tActStatus = '1';", connection);
+            var reader4 = command4.ExecuteReader();
             foreach (DbDataRecord record in reader4)
             {
                 this.Other.Add(record["tID"].ToString());

@@ -3,8 +3,7 @@
     using System;
     using System.Collections.ObjectModel;
     using System.Linq;
-
-    using P3.Model;
+    using Model;
 
     /// <summary>Статистика по сотрудникам.</summary>
     public class EmplStatistic
@@ -70,7 +69,7 @@
         {
             this.employeeNewLst.Clear();
 
-            foreach (Employee ee in this.employeeLst)
+            foreach (var ee in this.employeeLst)
             {
                 if (ee.StartDay >= startDay && ee.StartDay <= endDay)
                 {
