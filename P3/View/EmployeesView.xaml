@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d">
-
     
     <Grid Name="gridMain" Margin="10,0,1,1">
         <Grid.ColumnDefinitions>
@@ -30,36 +29,8 @@
                 <Image Height="20" Width="20" Source="/P3;component/Resources/sick2.png" ToolTip="Больничный"/>
                 <Label Content="{Binding Misc.Sick}"/>
             </WrapPanel>
-
-
-
-
-
-            <!--<Rectangle HorizontalAlignment="Left"  Width="30" Height="30" VerticalAlignment="Top">
-                    <Rectangle.Fill>
-                        <ImageBrush ImageSource="{StaticResource Customer}" />
-                    </Rectangle.Fill>
-                </Rectangle>-->
-            <!--<Button Content="Сброс" Width="60" Command="{Binding DataUpdCommand}" Margin="0,0,7,0" />-->
-        </WrapPanel>
+        </WrapPanel> 
         
-
-        <Grid Grid.Row="0" Grid.Column="2" Margin="0,0,1,1">
-            <!--<TextBlock Grid.Row="0" Grid.Column="1" Margin="5"  Text="{Binding Path=Value}" TextWrapping="Wrap" />-->
-            <!--<ListView Name="news" ItemsSource="{Binding news}" Height="50" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,1,0" Background="{x:Null}" BorderBrush="{x:Null}">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel>
-                            <TextBlock Text="{Binding Value}" TextWrapping="Wrap"/>
-                            <Line Stroke="#FFD6DDFD" X2="200" Y1="1" Y2="1" X1="10" StrokeThickness="2"></Line>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-
-            </ListView>-->
-
-        </Grid>
-
         <Grid Name="gridList" Grid.Column="0" Grid.Row="1" Margin="0,0,0,1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"></RowDefinition>
@@ -95,11 +66,8 @@
                     <RadioButton Content="Дата прихода ↑" Command="{Binding SortStartAscCommand}" Margin="20,0,0,0" />
                     <RadioButton Content="Дата прихода ↓" Command="{Binding SortStartDescCommand}" Margin="20,0,0,0" />
                 </StackPanel>
-
             </Expander>
 
-
-            <!--Height="{Binding Height, ElementName=wp1 }"-->
             <ListView Name="lstPeople" Grid.Row="3" SelectedIndex="{Binding Misc.SelectedIndex}" ItemsSource="{Binding EmployeeLst}"  HorizontalAlignment="Left" Width="250" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,0,0">
                 <ListView.ItemTemplate>
                     <DataTemplate>
@@ -120,10 +88,7 @@
             <WrapPanel Grid.Row="4">
                 <TextBlock Margin="5"  Text="Всего сотрудников:"/>
                 <TextBlock Margin="5"  Text="{Binding Path=Misc.EmployeeCount}" FontFamily="/P3;component/Fonts/#Open Sans" FontWeight="Bold" Foreground="#FF2DADF5"/>
-                <!--<TextBox Margin="5"  Text="{Binding Path=Misc.EmployeeCount}" IsReadOnly="True" BorderBrush="{x:Null}"/>-->
-            </WrapPanel>
-
-            
+            </WrapPanel>            
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="1" Visibility="{Binding Misc.StartPageVisible}">
@@ -158,10 +123,8 @@
                             <TextBlock Grid.Column="3" Text="{Binding YearCount}" TextWrapping="Wrap" FontFamily="/P3;component/Fonts/#Open Sans" Foreground="#FF17B02C" FontWeight="Bold"/>
                             <TextBlock Grid.Column="4" Text="{Binding Postfix}" TextWrapping="Wrap"/>
                         </Grid>
-
                     </DataTemplate>
                 </ListView.ItemTemplate>
-
             </ListView>
 
             <TextBlock Grid.Row="2" Text="Грядущие события:" TextWrapping="Wrap" FontFamily="/P3;component/Fonts/#Open Sans" FontWeight="Bold" Foreground="#FF2DADF5"/>
@@ -189,15 +152,12 @@
 
                     </DataTemplate>
                 </ListView.ItemTemplate>
-
             </ListView>
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="1" Visibility="{Binding Misc.FilterPageVisible}">
-
         
         <Grid  Name="gridCarDetails" Grid.Column="1" Grid.Row="1"  DataContext="{Binding ElementName=lstPeople, Path=SelectedItem}" Width="503" VerticalAlignment="Top" HorizontalAlignment="Left">
-
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
@@ -210,12 +170,6 @@
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
 
-
-            <!--<Ellipse Width="150" Height="150">
-                    <Ellipse.Fill>
-                        <ImageBrush ImageSource="{Binding Path=Image}" Stretch="Uniform"/>
-                    </Ellipse.Fill>
-                </Ellipse>-->
             <StackPanel>
                 <Rectangle HorizontalAlignment="Left"  Width="150" Height="200" VerticalAlignment="Top" Margin="7" RadiusX="10" RadiusY="10">
                     <Rectangle.Fill>
@@ -229,10 +183,8 @@
                 <WrapPanel>
                     <TextBlock Margin="5" Text="Стаж:"/>
                     <TextBlock Margin="5" Text="{Binding Path=TimeRecord}" FontFamily="/P3;component/Fonts/#Open Sans" FontWeight="Bold" Foreground="#FF2DADF5"/>
-                    <!--Foreground="#FF002EFF"-->
                 </WrapPanel>
             </StackPanel>
-            <!--<Image Grid.Row="0" Grid.Column="0" Width="150" Height="200" Source="{Binding Path=Image}" Margin="7"/>-->
 
             <Grid Grid.Row="0" Grid.Column="1">
                 <Grid.ColumnDefinitions>
@@ -277,21 +229,12 @@
                 <TextBox Grid.Row="8" Grid.Column="1" Margin="5" Text="{Binding  Path=StartDay, StringFormat=dd.MM.yyyy}" IsReadOnly="True" BorderBrush="{x:Null}"></TextBox>
             </Grid>
 
-
-
-
-
-
             <TextBlock Margin="7,7,7,0" Grid.Row="3" Visibility="Hidden">Должность:</TextBlock>
             <TextBox Margin="7" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
                          VerticalScrollBarVisibility="Visible" TextWrapping="Wrap" 
                          Text="{Binding Path=Position, TargetNullValue=[Описание не предоставлено]}" Visibility="Hidden"></TextBox>
-
         </Grid>
-
         </Grid>
         <TextBlock Grid.Row="2" Grid.Column="0" Margin="5"  Text="{Binding Path=Misc.UpdStatus}" Foreground="#FF22B90A" />
-
-        <!--</WrapPanel>-->
     </Grid>
 </UserControl>

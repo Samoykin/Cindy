@@ -14,52 +14,52 @@
         public NewsList GetNews(ObservableCollection<Employee> employeeLst)
         {
             var newsList = new NewsList();
-            newsList.News = new List<New>();
-            newsList.FutureNews = new List<New>();
+            newsList.News = new List<NewEvent>();
+            newsList.FutureNews = new List<NewEvent>();
 
-            foreach (var e in employeeLst)
+            foreach (var employee in employeeLst)
             {
-                if (e.BirthDay.Month == DateTime.Now.Month && e.BirthDay.Day == DateTime.Now.Day)
+                if (employee.BirthDay.Month == DateTime.Now.Month && employee.BirthDay.Day == DateTime.Now.Day)
                 {
-                    var item = new New();
+                    var item = new NewEvent();
 
-                    if (Convert.ToInt32(e.Age) % 5 == 0)
+                    if (Convert.ToInt32(employee.Age) % 5 == 0)
                     {
-                        item.FullName = e.FullName;
+                        item.FullName = employee.FullName;
                         item.Prefix = " празднует Юбилей: ";
-                        item.YearCount = e.Age;
+                        item.YearCount = employee.Age;
                         item.Postfix = " лет";
                     }
                     else
                     {
-                        item.FullName = e.FullName;
+                        item.FullName = employee.FullName;
                         item.Prefix = " празднует ";
-                        item.YearCount = e.Age;
+                        item.YearCount = employee.Age;
                         item.Postfix = "-й День рождения";
                     }
 
                     newsList.News.Add(item);
                 }
 
-                if (e.StartDay.Month == DateTime.Now.Month && e.StartDay.Day == DateTime.Now.Day)
+                if (employee.StartDay.Month == DateTime.Now.Month && employee.StartDay.Day == DateTime.Now.Day)
                 {
-                    var item = new New();
+                    var item = new NewEvent();
 
-                    if (e.TimeRecord != "менее года")
+                    if (employee.TimeRecord != "менее года")
                     {
-                        if (Convert.ToInt32(e.TimeRecord) % 5 == 0)
+                        if (Convert.ToInt32(employee.TimeRecord) % 5 == 0)
                         {
-                            // юбилей
-                            item.FullName = e.FullName;
+                            // Юбилей
+                            item.FullName = employee.FullName;
                             item.Prefix = " празднует Юбилей: ";
-                            item.YearCount = Convert.ToInt32(e.TimeRecord);
+                            item.YearCount = Convert.ToInt32(employee.TimeRecord);
                             item.Postfix = " лет работы в компании";
                         }
                         else
                         {
-                            item.FullName = e.FullName;
+                            item.FullName = employee.FullName;
                             item.Prefix = " празднует ";
-                            item.YearCount = Convert.ToInt32(e.TimeRecord);
+                            item.YearCount = Convert.ToInt32(employee.TimeRecord);
                             item.Postfix = "-й год работы в компании";
                         }
                     }
@@ -70,21 +70,21 @@
                 // ----------------------------------------------------------
                 // Предстоящие события
                 var dt1 = DateTime.Now;
-                var dt2 = e.BirthDay;
+                var dt2 = employee.BirthDay;
                 int diff = dt1.Year - dt2.Year;
 
-                dt2 = e.BirthDay.AddYears(diff);
+                dt2 = employee.BirthDay.AddYears(diff);
 
-                // день рождения
+                // День рождения
                 if (dt2 > dt1 && dt2 < dt1.AddDays(7))
                 {
-                    var item = new New();
+                    var item = new NewEvent();
 
-                    item.Date = new DateTime(DateTime.Now.Year, e.BirthDay.Month, e.BirthDay.Day);
-                    item.FullName = e.FullName;
-                    item.YearCount = e.Age + 1;
+                    item.Date = new DateTime(DateTime.Now.Year, employee.BirthDay.Month, employee.BirthDay.Day);
+                    item.FullName = employee.FullName;
+                    item.YearCount = employee.Age + 1;
 
-                    if (Convert.ToInt32(e.Age + 1) % 5 == 0)
+                    if (Convert.ToInt32(employee.Age + 1) % 5 == 0)
                     {                        
                         item.Prefix = " празднует Юбилей: ";                        
                         item.Postfix = " лет";
@@ -98,36 +98,36 @@
                     newsList.FutureNews.Add(item);
                 }
 
-                // годовщина работы
+                // Годовщина работы
                 var dt3 = DateTime.Now;
-                var dt4 = e.StartDay;
+                var dt4 = employee.StartDay;
                 int diff2 = dt3.Year - dt4.Year;
 
-                dt2 = e.StartDay.AddYears(diff2);
+                dt2 = employee.StartDay.AddYears(diff2);
 
                 if (dt2 > dt1 && dt2 < dt1.AddDays(7))
                 {
-                    var item = new New();
-                    item.Date = new DateTime(DateTime.Now.Year, e.StartDay.Month, e.StartDay.Day);
-                    item.FullName = e.FullName;
+                    var item = new NewEvent();
+                    item.Date = new DateTime(DateTime.Now.Year, employee.StartDay.Month, employee.StartDay.Day);
+                    item.FullName = employee.FullName;
 
-                    if (e.TimeRecord == "менее года")
+                    if (employee.TimeRecord == "менее года")
                     {                        
                         item.Prefix = " празднует ";
                         item.YearCount = 1;
                         item.Postfix = "-й год работы в компании";
                     }
-                    else if ((Convert.ToInt32(e.TimeRecord) + 1) % 5 == 0)
+                    else if ((Convert.ToInt32(employee.TimeRecord) + 1) % 5 == 0)
                     {
-                        // юбилей
+                        // Юбилей
                         item.Prefix = " празднует Юбилей: ";
-                        item.YearCount = Convert.ToInt32(e.TimeRecord) + 1;
+                        item.YearCount = Convert.ToInt32(employee.TimeRecord) + 1;
                         item.Postfix = " лет работы в компании";
                     }
                     else
                     {
                         item.Prefix = " празднует ";
-                        item.YearCount = Convert.ToInt32(e.TimeRecord) + 1;
+                        item.YearCount = Convert.ToInt32(employee.TimeRecord) + 1;
                         item.Postfix = "-й год работы в компании";
                     }
 

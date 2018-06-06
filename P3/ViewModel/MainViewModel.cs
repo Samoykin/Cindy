@@ -8,29 +8,32 @@
     using System.Threading.Tasks;
     using System.Windows.Input;
     using System.Windows.Threading;
-
     using Contacts;
     using DataUpd;
     using Model;
+    using NLog;
     using Updater;
     using Utils;
+    using static Model.Shell;
 
     /// <summary>Главная ViewModel.</summary>
     public class MainViewModel 
     {
+        private const string DatabasePath = "DBTels.sqlite";
+        private const string DatabasePathTemp = "DBTelsTemp.sqlite";
+        private const string SettingsPath = "Settings.xml";
+
         private DBconnect dbc = new DBconnect();
-        private UpdateContacts updCont = new UpdateContacts();
-        private string path = @"DBTels.sqlite";
-        private string pathTemp = "DBTelsTemp.sqlite";
-
-        private LogFile logFile = new LogFile();
+        private UpdateContacts updCont; 
+        private Logger logger = LogManager.GetCurrentClassLogger();
         private LogInfo logInfo = new LogInfo();
-
         private System.Windows.Forms.Timer timerForUpd = new System.Windows.Forms.Timer();
         private DispatcherTimer timer1 = new DispatcherTimer();
         private IDData upd = new IDData();
+        private SettingsXml<RootElement> settingsXml;
 
-        private string localPropPath = "LocalProp.xml";
+        // Конфигурация        
+        private RootElement settings = new RootElement();
 
         // Статусы сотрудников
         private List<string> vacation = new List<string>();
@@ -46,211 +49,221 @@
         /// <summary>Initializes a new instance of the <see cref="MainViewModel" /> class.</summary>
         public MainViewModel()
         {
-            this.logInfo.SaveInfo(); // сохранение информации о запустившем программу
-
-            var logText = DateTime.Now.ToString() + "|event| |Запуск приложения Phonebook 3 Cindy";
-            this.logFile.WriteLog(logText);
-
-            var xml = new XMLcode(this.localPropPath);
-            if (!File.Exists(this.localPropPath))
+            this.logInfo.SaveInfo(); // Сохранение информации о запустившем программу
+            this.logger.Info("Запуск приложения Phonebook 3 Cindy");
+            
+            try
             {
-                xml.CreateXml();
-                xml.CreateNodesXml();                
-            }
+                // Вычитывание параметров из XML
+                // Инициализация модели настроек
+                this.settingsXml = new SettingsXml<RootElement>(SettingsPath);
+                this.settings.SoftUpdate = new SoftUpdate();
+                this.settings.Contacts = new Contacts();
 
-            this.Misc = new Misc { };
-
-            // (Environment.UserDomainName) == "ELCOM"      
-            if (true) 
-            { 
-                try
+                if (!File.Exists(SettingsPath))
                 {
-                    var upd = new SoftUpdater(xml);
-                    upd.UpdateSoft();
-                }
-                catch
-                {
-                }
-
-                if (!File.Exists(this.path))
-                {
-                    this.dbc.CreateBase();
-                    this.dbc.EmployeeCreateTable();
-                    this.dbc.CustomerCreateTable();
-                    this.dbc.InfoCreateTable();
-                    this.dbc.StatusCreateTable();
-                }
-
-                File.Copy(this.path, this.pathTemp, true);
-
-                this.EmployeeLst = new ObservableCollection<Employee> { };
-                this.EmployeeLstT = new ObservableCollection<Employee> { };
-                this.EmployeeNewLst = new ObservableCollection<Employee> { };
-
-                this.CustomerLst = new ObservableCollection<Customer> { };
-                this.CustomerLstT = new ObservableCollection<Customer> { };
-
-                this.NewContact = new Customer { };
-
-                this.News = new ObservableCollection<Division> { };  // новости
-                this.FutureNews = new ObservableCollection<Division> { };  // предстоящие события
-                this.News2 = new ObservableCollection<New> { };
-                this.FutureNews2 = new ObservableCollection<New> { };  // предстоящие события
-
-                this.Statistic = new Statistic { };
-
-                this.Divisions = new ObservableCollection<Division> { };
-                this.SelectedDiv = new Employee { };
-
-                this.FutureNewsCommand = new Command(arg => this.FutureNewsMethod());
-                this.DataUpdCommand = new Command(arg => this.DataUpd()); // обновление данных с сайта
-                this.ClickCommand = new Command(arg => this.ClickMethod());
-                this.ClickCommandCust = new Command(arg => this.ClickMethodCust());
-                this.ClickCommand2 = new Command(arg => this.ClickMethod2());
-                this.ClickCommand3 = new Command(arg => this.ClickMethod3());
-                this.UpdateNewersCommand = new Command(arg => this.ClickMethodUpdateNewers());
-                this.ListSelChangCommand = new Command(arg => this.ClickMethodListSelChangCommand());
-
-                // Контакты
-                this.ClickCommand2Cust = new Command(arg => this.ClickMethod2Cust());
-                this.UpdCustCommand = new Command(arg => this.ClickMethodUpdCust());
-                this.SaveCustCommand = new Command(arg => this.ClickMethodSaveCust());
-                this.SaveNewCust = new Command(arg => this.ClickMethodSaveNewCust());
-                this.SortNameContAscCommand = new Command(arg => this.ClickMethodSortNameContAsc());
-                this.SortNameContDescCommand = new Command(arg => this.ClickMethodSortNameContDesc());
-
-                // Меню
-                this.ClickCommand4 = new Command(arg => this.ClickMethod4());
-                this.ClickCommand5 = new Command(arg => this.ClickMethod5());
-                this.MenuStatistic = new Command(arg => this.ClickMethodMenuStatistic());
-
-                // Сортировка
-                this.SortNameAscCommand = new Command(arg => this.ClickMethodSortNameAsc());
-                this.SortNameDescCommand = new Command(arg => this.ClickMethodSortNameDesc());
-                this.SortBirthAscCommand = new Command(arg => this.ClickMethodSortBirthAsc());
-                this.SortBirthDescCommand = new Command(arg => this.ClickMethodSortBirthDesc());
-                this.SortStartAscCommand = new Command(arg => this.ClickMethodSortStartAsc());
-                this.SortStartDescCommand = new Command(arg => this.ClickMethodSortStartDesc());
-
-                var tempEmpl = this.dbc.EmployeeRead();
-                this.EmployeeLst = tempEmpl;
-
-                // видимость стартовой страницы
-                this.Misc.StartPageVisible = "Visible";
-                this.Misc.FilterPageVisible = "Collapsed";
-
-                // -----------------------------------------------------
-                // Новости
-                var newsData = new NewsData();
-
-                var newsList = new NewsList();
-                var newsT = new List<New>();
-                var futureNewsT = new List<New>();
-                newsList = newsData.GetNews(this.EmployeeLst);
-
-                newsT = newsList.News;
-                futureNewsT = newsList.FutureNews;
-
-                if (newsT != null && newsT.Count != 0)
-                {
-                    foreach (New n in newsT.OrderBy(a => a.Date))
-                    {
-                        this.News2.Add(n);
-                    }
+                    this.settings = this.SetDefaultValue(this.settings); // Значения по умолчанию
+                    this.settingsXml.WriteXml(this.settings);
                 }
                 else
                 {
-                    New newT = new New();
-                    newT.Prefix = "На данный момент количество новостей ";
-                    newT.Postfix = " штук";
-                    this.News2.Add(newT);
+                    this.settings = this.settingsXml.ReadXml(this.settings);
                 }
 
-                if (futureNewsT != null)
-                {
-                    foreach (New n in futureNewsT.OrderBy(a => a.Date))
+                this.updCont = new UpdateContacts(this.settings);
+
+                this.Misc = new Misc { };
+
+                // (Environment.UserDomainName) == "ELCOM"      
+                if (true) 
+                {                 
+                    var upd = new SoftUpdater(this.settings);
+                    upd.UpdateSoft();                
+
+                    if (!File.Exists(DatabasePath))
                     {
-                        this.FutureNews2.Add(n);
+                        this.dbc.CreateBase();
+                        this.dbc.EmployeeCreateTable();
+                        this.dbc.CustomerCreateTable();
+                        this.dbc.InfoCreateTable();
+                        this.dbc.StatusCreateTable();
                     }
-                }
 
-                this.Misc.EmployeeCount = this.EmployeeLst.Count() - 10; // количество сотрудников кроме Корпорат номера сотр Логистика, Офис в Иркутсе, Офис в Красноярске, Офис в Москве, Офис в США, Офис в ТВЗ, Офис в Томске, Охранник, Столовая
+                    File.Copy(DatabasePath, DatabasePathTemp, true);
 
-                int age = 0;
-                int timeRec = 0;
+                    this.EmployeeLst = new ObservableCollection<Employee> { };
+                    this.EmployeeLstT = new ObservableCollection<Employee> { };
+                    this.EmployeeNewLst = new ObservableCollection<Employee> { };
 
-                foreach (Employee em in this.EmployeeLst)
-                {
-                    age += em.Age;
+                    this.CustomerLst = new ObservableCollection<Customer> { };
+                    this.CustomerLstT = new ObservableCollection<Customer> { };
 
-                    int timeRecT = 0;
-                    if (em.TimeRecord == "менее года")
+                    this.NewContact = new Customer { };
+
+                    this.News = new ObservableCollection<Division> { };  // новости
+                    this.FutureNews = new ObservableCollection<Division> { };  // предстоящие события
+                    this.News2 = new ObservableCollection<NewEvent> { };
+                    this.FutureNews2 = new ObservableCollection<NewEvent> { };  // предстоящие события
+
+                    this.Statistic = new Statistic { };
+
+                    this.Divisions = new ObservableCollection<Division> { };
+                    this.SelectedDiv = new Employee { };
+
+                    this.FutureNewsCommand = new Command(arg => this.FutureNewsMethod());
+                    this.DataUpdCommand = new Command(arg => this.DataUpd()); // обновление данных с сайта
+                    this.ClickCommand = new Command(arg => this.ClickMethod());
+                    this.ClickCommandCust = new Command(arg => this.ClickMethodCust());
+                    this.ClickCommand2 = new Command(arg => this.ClickMethod2());
+                    this.ClickCommand3 = new Command(arg => this.ClickMethod3());
+                    this.UpdateNewersCommand = new Command(arg => this.ClickMethodUpdateNewers());
+                    this.ListSelChangCommand = new Command(arg => this.ClickMethodListSelChangCommand());
+
+                    // Контакты
+                    this.ClickCommand2Cust = new Command(arg => this.ClickMethod2Cust());
+                    this.UpdCustCommand = new Command(arg => this.ClickMethodUpdCust());
+                    this.SaveCustCommand = new Command(arg => this.ClickMethodSaveCust());
+                    this.SaveNewCust = new Command(arg => this.ClickMethodSaveNewCust());
+                    this.SortNameContAscCommand = new Command(arg => this.ClickMethodSortNameContAsc());
+                    this.SortNameContDescCommand = new Command(arg => this.ClickMethodSortNameContDesc());
+
+                    // Меню
+                    this.ClickCommand4 = new Command(arg => this.ClickMethod4());
+                    this.ClickCommand5 = new Command(arg => this.ClickMethod5());
+                    this.MenuStatistic = new Command(arg => this.ClickMethodMenuStatistic());
+
+                    // Сортировка
+                    this.SortNameAscCommand = new Command(arg => this.ClickMethodSortNameAsc());
+                    this.SortNameDescCommand = new Command(arg => this.ClickMethodSortNameDesc());
+                    this.SortBirthAscCommand = new Command(arg => this.ClickMethodSortBirthAsc());
+                    this.SortBirthDescCommand = new Command(arg => this.ClickMethodSortBirthDesc());
+                    this.SortStartAscCommand = new Command(arg => this.ClickMethodSortStartAsc());
+                    this.SortStartDescCommand = new Command(arg => this.ClickMethodSortStartDesc());
+
+                    var tempEmpl = this.dbc.EmployeeRead();
+                    this.EmployeeLst = tempEmpl;
+
+                    // видимость стартовой страницы
+                    this.Misc.StartPageVisible = "Visible";
+                    this.Misc.FilterPageVisible = "Collapsed";
+
+                    // -----------------------------------------------------
+                    // Новости
+                    var newsData = new NewsData();
+
+                    var newsList = new NewsList();
+                    var newsT = new List<NewEvent>();
+                    var futureNewsT = new List<NewEvent>();
+                    newsList = newsData.GetNews(this.EmployeeLst);
+
+                    newsT = newsList.News;
+                    futureNewsT = newsList.FutureNews;
+
+                    if (newsT != null && newsT.Count != 0)
                     {
-                        timeRecT = 0;
+                        foreach (NewEvent n in newsT.OrderBy(a => a.Date))
+                        {
+                            this.News2.Add(n);
+                        }
                     }
                     else
                     {
-                        timeRecT = Convert.ToInt32(em.TimeRecord);
+                        NewEvent newT = new NewEvent();
+                        newT.Prefix = "На данный момент количество новостей ";
+                        newT.Postfix = " штук";
+                        this.News2.Add(newT);
                     }
 
-                    timeRec += timeRecT;
-                }
+                    if (futureNewsT != null)
+                    {
+                        foreach (NewEvent n in futureNewsT.OrderBy(a => a.Date))
+                        {
+                            this.FutureNews2.Add(n);
+                        }
+                    }
 
-                this.Misc.MiddleAge = age / this.Misc.EmployeeCount;
-                this.Misc.MiddleTimeRecord = timeRec / this.Misc.EmployeeCount;
+                    this.Misc.EmployeeCount = this.EmployeeLst.Count() - 10; // количество сотрудников кроме Корпорат номера сотр Логистика, Офис в Иркутсе, Офис в Красноярске, Офис в Москве, Офис в США, Офис в ТВЗ, Офис в Томске, Охранник, Столовая
 
-                // ---подразделения---
-                var divList = new List<string>();
-                Division temp;
+                    int age = 0;
+                    int timeRec = 0;
 
-                foreach (Employee ee in this.EmployeeLst)
-                {
-                    this.EmployeeLstT.Add(ee);
-                    divList.Add(ee.Division);
-                }
+                    foreach (Employee em in this.EmployeeLst)
+                    {
+                        age += em.Age;
 
-                divList.Sort();
+                        int timeRecT = 0;
+                        if (em.TimeRecord == "менее года")
+                        {
+                            timeRecT = 0;
+                        }
+                        else
+                        {
+                            timeRecT = Convert.ToInt32(em.TimeRecord);
+                        }
 
-                var result = (from m in divList select m).Distinct().ToList();
+                        timeRec += timeRecT;
+                    }
 
-                temp = new Division();
-                temp.Value = "1. Все";
-                this.Divisions.Add(temp);
+                    this.Misc.MiddleAge = age / this.Misc.EmployeeCount;
+                    this.Misc.MiddleTimeRecord = timeRec / this.Misc.EmployeeCount;
 
-                foreach (var s in result)
-                {
+                    // ---подразделения---
+                    var divList = new List<string>();
+                    Division temp;
+
+                    foreach (Employee ee in this.EmployeeLst)
+                    {
+                        this.EmployeeLstT.Add(ee);
+                        divList.Add(ee.Division);
+                    }
+
+                    divList.Sort();
+
+                    var result = (from m in divList select m).Distinct().ToList();
+
                     temp = new Division();
-                    temp.Value = s;
+                    temp.Value = "1. Все";
                     this.Divisions.Add(temp);
+
+                    foreach (var s in result)
+                    {
+                        temp = new Division();
+                        temp.Value = s;
+                        this.Divisions.Add(temp);
+                    }
+
+                    this.SelectedDiv.Division = "1. Все";
+
+                    // ----------------------
+                    this.emplStat = new EmplStatistic(this.EmployeeLst, this.Statistic);
+                    this.Statistic = this.emplStat.CalcCount();
+
+                    var employeeNewLstT = this.emplStat.Newers(this.Statistic.StartNewers, DateTime.Now);
+
+                    this.EmployeeNewLst.Clear();
+
+                    foreach (var ee in employeeNewLstT)
+                    {
+                        this.EmployeeNewLst.Add(ee);
+                    }
+
+                    this.UpdateContacts();
+                    this.Misc.ContactsCount = this.CustomerLst.Count();
+                    this.ClickMethodSortNameContAsc();
+
+                    this.ClickMethod5();
+                    this.VacCount();
+                    this.DataUpd();
                 }
-
-                this.SelectedDiv.Division = "1. Все";
-
-                // ----------------------
-                this.emplStat = new EmplStatistic(this.EmployeeLst, this.Statistic);
-                this.Statistic = this.emplStat.CalcCount();
-
-                var employeeNewLstT = this.emplStat.Newers(this.Statistic.StartNewers, DateTime.Now);
-
-                this.EmployeeNewLst.Clear();
-
-                foreach (var ee in employeeNewLstT)
+                else
                 {
-                    this.EmployeeNewLst.Add(ee);
+                    this.Misc.AccessDenied = "Collapsed";
+                    this.Misc.AccessDeniedMess = "Visible";
                 }
-
-                this.UpdateContacts();
-                this.Misc.ContactsCount = this.CustomerLst.Count();
-                this.ClickMethodSortNameContAsc();
-
-                this.ClickMethod5();
-                this.VacCount();
-                this.DataUpd();
             }
-            else
+            catch (Exception ex)
             {
-                this.Misc.AccessDenied = "Collapsed";
-                this.Misc.AccessDeniedMess = "Visible";
+                this.logger.Error(ex.Message);
             }
         }
 
@@ -260,10 +273,10 @@
         public Misc Misc { get; set; }
 
         /// <summary>Новости 2.</summary>
-        public ObservableCollection<New> News2 { get; set; }
+        public ObservableCollection<NewEvent> News2 { get; set; }
 
         /// <summary>Анонсы событий 2.</summary>
-        public ObservableCollection<New> FutureNews2 { get; set; }
+        public ObservableCollection<NewEvent> FutureNews2 { get; set; }
 
         /// <summary>Новости.</summary>
         public ObservableCollection<Division> News { get; set; }
@@ -545,7 +558,7 @@
             this.ClickMethodSortNameContAsc();
         }
 
-        // загрузка данных о контактах
+        // Загрузка данных о контактах
         private void ClickMethodUpdCust()
         {
             var customPath = string.Empty;
@@ -553,10 +566,8 @@
 
             this.Preparer(customPath);
 
-            var localPropPath = "Settings.xml";
-
-            var xmlCode = new XMLcodeContacts(localPropPath);
-            xmlCode.WriteXml(customPath); 
+            this.settings.Contacts.FilePath = customPath;
+            this.settingsXml.WriteXml(this.settings);            
         }
         
         private async void Preparer(string customPath)
@@ -872,6 +883,14 @@
 
             this.Misc.SelectedIndex = 0;
             this.timer1.Stop();
+        }
+
+        private RootElement SetDefaultValue(RootElement set)
+        {
+            set.SoftUpdate.UpdPath = @"d:\Temp\RemoteProp.xml";
+            set.Contacts.FilePath = @"\\elcom.local\files\01-Deps\ДПАСУТП\05_Контакты\Контакты заказчиков.xlsx";            
+
+            return set;
         }
     }
 }

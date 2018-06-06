@@ -6,9 +6,9 @@
     public class NewsList
     {
         /// <summary>Новости.</summary>
-        public List<New> News { get; set; }
+        public List<NewEvent> News { get; set; }
 
         /// <summary>Будущие новости.</summary>
-        public List<New> FutureNews { get; set; }            
+        public List<NewEvent> FutureNews { get; set; }            
     }
 }

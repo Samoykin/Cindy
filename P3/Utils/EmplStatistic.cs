@@ -19,7 +19,6 @@
         {
             this.employeeLst = employeeLst;
             this.statistic = statistic;
-            this.CalcCount();
         }
 
         /// <summary>Количество новичков.</summary>
@@ -28,23 +27,23 @@
         {
             var date = DateTime.Now;
 
-            // новички за месяц 
+            // Новички за месяц 
             this.Newers(new DateTime(date.Year, date.Month, 1), date);
             this.statistic.NewersCountMonth = this.employeeNewLst.Count();
 
-            // новички за 1 квартал         DateTime.Now.AddDays(-92)   
+            // Новички за 1 квартал
             this.Newers(new DateTime(date.Year, 1, 1), new DateTime(date.Year, 3, 31));
             this.statistic.NewersCountQuarter1 = this.employeeNewLst.Count();
 
-            // новички за 2 квартал
+            // Новички за 2 квартал
             this.Newers(new DateTime(date.Year, 4, 1), new DateTime(date.Year, 6, 30));
             this.statistic.NewersCountQuarter2 = this.employeeNewLst.Count();
 
-            // новички за 3 квартал
+            // Новички за 3 квартал
             this.Newers(new DateTime(date.Year, 7, 1), new DateTime(date.Year, 9, 30));
             this.statistic.NewersCountQuarter3 = this.employeeNewLst.Count();
 
-            // новички за 4 квартал
+            // Новички за 4 квартал
             this.Newers(new DateTime(date.Year, 10, 1), new DateTime(date.Year, 12, 31));
             this.statistic.NewersCountQuarter4 = this.employeeNewLst.Count();
 
@@ -69,11 +68,11 @@
         {
             this.employeeNewLst.Clear();
 
-            foreach (var ee in this.employeeLst)
+            foreach (var empl in this.employeeLst)
             {
-                if (ee.StartDay >= startDay && ee.StartDay <= endDay)
+                if (empl.StartDay >= startDay && empl.StartDay <= endDay)
                 {
-                    this.employeeNewLst.Add(ee);
+                    this.employeeNewLst.Add(empl);
                 }
             }
 

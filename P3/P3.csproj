@@ -89,11 +89,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Contacts\GetData.cs" />
     <Compile Include="Model\NewsList.cs" />
-    <Compile Include="Model\New.cs" />
+    <Compile Include="Model\NewEvent.cs" />
+    <Compile Include="Model\UpdaterSettings.cs" />
+    <Compile Include="Model\RemoteSettings.cs" />
+    <Compile Include="Model\Settings.cs" />
     <Compile Include="Utils\EmplStatistic.cs" />
     <Compile Include="Utils\NewsData.cs" />
+    <Compile Include="Utils\SettingsXml.cs" />
     <Compile Include="Utils\ViewShower.cs" />
     <Compile Include="View\ContactsView.xaml.cs">
       <DependentUpon>ContactsView.xaml</DependentUpon>
@@ -104,13 +107,6 @@
     <Compile Include="View\StatisticsView.xaml.cs">
       <DependentUpon>StatisticsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Test.xaml.cs">
-      <DependentUpon>Test.xaml</DependentUpon>
-    </Compile>
-    <Page Include="View\DinnersView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="View\EmployeesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -129,7 +125,6 @@
     </Compile>
     <Compile Include="Contacts\ExcelExport.cs" />
     <Compile Include="Contacts\UpdateContacts.cs" />
-    <Compile Include="Contacts\XMLcodeContacts.cs" />
     <Compile Include="DataUpd\IDData.cs" />
     <Compile Include="DataUpd\PersonalData.cs" />
     <Compile Include="Model\Customer.cs" />
@@ -138,21 +133,16 @@
     <Compile Include="Model\Misc.cs" />
     <Compile Include="Model\People.cs" />
     <Compile Include="Model\Statistic.cs" />
-    <Compile Include="Updater\XMLcode.cs" />
     <Compile Include="Utils\DBconnect.cs" />
     <Compile Include="Utils\Picture.cs" />
     <Compile Include="Utils\GetHTML.cs" />
-    <Compile Include="Utils\LogFile.cs" />
     <Compile Include="Utils\LogInfo.cs" />
     <Compile Include="Utils\SendMail.cs" />
     <Compile Include="Utils\Status.cs" />
-    <Compile Include="Updater\Updater.cs" />
+    <Compile Include="Updater\SoftUpdater.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />
     <Compile Include="ViewModel\Command.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="View\DinnersView.xaml.cs">
-      <DependentUpon>DinnersView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="View\EmployeesView.xaml.cs">
       <DependentUpon>EmployeesView.xaml</DependentUpon>
     </Compile>
@@ -165,10 +155,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\StatisticsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\Test.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

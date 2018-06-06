@@ -8,9 +8,9 @@
     /// <summary>Состояние.</summary>
     public class Status
     {
+        private const string Address = "http://ares/Lists/List2/AllItems.aspx";
         private DBconnect dbc = new DBconnect();
-        private GetHTML ghtml = new GetHTML();
-        private string address = "http://ares/Lists/List2/AllItems.aspx";
+        private GetHTML ghtml = new GetHTML();        
         private string htmlText;
         private string text;
         private int countStatus;
@@ -34,7 +34,7 @@
                 var pingReply = ping.Send("ares.elcom.local");
                 if (pingReply.Status == IPStatus.Success)
                 {
-                    this.htmlText = this.ghtml.Html(this.address);
+                    this.htmlText = this.ghtml.Html(Address);
 
                     if (this.htmlText.IndexOf(@"Кол-во значений", 0) != -1)
                     {
@@ -58,6 +58,7 @@
             }
             catch
             {
+                throw;
             }
         }
 
@@ -98,7 +99,7 @@
             var pattern4 = @"( \(и.о. \D+\))";
             var regex4 = new Regex(pattern4);
 
-            int k = 0;
+            var k = 0;
 
             foreach (string str in this.status)
             {

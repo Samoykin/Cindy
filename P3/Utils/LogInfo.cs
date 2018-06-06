@@ -7,20 +7,19 @@
     /// <summary>Лог информация.</summary>
     public class LogInfo
     {
-        private string infoPath = @"\\elcom.local\files\01-Deps\ДПАСУТП\00_TEMP\Samoykin\log\";
+        private const string InfoPath = @"\\elcom.local\files\01-Deps\ДПАСУТП\00_TEMP\Samoykin\log\";
 
         /// <summary>Сохранить информацию.</summary>
         public void SaveInfo()
         {
-            var infoPathFile = this.infoPath + "\\log_" + DateTime.Now.ToString("yyy.MM.dd") + ".txt";
+            var infoPathFile = InfoPath + "\\log_" + DateTime.Now.ToString("yyy.MM.dd") + ".txt";
 
             var date = DateTime.Now;
             var name = Environment.UserName;
             var computerName = Environment.MachineName;
             var ip = System.Net.Dns.GetHostByName(Environment.MachineName).AddressList[0].ToString();
-            string remoteBD = "0";
 
-            if (Directory.Exists(this.infoPath))
+            if (Directory.Exists(InfoPath))
             {
                 if (!File.Exists(infoPathFile))
                 {
@@ -29,7 +28,6 @@
                 }
 
                 this.LogInfoWriteFile(infoPathFile, date.ToString(), name, computerName, ip);
-                remoteBD = "1";
             }
         }
 

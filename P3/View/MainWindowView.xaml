@@ -5,10 +5,8 @@
         xmlns:controls="clr-namespace:P3.View"
         Title="Cindy" Height="678.325" Width="850" Icon="/P3;component/phone.ico" FontFamily="/P3;component/Fonts/#Open Sans Light" FontSize="14" MinWidth="500" MinHeight="400"
         >
-    
+
     <Window.Resources>
-        <!--<BitmapImage x:Key="Customer" UriSource="/P3;component/phone.ico"/>-->
-        <!--<Image x:Key="redStyle" Source="pack://siteoforigin:,,,/Resources/portfolio-suitcase_icon-icons.com_52927.png"/>-->
         <Style x:Key="BigFontButton">
             <Style.Triggers>
                 <Trigger Property="Control.IsMouseOver" Value="True">
@@ -17,19 +15,18 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-
     </Window.Resources>
+    
     <Grid>
         <Grid Visibility="{Binding Misc.AccessDeniedMess}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
-
             </Grid.RowDefinitions>
             <TextBlock HorizontalAlignment="Center" FontFamily="/P3;component/Fonts/#Open Sans" FontWeight="Bold" Foreground="#FFFF1700" FontSize="18">Доступ запрещен</TextBlock>
             <TextBlock Grid.Row="1" HorizontalAlignment="Center" FontFamily="/P3;component/Fonts/#Open Sans" FontWeight="Bold" Foreground="#FF2DADF5" FontSize="16">Обратитесь к разработчику за комментариями</TextBlock>
         </Grid>
-        <!---->
+
         <DockPanel Margin="0,0,0,3" Visibility="{Binding Misc.AccessDenied}">
         <DockPanel.Background>
             <ImageBrush ImageSource="{DynamicResource ImageFon}"/>
@@ -43,20 +40,19 @@
             <Menu  FontFamily="/P3;component/Fonts/#Open Sans Light" FontSize="14">
                 <MenuItem Header="Главная" Command="{Binding ClickCommand5}"/>
                 <MenuItem Header="Контакты" Command="{Binding ClickCommand4}"/>
-                <MenuItem Header="Статистика" Command="{Binding MenuStatistic}" />
-            
+                <MenuItem Header="Статистика" Command="{Binding MenuStatistic}"/>            
             </Menu>
             <Menu Grid.Column="1" FontFamily="/P3;component/Fonts/#Open Sans Light" FontSize="14">
                 <MenuItem Header="О программе" Command="{Binding ClickCommand5}">
                     <StackPanel>
                         <TextBlock Margin="7" FontSize="11">2018, Cindy</TextBlock>
                         <TextBlock Margin="7" FontSize="11">Самойкин Андрей</TextBlock>
-                        <TextBlock Margin="7" FontSize="11">v 3.0.3.0</TextBlock>
+                        <TextBlock Margin="7" FontSize="11">v 3.0.4.0</TextBlock>
                     </StackPanel>
                 </MenuItem>
-
             </Menu>
         </Grid>
+            
         <!--Работники-->
         <Grid DockPanel.Dock="Left" Visibility="{Binding Misc.Page1State}" Margin="0,1,0,1">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
@@ -69,17 +65,8 @@
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                 <controls:ContactsView Margin="0,1,1,1"/>
             </ScrollViewer>
-        </Grid>            
+        </Grid>
             
-        
-        <!--Обеды-->
-        <Grid DockPanel.Dock="Left" Visibility="{Binding Misc.Page3State}" Margin="0,1,0,1">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                <controls:DinnersView Margin="0,1,0,1"/>
-            </ScrollViewer>
-        </Grid>             
-
-        
         <!--Статистика-->
         <Grid DockPanel.Dock="Left" Visibility="{Binding Misc.PageStatistic}" Margin="0,1,1,1">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">

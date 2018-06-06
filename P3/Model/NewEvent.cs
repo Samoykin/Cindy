@@ -3,7 +3,7 @@
     using System;
 
     /// <summary>Новый.</summary>
-    public class New
+    public class NewEvent
     {
         /// <summary>Дата.</summary>
         public DateTime Date { get; set; }

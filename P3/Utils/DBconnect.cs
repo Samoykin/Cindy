@@ -193,37 +193,10 @@
             sqlitecommand.ExecuteNonQuery();
             connection.Close();
         }
-
-        /// <summary>Записать в таблицу сотрудника.</summary>
-        /// <param name="id">ID.</param>
-        /// <param name="names">Имя.</param>
-        /// <param name="tels">Телефон.</param>
-        /// <param name="tels2">Телефон2.</param>
-        /// <param name="tels3">Телефон3.</param>
-        /// <param name="email">Email.</param>
-        /// <param name="div">Подразделение.</param>
-        /// <param name="pos">Должность.</param>
-        public void EmployeeWrite(List<string> id, List<string> names, List<string> tels, List<string> tels2, List<string> tels3, List<string> email, List<string> div, List<string> pos)
-        {
-            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
-
-            connection.Open();
-            SQLiteCommand command;
-
-            for (int i = 0; i < this.Names.Count(); i++)
-            {
-                command = new SQLiteCommand("INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos') VALUES ('" + id[i] + "', '" + names[i] + "', '" + tels[i] + "', '" + tels2[i] + "', '" + tels3[i] + "', '" + email[i] + "', '" + div[i] + "', '" + pos[i] + "');", connection);
-                command.ExecuteNonQuery();
-            }
-
-            connection.Close();
-
-            File.Copy(DataBase2Name, DataBaseName, true);
-        }
         
-        /// <summary>Записать в таблицу сотрудника2.</summary>
+        /// <summary>Записать в таблицу сотрудника.</summary>
         /// <param name="employeeLst">Коллекция сотрудников.</param>
-        public void EmployeeWrite2(List<Employee> employeeLst) 
+        public void EmployeeWrite(List<Employee> employeeLst) 
         {
             var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
 
@@ -232,7 +205,7 @@
 
             for (int i = 0; i < employeeLst.Count(); i++)
             {
-                command = new SQLiteCommand("INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos', 'tBirthDay', 'tStartDay') VALUES ('" + employeeLst[i].ID + "', '" + employeeLst[i].FullName + "', '" + employeeLst[i].PhoneWork + "', '" + employeeLst[i].PhoneMobile + "', '" + employeeLst[i].PhoneExch + "', '" + employeeLst[i].Email + "', '" + employeeLst[i].Division + "', '" + employeeLst[i].Position + "', '" + employeeLst[i].BirthDayShort + "', '" + employeeLst[i].StartDayShort + "');", connection);
+                command = new SQLiteCommand($"INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos', 'tBirthDay', 'tStartDay') VALUES ('{employeeLst[i].ID}', '{employeeLst[i].FullName}', '{employeeLst[i].PhoneWork}', '{employeeLst[i].PhoneMobile}', '{employeeLst[i].PhoneExch}', '{employeeLst[i].Email}', '{employeeLst[i].Division}', '{employeeLst[i].Position}', '{employeeLst[i].BirthDayShort}', '{employeeLst[i].StartDayShort}');", connection);
                 command.ExecuteNonQuery();
             }
 
@@ -242,21 +215,16 @@
         }
 
         /// <summary>Записать в таблицу заказчика.</summary>
-        /// <param name="custNames">Имя.</param>
-        /// <param name="custPos">Должность.</param>
-        /// <param name="custTels">Телефон.</param>
-        /// <param name="custTels2">Телефон2.</param>
-        /// <param name="custEmail">Email.</param>
-        /// <param name="custComp">Компания.</param>
-        public void CustomerWrite(List<string> custNames, List<string> custPos, List<string> custTels, List<string> custTels2, List<string> custEmail, List<string> custComp)
+        /// <param name="customers">Заказчики.</param>
+        public void CustomerWrite(List<Customer> customers)
         {
             var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
             connection.Open();
             SQLiteCommand command;
 
-            for (int i = 0; i < custNames.Count(); i++)
+            for (int i = 0; i < customers.Count(); i++)
             {
-                command = new SQLiteCommand("INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('" + custNames[i] + "', '" + custPos[i] + "', '" + custTels[i] + "', '" + custTels2[i] + "', '" + custEmail[i] + "', '" + custComp[i] + "');", connection);
+                command = new SQLiteCommand($"INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('{customers[i].FullName}', '{customers[i].Position}', '{customers[i].PhoneMobile}', '{customers[i].PhoneWork}', '{customers[i].Email}', '{customers[i].Company}');", connection);
                 command.ExecuteNonQuery();
             }
 
@@ -269,7 +237,7 @@
         {
             var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
             connection.Open();
-            SQLiteCommand command = new SQLiteCommand("UPDATE customer SET custNames = '" + contact.FullName + "', custPos = '" + contact.Position + "', custTels = '" + contact.PhoneMobile + "', custTels2 = '" + contact.PhoneWork + "', custEmail = '" + contact.Email + "', custComp = '" + contact.Company + "' WHERE custNames Like '" + contact.FullName + "';", connection);
+            SQLiteCommand command = new SQLiteCommand($"UPDATE customer SET custNames = '{contact.FullName}', custPos = '{contact.Position}', custTels = '{contact.PhoneMobile}', custTels2 = '{contact.PhoneWork}', custEmail = '{contact.Email}', custComp = '{contact.Company}' WHERE custNames Like '{contact.FullName}';", connection);
                 
             command.ExecuteNonQuery();            
 
@@ -284,7 +252,7 @@
         {
             var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", DataBase2Name, Pass));
             connection.Open();
-            SQLiteCommand command = new SQLiteCommand("INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('" + contact.FullName + "', '" + contact.Position + "', '" + contact.PhoneMobile + "', '" + contact.PhoneWork + "', '" + contact.Email + "', '" + contact.Company + "');", connection);
+            SQLiteCommand command = new SQLiteCommand($"INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('{contact.FullName}', '{contact.Position}', '{contact.PhoneMobile}', '{contact.PhoneWork}', '{contact.Email}', '{contact.Company}');", connection);
             
             command.ExecuteNonQuery();
             connection.Close();
@@ -304,7 +272,7 @@
             connection.Open();
             SQLiteCommand command;
 
-            command = new SQLiteCommand("INSERT INTO 'info' ('date', 'name', 'pcName', 'ip', 'remoteBD') VALUES ('" + date + "', '" + name + "', '" + computerName + "', '" + ip + "', '" + remoteBD + "');", connection);
+            command = new SQLiteCommand($"INSERT INTO 'info' ('date', 'name', 'pcName', 'ip', 'remoteBD') VALUES ('{date}', '{name}', '{computerName}', '{ip}', '{remoteBD}');", connection);
             command.ExecuteNonQuery();
 
             connection.Close();
@@ -323,7 +291,7 @@
 
             for (int i = 0; i < status.Count(); i++)
             {
-                command = new SQLiteCommand("INSERT INTO 'status' ('statusVal') VALUES ('" + status[i] + "');", connection);
+                command = new SQLiteCommand($"INSERT INTO 'status' ('statusVal') VALUES ('{status[i]}');", connection);
                 command.ExecuteNonQuery();
             }
 
@@ -345,7 +313,7 @@
 
             for (int i = 0; i < status.Count(); i++)
             {
-                command = new SQLiteCommand("UPDATE employee SET tStatus = '" + status[i] + "', tActStatus = '" + act[i] + "' WHERE tNames Like '" + names[i] + "%';", connection);
+                command = new SQLiteCommand($"UPDATE employee SET tStatus = '{status[i]}', tActStatus = '{act[i]}' WHERE tNames Like '{names[i]}%';", connection);
                 command.ExecuteNonQuery();
             }
 
@@ -366,10 +334,10 @@
 
             for (int i = 0; i < birthDayID.Count(); i++)
             {
-                command = new SQLiteCommand("UPDATE employee SET tBirthDay = '" + birthDay[i] + "' WHERE tID = '" + birthDayID[i] + "';", connection);
+                command = new SQLiteCommand($"UPDATE employee SET tBirthDay = '{birthDay[i]}' WHERE tID = '{birthDayID[i]}';", connection);
                 command.ExecuteNonQuery();
 
-                command = new SQLiteCommand("UPDATE employee SET tStartDay = '" + startDay[i] + "' WHERE tID = '" + birthDayID[i] + "';", connection);
+                command = new SQLiteCommand($"UPDATE employee SET tStartDay = '{startDay[i]}' WHERE tID = '{birthDayID[i]}';", connection);
                 command.ExecuteNonQuery();
             }
 
@@ -674,7 +642,7 @@
 
             for (int i = 0; i < tempName.Count(); i++)
             {
-                command2 = new SQLiteCommand("INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos') VALUES ('" + tempID[i] + "', '" + tempName[i] + "', '" + tempTel[i] + "', '" + tempTel2[i] + "', '" + tempTel3[i] + "', '" + tempEm[i] + "', '" + tempDi[i] + "', '" + tempPo[i] + "');", connection2);
+                command2 = new SQLiteCommand($"INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos') VALUES ('{tempID[i]}', '{tempName[i]}', '{tempTel[i]}', '{tempTel2[i]}', '{tempTel3[i]}', '{tempEm[i]}', '{tempDi[i]}', '{tempPo[i]}');", connection2);
                 command2.ExecuteNonQuery();
             }
 

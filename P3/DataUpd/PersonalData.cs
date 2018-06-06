@@ -50,7 +50,7 @@
                     {
                     }
 
-                    this.dbc.EmployeeWrite2(this.employeeLst);
+                    this.dbc.EmployeeWrite(this.employeeLst);
                 }
             }
             catch
