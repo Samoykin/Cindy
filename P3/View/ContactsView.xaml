@@ -25,11 +25,11 @@
             </Grid.RowDefinitions>
 
             <WrapPanel Grid.Row="0" Margin="0,0,0,1">
-                <Button Content="Сброс" Width="60" Command="{Binding ClickCommand2Cust}" Margin="0,0,7,0"/>
+                <Button Content="Сброс" Width="60" Command="{Binding ClearFilterContactCmd}" Margin="0,0,7,0"/>
                 <TextBox x:Name="tb3" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" InputLanguageManager.InputLanguage="ru-RU" VerticalAlignment="Top" Width="183" Text="{Binding Misc.TextChangeCust, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged" >
-                            <i:InvokeCommandAction Command="{Binding ClickCommandCust}"/>
+                            <i:InvokeCommandAction Command="{Binding SearchContactCmd}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
@@ -65,14 +65,14 @@
                         <TextBlock Grid.Row="5" Margin="7" >Организация:</TextBlock>
                         <TextBox Grid.Row="5" Grid.Column="1" Margin="5" Text="{Binding Path=Company}" TextWrapping="Wrap"></TextBox>
                     </Grid>
-                    <Button Content="Добавить" Width="130" Command="{Binding SaveNewCust}" Margin="0,0,0,7" HorizontalAlignment="Center"/>
+                    <Button Content="Добавить" Width="130" Command="{Binding AddNewContactCmd}" Margin="0,0,0,7" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Expander>
 
             <Expander Header="Сортировка" Grid.Row="2" Margin="0,0,0,7">
                 <StackPanel>
-                    <RadioButton Content="Имя ↑" Command="{Binding SortNameContAscCommand}" Margin="20,0,0,0" IsChecked="True"/>
-                    <RadioButton Content="Имя ↓" Command="{Binding SortNameContDescCommand}" Margin="20,0,0,0"/>
+                    <RadioButton Content="Имя ↑" Command="{Binding SortNameAscContactCmd}" Margin="20,0,0,0" IsChecked="True"/>
+                    <RadioButton Content="Имя ↓" Command="{Binding SortNameDescContactCmd}" Margin="20,0,0,0"/>
                 </StackPanel>
             </Expander>
             <ListView Name="lstCustomer" Grid.Row="3" SelectedIndex="{Binding Misc.SelectedIndexCust}" ItemsSource="{Binding CustomerLst}" HorizontalAlignment="Left" Width="250" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,0,0">
@@ -132,8 +132,8 @@
         </StackPanel>
 
         <WrapPanel Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,1,0" Width="263">
-            <Button Content="Открыть Excel" Width="120" Command="{Binding UpdCustCommand}" Margin="0,0,10,7" HorizontalAlignment="Left"/>
-            <Button Content="Сохранить как" Width="120" Command="{Binding SaveCustCommand}" CommandParameter="123" Margin="0,0,10,7"/>
+            <Button Content="Открыть Excel" Width="120" Command="{Binding DownloadContactCmd}" Margin="0,0,10,7" HorizontalAlignment="Left"/>
+            <Button Content="Сохранить как" Width="120" Command="{Binding SaveContactCmd}" CommandParameter="123" Margin="0,0,10,7"/>
         </WrapPanel>
     </Grid>
 </UserControl>

@@ -40,11 +40,11 @@
                 <RowDefinition Height="25"></RowDefinition>
             </Grid.RowDefinitions>
             <WrapPanel Grid.Row="0">
-                <Button Content="Сброс" Width="60" Command="{Binding ClickCommand2}" Margin="0,0,7,0" />
+                <Button Content="Сброс" Width="60" Command="{Binding ClearFilterEmployeeCmd}" Margin="0,0,7,0" />
                 <TextBox x:Name="tb2" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" InputLanguageManager.InputLanguage="ru-RU" VerticalAlignment="Top" Width="183" Text="{Binding Misc.TextChange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged" >
-                            <i:InvokeCommandAction Command="{Binding ClickCommand}"/>
+                            <i:InvokeCommandAction Command="{Binding SearchEmployeeCmd}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
@@ -53,18 +53,18 @@
             <ComboBox Grid.Row="1" ItemsSource="{Binding Divisions}" SelectedValuePath="Value" SelectedValue="{Binding SelectedDiv.Division}" Margin="0,7,0,7" DisplayMemberPath="Value" Width="251" HorizontalAlignment="Left">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged" >
-                        <i:InvokeCommandAction Command="{Binding ClickCommand3}"/>
+                        <i:InvokeCommandAction Command="{Binding SelectDivEmployeeCmd}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ComboBox>
             <Expander Grid.Row="2" Header="Сортировка" Margin="0,0,0,7">
                 <StackPanel>
-                    <RadioButton Content="Имя ↑" Command="{Binding SortNameAscCommand}" Margin="20,0,0,0" IsChecked="True"/>
-                    <RadioButton Content="Имя ↓" Command="{Binding SortNameDescCommand}" Margin="20,0,0,0" />
-                    <RadioButton Content="День рождения ↑" Command="{Binding SortBirthAscCommand}" Margin="20,0,0,0" />
-                    <RadioButton Content="День рождения ↓" Command="{Binding SortBirthDescCommand}" Margin="20,0,0,0" />
-                    <RadioButton Content="Дата прихода ↑" Command="{Binding SortStartAscCommand}" Margin="20,0,0,0" />
-                    <RadioButton Content="Дата прихода ↓" Command="{Binding SortStartDescCommand}" Margin="20,0,0,0" />
+                    <RadioButton Content="Имя ↑" Command="{Binding SortNameAscCmd}" Margin="20,0,0,0" IsChecked="True"/>
+                    <RadioButton Content="Имя ↓" Command="{Binding SortNameDescCmd}" Margin="20,0,0,0" />
+                    <RadioButton Content="День рождения ↑" Command="{Binding SortBirthAscCmd}" Margin="20,0,0,0" />
+                    <RadioButton Content="День рождения ↓" Command="{Binding SortBirthDescCmd}" Margin="20,0,0,0" />
+                    <RadioButton Content="Дата прихода ↑" Command="{Binding SortStartAscCmd}" Margin="20,0,0,0" />
+                    <RadioButton Content="Дата прихода ↓" Command="{Binding SortStartDescCmd}" Margin="20,0,0,0" />
                 </StackPanel>
             </Expander>
 
@@ -80,7 +80,7 @@
                 </ListView.ItemTemplate>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged" >
-                        <i:InvokeCommandAction Command="{Binding ListSelChangCommand}"/>
+                        <i:InvokeCommandAction Command="{Binding SelectEmployeeCmd}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ListView>
@@ -104,7 +104,7 @@
 
             <TextBlock Text="Новости текущего дня:" TextWrapping="Wrap" FontFamily="/P3;component/Fonts/#Open Sans" FontWeight="Bold" Foreground="#FF2DADF5"/>
 
-            <ListView Name="News2" Grid.Row="1" ItemsSource="{Binding News2}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,1,0" Background="{x:Null}" BorderBrush="{x:Null}">
+            <ListView Name="News2" Grid.Row="1" ItemsSource="{Binding News}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,1,0" Background="{x:Null}" BorderBrush="{x:Null}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid Grid.Column="1" Grid.Row="1" Visibility="{Binding Misc.StartPageVisible}">
@@ -129,7 +129,7 @@
 
             <TextBlock Grid.Row="2" Text="Грядущие события:" TextWrapping="Wrap" FontFamily="/P3;component/Fonts/#Open Sans" FontWeight="Bold" Foreground="#FF2DADF5"/>
             
-            <ListView Name="futureNews2" Grid.Row="3" ItemsSource="{Binding FutureNews2}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,1,0" Background="{x:Null}" BorderBrush="{x:Null}">
+            <ListView Name="futureNews2" Grid.Row="3" ItemsSource="{Binding FutureNews}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="1,0,1,0" Background="{x:Null}" BorderBrush="{x:Null}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid Grid.Column="1" Grid.Row="1" Visibility="{Binding Misc.StartPageVisible}">

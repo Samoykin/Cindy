@@ -38,16 +38,16 @@
                 <ColumnDefinition Width="110"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Menu  FontFamily="/P3;component/Fonts/#Open Sans Light" FontSize="14">
-                <MenuItem Header="Главная" Command="{Binding ClickCommand5}"/>
-                <MenuItem Header="Контакты" Command="{Binding ClickCommand4}"/>
-                <MenuItem Header="Статистика" Command="{Binding MenuStatistic}"/>            
+                <MenuItem Header="Главная" Command="{Binding MenuMainCmd}"/>
+                <MenuItem Header="Контакты" Command="{Binding MenuContactsCmd}"/>
+                <MenuItem Header="Статистика" Command="{Binding MenuStatisticCmd}"/>            
             </Menu>
             <Menu Grid.Column="1" FontFamily="/P3;component/Fonts/#Open Sans Light" FontSize="14">
-                <MenuItem Header="О программе" Command="{Binding ClickCommand5}">
+                <MenuItem Header="О программе">
                     <StackPanel>
                         <TextBlock Margin="7" FontSize="11">2018, Cindy</TextBlock>
                         <TextBlock Margin="7" FontSize="11">Самойкин Андрей</TextBlock>
-                        <TextBlock Margin="7" FontSize="11">v 3.0.5.0</TextBlock>
+                        <TextBlock Margin="7" FontSize="11">v 3.0.6.0</TextBlock>
                     </StackPanel>
                 </MenuItem>
             </Menu>

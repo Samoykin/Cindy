@@ -95,6 +95,7 @@
     <Compile Include="Model\RemoteSettings.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="Utils\EmplStatistic.cs" />
+    <Compile Include="Utils\NewsManager.cs" />
     <Compile Include="Utils\NewsData.cs" />
     <Compile Include="Utils\SettingsXml.cs" />
     <Compile Include="View\ContactsView.xaml.cs">

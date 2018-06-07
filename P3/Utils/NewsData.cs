@@ -11,7 +11,7 @@
         /// <summary>Получить новости.</summary>
         /// <param name="employeeLst">Сотрудники.</param>
         /// <returns>Список.</returns>
-        public NewsList GetNews(ObservableCollection<Employee> employeeLst)
+        public NewsList GetNews(IEnumerable<Employee> employeeLst)
         {
             var newsList = new NewsList();
             newsList.News = new List<NewEvent>();
