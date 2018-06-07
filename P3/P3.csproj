@@ -97,21 +97,13 @@
     <Compile Include="Utils\EmplStatistic.cs" />
     <Compile Include="Utils\NewsData.cs" />
     <Compile Include="Utils\SettingsXml.cs" />
-    <Compile Include="Utils\ViewShower.cs" />
     <Compile Include="View\ContactsView.xaml.cs">
       <DependentUpon>ContactsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\FutureNewsView.xaml.cs">
-      <DependentUpon>FutureNewsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\StatisticsView.xaml.cs">
       <DependentUpon>StatisticsView.xaml</DependentUpon>
     </Compile>
     <Page Include="View\EmployeesView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\FutureNewsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

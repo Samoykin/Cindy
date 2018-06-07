@@ -47,7 +47,7 @@
             this.Newers(new DateTime(date.Year, 10, 1), new DateTime(date.Year, 12, 31));
             this.statistic.NewersCountQuarter4 = this.employeeNewLst.Count();
 
-            // новички за год            
+            // Новички за год            
             this.Newers(new DateTime(date.Year, 1, 1), date);
             this.statistic.NewersCountYear = this.employeeNewLst.Count();
 

@@ -19,7 +19,6 @@
         private string page2State;
         private string page3State; 
         private string pageStatistic; 
-        private string dinnerSelectedPeople;
         private int employeeCount; 
         private int contactsCount;
         private string saveStatus; 
@@ -253,24 +252,6 @@
                 {
                     this.pageStatistic = value;
                     this.OnPropertyChanged("PageStatistic");
-                }
-            }
-        }
-
-        /// <summary>Выбранный сотрудник для добавления в обеды.</summary>
-        public string DinnerSelectedPeople
-        {
-            get
-            {
-                return this.dinnerSelectedPeople;
-            }
-
-            set
-            {
-                if (this.dinnerSelectedPeople != value)
-                {
-                    this.dinnerSelectedPeople = value;
-                    this.OnPropertyChanged("DinnerSelectedPeople");
                 }
             }
         }

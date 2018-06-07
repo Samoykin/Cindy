@@ -74,7 +74,7 @@
                 this.excelApp.Quit();
                 GC.Collect();
 
-                this.logger.Info("Контакты сохранены в Excel " + this.filePath);
+                this.logger.Info($"Контакты сохранены в Excel {this.filePath}");
             }
             catch (Exception ex)
             {

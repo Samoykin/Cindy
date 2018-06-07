@@ -149,7 +149,6 @@
                             <TextBlock Grid.Column="3" Text="{Binding YearCount}" TextWrapping="Wrap" FontFamily="/P3;component/Fonts/#Open Sans" Foreground="#FF17B02C" FontWeight="Bold"/>
                             <TextBlock Grid.Column="4" Text="{Binding Postfix}" TextWrapping="Wrap"/>
                         </Grid>
-
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>

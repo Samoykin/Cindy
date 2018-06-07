@@ -35,12 +35,6 @@
         // Конфигурация        
         private RootElement settings = new RootElement();
 
-        // Статусы сотрудников
-        private List<string> vacation = new List<string>();
-        private List<string> sick = new List<string>();
-        private List<string> btrip = new List<string>();
-        private List<string> other = new List<string>();
-
         private bool contactUpd = true;
         private EmplStatistic emplStat;
         private ICommand sendMail;
@@ -71,7 +65,6 @@
                 }
 
                 this.updCont = new UpdateContacts(this.settings);
-
                 this.Misc = new Misc { };
 
                 // (Environment.UserDomainName) == "ELCOM"      
@@ -110,7 +103,6 @@
                     this.Divisions = new ObservableCollection<Division> { };
                     this.SelectedDiv = new Employee { };
 
-                    this.FutureNewsCommand = new Command(arg => this.FutureNewsMethod());
                     this.DataUpdCommand = new Command(arg => this.DataUpd()); // обновление данных с сайта
                     this.ClickCommand = new Command(arg => this.ClickMethod());
                     this.ClickCommandCust = new Command(arg => this.ClickMethodCust());
@@ -143,7 +135,7 @@
                     var tempEmpl = this.dbc.EmployeeRead();
                     this.EmployeeLst = tempEmpl;
 
-                    // видимость стартовой страницы
+                    // Видимость стартовой страницы
                     this.Misc.StartPageVisible = "Visible";
                     this.Misc.FilterPageVisible = "Collapsed";
 
@@ -161,14 +153,14 @@
 
                     if (newsT != null && newsT.Count != 0)
                     {
-                        foreach (NewEvent n in newsT.OrderBy(a => a.Date))
+                        foreach (var n in newsT.OrderBy(a => a.Date))
                         {
                             this.News2.Add(n);
                         }
                     }
                     else
                     {
-                        NewEvent newT = new NewEvent();
+                        var newT = new NewEvent();
                         newT.Prefix = "На данный момент количество новостей ";
                         newT.Postfix = " штук";
                         this.News2.Add(newT);
@@ -182,7 +174,7 @@
                         }
                     }
 
-                    this.Misc.EmployeeCount = this.EmployeeLst.Count() - 10; // количество сотрудников кроме Корпорат номера сотр Логистика, Офис в Иркутсе, Офис в Красноярске, Офис в Москве, Офис в США, Офис в ТВЗ, Офис в Томске, Охранник, Столовая
+                    this.Misc.EmployeeCount = this.EmployeeLst.Count() - 10; // Количество сотрудников кроме Корпорат номера сотр Логистика, Офис в Иркутсе, Офис в Красноярске, Офис в Москве, Офис в США, Офис в ТВЗ, Офис в Томске, Охранник, Столовая
 
                     int age = 0;
                     int timeRec = 0;
@@ -314,9 +306,6 @@
         #endregion
 
         #region Commands
-
-        /// <summary>Анонс предстоящих событий.</summary>
-        public ICommand FutureNewsCommand { get; set; }
 
         /// <summary>Обновить данные.</summary>
         public ICommand DataUpdCommand { get; set; }
@@ -470,18 +459,7 @@
 
         private void VacCount()
         {
-            this.sick.Clear();
-            this.vacation.Clear();
-            this.btrip.Clear();
-            this.other.Clear();
-            this.dbc.EmployeeReadStatusCount();
-            this.sick = this.dbc.Sick;
-            this.vacation = this.dbc.Vacation;
-            this.btrip = this.dbc.BTrip;
-            this.other = this.dbc.Other;
-            this.Misc.Vacation = this.vacation.Count;
-            this.Misc.BTrip = this.btrip.Count;
-            this.Misc.Sick = this.sick.Count;
+            this.Misc = this.dbc.EmployeeReadStatusCount(this.Misc);
         }
 
         // Фильтр по имени
@@ -836,12 +814,6 @@
             }
             
             this.Misc.SelectedIndex = 0;
-        }
-
-        // Окно с предстоящими событиями
-        private void FutureNewsMethod()
-        {
-            ViewShower.Show(0, this.FutureNews, false, b => { });            
         }
 
         // обновление данных с сайта
