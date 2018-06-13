@@ -4,7 +4,7 @@
     using System.Xml.Serialization;
 
     /// <summary>Оболочка.</summary>
-    public class ShellRemoteSettings
+    public class RemoteSettingsShell
     {
         /// <summary>Корневой элемент.</summary>
         [Serializable]

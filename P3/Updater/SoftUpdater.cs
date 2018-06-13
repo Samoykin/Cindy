@@ -4,11 +4,12 @@
     using System.Diagnostics;
     using System.IO;
     using System.Windows.Forms;
+    using Model;
     using NLog;    
     using Utils;
-    using static Model.Shell;
-    using static Model.ShellRemoteSettings;
-    using static Model.ShellUpdaterSettings;
+    using static Model.RemoteSettingsShell;
+    using static Model.SettingsShell;
+    using static Model.UpdaterSettingsShell;
 
     /// <summary>Обновление ПО.</summary>
     public class SoftUpdater
@@ -26,7 +27,7 @@
         private RootElementUpdaterSettings updaterSettings = new RootElementUpdaterSettings();
 
         /// <summary>Initializes a new instance of the <see cref="SoftUpdater" /> class.</summary
-        /// <param name="xml">XML.</param>
+        /// <param name="settings">Параметры.</param>
         public SoftUpdater(RootElement settings)
         {
             this.settings = settings;            
@@ -35,7 +36,7 @@
         /// <summary>Обновить.</summary>
         public void UpdateSoft()
         {
-            this.remotePropPath = this.settings.SoftUpdate.UpdPath;
+            this.remotePropPath = this.settings.SoftUpdate.RemoteSettingsPath;
 
             // Вычитывание параметров из удаленного xml
             // Инициализация модели настроек
@@ -45,7 +46,7 @@
 
             try
             {
-                if (this.settings.SoftUpdate.UpdPath != string.Empty)
+                if (!string.IsNullOrEmpty(this.settings.SoftUpdate.RemoteSettingsPath))
                 {
                     this.remoteSettings = settingsXml.ReadXml(this.remoteSettings);
                 }
@@ -58,7 +59,7 @@
                     // Вычитывание параметров из xml updatera
                     // Инициализация модели настроек
                     var updSettingsXml = new SettingsXml<RootElementUpdaterSettings>(this.updPropPath);
-                    this.updaterSettings.Updater = new Updater();
+                    this.updaterSettings.Updater = new UpdaterSettingsShell.Updater();
 
                     this.updaterSettings = updSettingsXml.ReadXml(this.updaterSettings);
 

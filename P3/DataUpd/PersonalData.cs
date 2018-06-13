@@ -1,8 +1,8 @@
 ﻿namespace P3.DataUpd
 {
+    using System;
     using System.Collections.Generic;
     using System.Net.NetworkInformation;
-
     using Model;
     using Utils;
 
@@ -28,12 +28,10 @@
         /// <summary>Распарсить HTML.</summary>
         public void ParseHTML()
         {
-            var q = new Ping();
+            var ping = new Ping();
 
-            try
-            {
-                var an = q.Send(CheckSite);
-                if (an.Status == IPStatus.Success)
+                var pingReply = ping.Send(CheckSite);
+                if (pingReply != null && pingReply.Status == IPStatus.Success)
                 {
                     for (short i = 0; i < this.idValue.Count; i++)
                     {
@@ -42,20 +40,10 @@
                         this.ExecValues(this.idValue[i]);
                     }
 
-                    try
-                    {
-                        this.dbc.ClearTable("employee");
-                    }
-                    catch
-                    {
-                    }
-
+                    this.dbc.ClearTable("employee");
                     this.dbc.EmployeeWrite(this.employeeLst);
+                    this.dbc.DatabaseCopy();
                 }
-            }
-            catch
-            {
-            }
         }
 
         /// <summary>Извлечь значения.</summary>
@@ -65,108 +53,84 @@
             this.htmlText = this.ghtml.Html(this.address);
             var emplTemp = new Employee();
 
-            if (this.htmlText.IndexOf(@"Фото:", 19) != -1)
+            if (this.htmlText.IndexOf(@"Фото:", 19, StringComparison.Ordinal) != -1)
             {
-                this.text = this.htmlText.Substring(this.htmlText.IndexOf(@"Фото:"));
-
-                    emplTemp.ID = id;
+                this.text = this.htmlText.Substring(this.htmlText.IndexOf(@"Фото:", StringComparison.Ordinal));
+                emplTemp.ID = id;
 
                 // ФИО
-                this.text = this.text.Substring(this.text.IndexOf("ФИО"));
-                var startD = this.text.IndexOf("ms-formbody", 110);
-
-                    emplTemp.FullName = this.SubObj(@"ms-formbody", 110, "</td");
+                this.text = this.text.Substring(this.text.IndexOf("ФИО", StringComparison.Ordinal));
+                var startD = this.text.IndexOf("ms-formbody", 110, StringComparison.Ordinal);
+                emplTemp.FullName = this.SubObj(@"ms-formbody", 110, "</td");
 
                 // Подразделение
-                this.text = this.text.Substring(this.text.IndexOf("Подразделение"));
-                    startD = this.text.IndexOf("ID", 10);
+                this.text = this.text.Substring(this.text.IndexOf("Подразделение", StringComparison.Ordinal));
+                startD = this.text.IndexOf("ID", 10, StringComparison.Ordinal);
 
-                    string idTemp;
-                    idTemp = this.text.Substring(startD + 3, 3);
-                    if (idTemp.IndexOf("\"", 0) != -1)
-                    {
-                        idTemp = this.text.Substring(startD + 3, 2);
-                    }
+                var idTemp = this.text.Substring(startD + 3, 3);
+                if (idTemp.IndexOf("\"", 0, StringComparison.Ordinal) != -1)
+                {
+                    idTemp = this.text.Substring(startD + 3, 2);
+                }
 
-                    if (idTemp.IndexOf("\"", 0) != -1)
-                    {
-                        idTemp = this.text.Substring(startD + 3, 1);
-                    }
+                if (idTemp.IndexOf("\"", 0, StringComparison.Ordinal) != -1)
+                {
+                    idTemp = this.text.Substring(startD + 3, 1);
+                }
 
                 var divTemp = this.SubObj(idTemp, 160, "</A");
-                    emplTemp.Division = this.ReplaceStr(divTemp, @"&quot;", string.Empty);
+                emplTemp.Division = this.ReplaceStr(divTemp, @"&quot;", string.Empty);
 
                 // День рождения
-                this.text = this.text.Substring(this.text.IndexOf("Дата рождения"));
-                    emplTemp.BirthDayShort = this.SubObj("ms-formbody", 70, "</td");
+                this.text = this.text.Substring(this.text.IndexOf("Дата рождения", StringComparison.Ordinal));
+                emplTemp.BirthDayShort = this.SubObj("ms-formbody", 70, "</td");
 
                 // Должность
-                this.text = this.text.Substring(this.text.IndexOf("Должность"));
-                    emplTemp.Position = this.SubObj("ms-formbody", 70, "</td");
+                this.text = this.text.Substring(this.text.IndexOf("Должность", StringComparison.Ordinal));
+                emplTemp.Position = this.SubObj("ms-formbody", 70, "</td");
 
                 // Email
-                this.text = this.text.Substring(this.text.IndexOf("Email"));
-                    var temp = this.SubObj("mailt", 70, "\">");
-                    if (temp.IndexOf("</TH", 0) != -1)
-                    {
-                        emplTemp.Email = string.Empty;
-                    }
-                    else
-                    {
-                        emplTemp.Email = temp;
-                    }
+                this.text = this.text.Substring(this.text.IndexOf("Email", StringComparison.Ordinal));
+                var temp = this.SubObj("mailt", 70, "\">");
+                emplTemp.Email = temp.IndexOf("</TH", 0, StringComparison.Ordinal) != -1 ? string.Empty : temp;
 
                 // Внутр тел
-                this.text = this.text.Substring(this.text.IndexOf("Внутр. тлф"));
+                this.text = this.text.Substring(this.text.IndexOf("Внутр. тлф", StringComparison.Ordinal));
 
-                    var phoneTemp = this.SubObj("ms-formbody", 70, "</td");
-                    emplTemp.PhoneWork = this.ReplaceStr(phoneTemp, @"&nbsp;", string.Empty);
+                var phoneTemp = this.SubObj("ms-formbody", 70, "</td");
+                emplTemp.PhoneWork = this.ReplaceStr(phoneTemp, @"&nbsp;", string.Empty);
 
                 // Сотовый тел
-                this.text = this.text.Substring(this.text.IndexOf("Сотовый тлф"));
+                this.text = this.text.Substring(this.text.IndexOf("Сотовый тлф", StringComparison.Ordinal));
                 var phoneMobileTemp = this.SubObj("ms-formbody", 70, "</td");
-                    emplTemp.PhoneMobile = this.ReplaceStr(phoneMobileTemp, @"&nbsp;", string.Empty);
+                emplTemp.PhoneMobile = this.ReplaceStr(phoneMobileTemp, @"&nbsp;", string.Empty);
 
                 // Переадрес тел
-                this.text = this.text.Substring(this.text.IndexOf("Переадр.на"));
-                    emplTemp.PhoneExch = this.SubObj("ms-formbody", 70, "</td");
+                this.text = this.text.Substring(this.text.IndexOf("Переадр.на", StringComparison.Ordinal));
+                emplTemp.PhoneExch = this.SubObj("ms-formbody", 70, "</td");
 
                 // Дата прихода в Элком+
-                this.text = this.text.Substring(this.text.IndexOf("Дата прихода"));
-
-                    emplTemp.StartDayShort = this.SubObj("ms-formbody", 70, "</td");
+                this.text = this.text.Substring(this.text.IndexOf("Дата прихода", StringComparison.Ordinal));
+                emplTemp.StartDayShort = this.SubObj("ms-formbody", 70, "</td");
 
                 this.employeeLst.Add(emplTemp);
             }
         }
 
-        private string ReplaceStr(string text, string oldValue, string newValue)
+        private string ReplaceStr(string textRep, string oldValue, string newValue)
         {
-            while (text.IndexOf(oldValue, 0) != -1)
+            while (textRep.IndexOf(oldValue, 0, StringComparison.Ordinal) != -1)
             {
-                text = text.Replace(oldValue, newValue);
+                textRep = textRep.Replace(oldValue, newValue);
             }           
 
-            return text;
+            return textRep;
         }
 
         private string SubObj(string sub, int startPos, string endText)
         {
-            var len = sub.Length + 2;
-            string sub2;
-
-            if (sub == "_self")
-            {
-                sub2 = @"</a>";
-            }
-            else
-            {
-                sub2 = endText;
-            }
-
-            int startNamePos = this.text.IndexOf(sub, startPos) + len;
-
-            int endNamePos = this.text.IndexOf(sub2, startNamePos);
+            var startNamePos = this.text.IndexOf(sub, startPos, StringComparison.Ordinal) + sub.Length + 2;
+            var endNamePos = this.text.IndexOf(sub == "_self" ? @"</a>" : endText, startNamePos, StringComparison.Ordinal);
 
             return this.text.Substring(startNamePos, endNamePos - startNamePos);
         }

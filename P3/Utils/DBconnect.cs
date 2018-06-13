@@ -27,7 +27,7 @@
             if (!File.Exists(DataBaseName))
             {
                 SQLiteConnection.CreateFile(DataBaseName);
-                SQLiteConnection connection = new SQLiteConnection("Data Source=DBTels.sqlite;Version=3;");
+                var connection = new SQLiteConnection("Data Source=DBTels.sqlite;Version=3;");
                 connection.SetPassword(Pass);
             }
         }
@@ -81,42 +81,48 @@
                 connection.Open();
                 sqlitecommand.ExecuteNonQuery();
                 connection.Close();
+
+                this.WriteDefaultData();
             }
         }
-        
+
         /// <summary>Записать в таблицу сотрудника.</summary>
         /// <param name="employeeLst">Коллекция сотрудников.</param>
-        public void EmployeeWrite(List<Employee> employeeLst) 
+        /// <param name="dataBaseName">Название базы.</param>
+        public void EmployeeWrite(List<Employee> employeeLst, string dataBaseName = DataBase2Name) 
         {
-            using (var connection = new SQLiteConnection(this.Connstring(DataBase2Name)))
+            using (var connection = new SQLiteConnection(this.Connstring(dataBaseName)))
             {
                 connection.Open();
-                SQLiteCommand command;
 
-                for (int i = 0; i < employeeLst.Count(); i++)
+                for (var i = 0; i < employeeLst.Count(); i++)
                 {
-                    command = new SQLiteCommand($"INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos', 'tBirthDay', 'tStartDay') VALUES ('{employeeLst[i].ID}', '{employeeLst[i].FullName}', '{employeeLst[i].PhoneWork}', '{employeeLst[i].PhoneMobile}', '{employeeLst[i].PhoneExch}', '{employeeLst[i].Email}', '{employeeLst[i].Division}', '{employeeLst[i].Position}', '{employeeLst[i].BirthDayShort}', '{employeeLst[i].StartDayShort}');", connection);
+                    var command = new SQLiteCommand($"INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos', 'tBirthDay', 'tStartDay') VALUES ('{employeeLst[i].ID}', '{employeeLst[i].FullName}', '{employeeLst[i].PhoneWork}', '{employeeLst[i].PhoneMobile}', '{employeeLst[i].PhoneExch}', '{employeeLst[i].Email}', '{employeeLst[i].Division}', '{employeeLst[i].Position}', '{employeeLst[i].BirthDayShort}', '{employeeLst[i].StartDayShort}');", connection);
                     command.ExecuteNonQuery();
                 }
 
                 connection.Close();
-
-                File.Copy(DataBase2Name, DataBaseName, true);
             }
+        }
+
+        /// <summary>Копирование базы во временную.</summary>
+        public void DatabaseCopy()
+        {
+            File.Copy(DataBase2Name, DataBaseName, true);
         }
 
         /// <summary>Записать в таблицу заказчика.</summary>
         /// <param name="customers">Заказчики.</param>
-        public void CustomerWrite(List<Customer> customers)
+        /// <param name="dataBaseName">Название базы.</param>
+        public void CustomerWrite(List<Customer> customers, string dataBaseName = DataBase2Name)
         {
-            using (var connection = new SQLiteConnection(this.Connstring(DataBase2Name)))
+            using (var connection = new SQLiteConnection(this.Connstring(dataBaseName)))
             {
                 connection.Open();
-                SQLiteCommand command;
 
-                for (int i = 0; i < customers.Count(); i++)
+                for (var i = 0; i < customers.Count(); i++)
                 {
-                    command = new SQLiteCommand($"INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('{customers[i].FullName}', '{customers[i].Position}', '{customers[i].PhoneMobile}', '{customers[i].PhoneWork}', '{customers[i].Email}', '{customers[i].Company}');", connection);
+                    var command = new SQLiteCommand($"INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('{customers[i].FullName}', '{customers[i].Position}', '{customers[i].PhoneMobile}', '{customers[i].PhoneWork}', '{customers[i].Email}', '{customers[i].Company}');", connection);
                     command.ExecuteNonQuery();
                 }
 
@@ -131,13 +137,9 @@
             using (var connection = new SQLiteConnection(this.Connstring(DataBase2Name)))
             {
                 connection.Open();
-                SQLiteCommand command = new SQLiteCommand($"UPDATE customer SET custNames = '{contact.FullName}', custPos = '{contact.Position}', custTels = '{contact.PhoneMobile}', custTels2 = '{contact.PhoneWork}', custEmail = '{contact.Email}', custComp = '{contact.Company}' WHERE custNames Like '{contact.FullName}';", connection);
-
+                var command = new SQLiteCommand($"UPDATE customer SET custNames = '{contact.FullName}', custPos = '{contact.Position}', custTels = '{contact.PhoneMobile}', custTels2 = '{contact.PhoneWork}', custEmail = '{contact.Email}', custComp = '{contact.Company}' WHERE custNames Like '{contact.FullName}';", connection);
                 command.ExecuteNonQuery();
-
                 connection.Close();
-
-                File.Copy(DataBase2Name, DataBaseName, true);
             }
         }
         
@@ -148,12 +150,9 @@
             using (var connection = new SQLiteConnection(this.Connstring(DataBase2Name)))
             {
                 connection.Open();
-                SQLiteCommand command = new SQLiteCommand($"INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('{contact.FullName}', '{contact.Position}', '{contact.PhoneMobile}', '{contact.PhoneWork}', '{contact.Email}', '{contact.Company}');", connection);
-
+                var command = new SQLiteCommand($"INSERT INTO 'customer' ('custNames', 'custPos', 'custTels', 'custTels2', 'custEmail', 'custComp') VALUES ('{contact.FullName}', '{contact.Position}', '{contact.PhoneMobile}', '{contact.PhoneWork}', '{contact.Email}', '{contact.Company}');", connection);
                 command.ExecuteNonQuery();
                 connection.Close();
-
-                File.Copy(DataBase2Name, DataBaseName, true);
             }
         }
 
@@ -168,11 +167,8 @@
             using (var connection = new SQLiteConnection(this.Connstring(DataBase2Name)))
             {
                 connection.Open();
-                SQLiteCommand command;
-
-                command = new SQLiteCommand($"INSERT INTO 'info' ('date', 'name', 'pcName', 'ip', 'remoteBD') VALUES ('{date}', '{name}', '{computerName}', '{ip}', '{remoteBD}');", connection);
+                var command = new SQLiteCommand($"INSERT INTO 'info' ('date', 'name', 'pcName', 'ip', 'remoteBD') VALUES ('{date}', '{name}', '{computerName}', '{ip}', '{remoteBD}');", connection);
                 command.ExecuteNonQuery();
-
                 connection.Close();
             }
         }
@@ -184,12 +180,10 @@
             using (var connection = new SQLiteConnection(this.Connstring(DataBase2Name)))
             {
                 connection.Open();
-                SQLiteCommand command;
-
-                command = new SQLiteCommand("DELETE FROM 'status';", connection);
+                var command = new SQLiteCommand("DELETE FROM 'status';", connection);
                 command.ExecuteNonQuery();
 
-                for (int i = 0; i < status.Count(); i++)
+                for (var i = 0; i < status.Count(); i++)
                 {
                     command = new SQLiteCommand($"INSERT INTO 'status' ('statusVal') VALUES ('{status[i]}');", connection);
                     command.ExecuteNonQuery();
@@ -208,20 +202,16 @@
             using (var connection = new SQLiteConnection(this.Connstring(DataBase2Name)))
             {
                 connection.Open();
-                SQLiteCommand command;
-
-                command = new SQLiteCommand("UPDATE employee SET tStatus = '';", connection);
+                var command = new SQLiteCommand("UPDATE employee SET tStatus = '';", connection);
                 command.ExecuteNonQuery();
 
-                for (int i = 0; i < status.Count(); i++)
+                for (var i = 0; i < status.Count(); i++)
                 {
                     command = new SQLiteCommand($"UPDATE employee SET tStatus = '{status[i]}', tActStatus = '{act[i]}' WHERE tNames Like '{names[i]}%';", connection);
                     command.ExecuteNonQuery();
                 }
 
                 connection.Close();
-
-                File.Copy(DataBase2Name, DataBaseName, true);
             }
         }
 
@@ -234,11 +224,10 @@
             using (var connection = new SQLiteConnection(this.Connstring(DataBase2Name)))
             {
                 connection.Open();
-                SQLiteCommand command;
 
-                for (int i = 0; i < birthDayID.Count(); i++)
+                for (var i = 0; i < birthDayID.Count(); i++)
                 {
-                    command = new SQLiteCommand($"UPDATE employee SET tBirthDay = '{birthDay[i]}' WHERE tID = '{birthDayID[i]}';", connection);
+                    var command = new SQLiteCommand($"UPDATE employee SET tBirthDay = '{birthDay[i]}' WHERE tID = '{birthDayID[i]}';", connection);
                     command.ExecuteNonQuery();
 
                     command = new SQLiteCommand($"UPDATE employee SET tStartDay = '{startDay[i]}' WHERE tID = '{birthDayID[i]}';", connection);
@@ -253,7 +242,6 @@
         /// <returns>Сотрудники.</returns>
         public ObservableCollection<Employee> EmployeeRead()
         {
-            Employee empl;
             this.EmployeeLst = new ObservableCollection<Employee> { };
 
             using (var connection = new SQLiteConnection(this.Connstring(DataBaseName)))
@@ -261,6 +249,8 @@
                 connection.Open();
                 var command = new SQLiteCommand("SELECT * FROM 'employee';", connection);
                 var reader = command.ExecuteReader();
+                var dateTemp = DateTime.Now;
+
                 foreach (DbDataRecord record in reader)
                 {
                     string dtime;
@@ -271,69 +261,51 @@
                     var startDayTemp = record["tStartDay"].ToString();
 
                     // День рождения
-                    if (birthDayTemp.Length > 0 && DateTime.TryParse(birthDayTemp, out dateValue))
-                    {
-                        dtime = birthDayTemp;
-                    }
-                    else
-                    {
-                        dtime = "21.12.1994";
-                    }
+                    dtime = birthDayTemp.Length > 0 && DateTime.TryParse(birthDayTemp, out dateValue) ? birthDayTemp : "21.12.1994";
 
                     // Дата прихода
-                    if (startDayTemp.Length > 0 && DateTime.TryParse(startDayTemp, out dateValue))
+                    dtime2 = startDayTemp.Length > 0 && DateTime.TryParse(startDayTemp, out dateValue) ? startDayTemp : "21.12.1994";
+
+                    var empl = new Employee
                     {
-                        dtime2 = startDayTemp;
-                    }
-                    else
-                    {
-                        dtime2 = "21.12.1994";
-                    }
+                        FullName = record["tNames"].ToString(),
+                        PhoneWork = record["tTels"].ToString(),
+                        PhoneMobile = record["tTels2"].ToString(),
+                        PhoneExch = record["tTels3"].ToString(),
+                        Email = record["tEmail"].ToString(),
+                        Division = record["tDiv"].ToString(),
+                        Position = record["tPos"].ToString(),
+                        ID = record["tID"].ToString(),
+                        Status = record["tStatus"].ToString(),
+                        BirthDay = Convert.ToDateTime(dtime)
+                    };
 
-                    var dateTemp = DateTime.Now;
-
-                    empl = new Employee();
-
-                    empl.FullName = record["tNames"].ToString();
-                    empl.PhoneWork = record["tTels"].ToString();
-                    empl.PhoneMobile = record["tTels2"].ToString();
-                    empl.PhoneExch = record["tTels3"].ToString();
-                    empl.Email = record["tEmail"].ToString();
-                    empl.Division = record["tDiv"].ToString();
-                    empl.Position = record["tPos"].ToString();
-                    empl.ID = record["tID"].ToString();
-                    empl.Status = record["tStatus"].ToString();
-                    empl.BirthDay = Convert.ToDateTime(dtime);
-
-                    // -------------------------------
                     // Возраст
                     empl.Age = dateTemp.Year - empl.BirthDay.Year;
                     if (dateTemp.Month < empl.BirthDay.Month)
                     {
-                        empl.Age = empl.Age - 1;
+                        empl.Age -= 1;
                     }
                     else if (dateTemp.Month == empl.BirthDay.Month && dateTemp.Day < empl.BirthDay.Day)
                     {
-                        empl.Age = empl.Age - 1;
+                        empl.Age -= 1;
                     }
 
-                    // -------------------------------
                     // День рождения
                     var monthTemp = empl.BirthDay.Month.ToString();
                     var dayTemp = empl.BirthDay.Day.ToString();
                     if (empl.BirthDay.Month < 10)
                     {
-                        monthTemp = "0" + empl.BirthDay.Month.ToString();
+                        monthTemp = $"0{empl.BirthDay.Month}";
                     }
 
                     if (empl.BirthDay.Day < 10)
                     {
-                        dayTemp = "0" + empl.BirthDay.Day.ToString();
+                        dayTemp = $"0{empl.BirthDay.Day}";
                     }
 
-                    empl.BirthDayShort = monthTemp + "." + dayTemp + "." + empl.BirthDay.Year.ToString();
+                    empl.BirthDayShort = $"{monthTemp}.{dayTemp}.{empl.BirthDay.Year}";
 
-                    // -------------------------------
                     // Стаж
                     empl.StartDay = Convert.ToDateTime(dtime2);
 
@@ -361,25 +333,23 @@
                         empl.TimeRecord = "менее года";
                     }
 
-                    // -------------------------------
                     // Дата начала работы 
                     monthTemp = empl.StartDay.Month.ToString();
                     dayTemp = empl.StartDay.Day.ToString();
                     if (empl.StartDay.Month < 10)
                     {
-                        monthTemp = "0" + empl.StartDay.Month.ToString();
+                        monthTemp = $"0{empl.StartDay.Month}";
                     }
 
                     if (empl.StartDay.Day < 10)
                     {
-                        dayTemp = "0" + empl.StartDay.Day.ToString();
+                        dayTemp = $"0{empl.StartDay.Day}";
                     }
 
-                    empl.StartDayShort = monthTemp + "." + dayTemp + "." + empl.StartDay.Year.ToString();
+                    empl.StartDayShort = $"{monthTemp}.{dayTemp}.{empl.StartDay.Year}";
 
-                    // -------------------------------
-                    // фото
-                    empl.Image = AppDomain.CurrentDomain.BaseDirectory + @"\img\" + empl.ID + ".jpg";
+                    // Фото
+                    empl.Image = $@"{AppDomain.CurrentDomain.BaseDirectory}\img\{empl.ID}.jpg";
 
                     this.EmployeeLst.Add(empl);
                 }
@@ -394,7 +364,6 @@
         /// <returns>Заказчики.</returns>
         public ObservableCollection<Customer> CustomerRead()
         {
-            Customer cust;
             this.CustomerLst = new ObservableCollection<Customer> { };
 
             using (var connection = new SQLiteConnection(this.Connstring(DataBaseName)))
@@ -404,14 +373,15 @@
                 var reader = command.ExecuteReader();
                 foreach (DbDataRecord record in reader)
                 {
-                    cust = new Customer();
-
-                    cust.FullName = record["custNames"].ToString();
-                    cust.PhoneMobile = record["custTels"].ToString();
-                    cust.PhoneWork = record["custTels2"].ToString();
-                    cust.Email = record["custEmail"].ToString();
-                    cust.Position = record["custPos"].ToString();
-                    cust.Company = record["custComp"].ToString();
+                    var cust = new Customer
+                    {
+                        FullName = record["custNames"].ToString(),
+                        PhoneMobile = record["custTels"].ToString(),
+                        PhoneWork = record["custTels2"].ToString(),
+                        Email = record["custEmail"].ToString(),
+                        Position = record["custPos"].ToString(),
+                        Company = record["custComp"].ToString()
+                    };
 
                     this.CustomerLst.Add(cust);
                 }
@@ -428,7 +398,7 @@
         {
             using (var connection = new SQLiteConnection(this.Connstring(DataBase2Name)))
             {
-                var command = "DELETE FROM '" + table + "';";
+                var command = $"DELETE FROM '{table}';";
 
                 var sqlitecommand = new SQLiteCommand(command, connection);
                 connection.Open();
@@ -463,8 +433,6 @@
         /// <returns>Дни рождения.</returns>
         public DataTable EmployeeReadBirthDays()
         {
-            string prepDay;
-            string prepMonth;
             var dt = new DataTable();
             dt.Columns.Add("ФИО");
             dt.Columns.Add("Дата");
@@ -482,8 +450,8 @@
 
                     if (record["tBirthDay"].ToString().Length > 0)
                     {
-                        prepDay = record["tBirthDay"].ToString().Remove(2);
-                        prepMonth = record["tBirthDay"].ToString().Substring(3, 2);
+                        var prepDay = record["tBirthDay"].ToString().Remove(2);
+                        var prepMonth = record["tBirthDay"].ToString().Substring(3, 2);
 
                         if (Convert.ToInt32(prepMonth) == dtime2.Month)
                         {
@@ -511,7 +479,7 @@
             var tempEm = new List<string>();
             var tempDi = new List<string>();
             var tempPo = new List<string>();
-            var tempID = new List<string>();
+            var tempId = new List<string>();
 
             var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", "DBTels2.sqlite", Pass));
             connection.Open();
@@ -526,18 +494,17 @@
                 tempEm.Add(record["tEmail"].ToString());
                 tempDi.Add(record["tDiv"].ToString());
                 tempPo.Add(record["tPos"].ToString());
-                tempID.Add(record["tID"].ToString());
+                tempId.Add(record["tID"].ToString());
             }
 
             connection.Close();
 
             var connection2 = new SQLiteConnection(string.Format("Data Source={0};Password={1};", "DBTels.sqlite", Pass));
             connection2.Open();
-            SQLiteCommand command2;
 
-            for (int i = 0; i < tempName.Count(); i++)
+            for (var i = 0; i < tempName.Count(); i++)
             {
-                command2 = new SQLiteCommand($"INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos') VALUES ('{tempID[i]}', '{tempName[i]}', '{tempTel[i]}', '{tempTel2[i]}', '{tempTel3[i]}', '{tempEm[i]}', '{tempDi[i]}', '{tempPo[i]}');", connection2);
+                var command2 = new SQLiteCommand($"INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos') VALUES ('{tempId[i]}', '{tempName[i]}', '{tempTel[i]}', '{tempTel2[i]}', '{tempTel3[i]}', '{tempEm[i]}', '{tempDi[i]}', '{tempPo[i]}');", connection2);
                 command2.ExecuteNonQuery();
             }
 
@@ -591,7 +558,104 @@
 
         private string Connstring(string dataBaseName)
         {
-            return string.Format("Data Source={0};Version=3;Password={1};", dataBaseName, Pass);
+            return $"Data Source={dataBaseName};Version=3;Password={Pass};";
+        }
+
+        private void WriteDefaultData()
+        {
+            var employeeLst = new List<Employee>();
+            var empl = new Employee()
+            {
+                ID = "421",
+                FullName = "Тарасов Николай Львович",
+                PhoneWork = "1117",
+                PhoneMobile = "8-933-333-3333",
+                PhoneExch = "801117",
+                Email = "example0@mail.com",
+                Division = "Отдел разработки",
+                Position = "Программист",
+                BirthDayShort = "11.03.1988",
+                StartDayShort = "04.02.2013"
+            };
+
+            employeeLst.Add(empl);
+
+            empl = new Employee()
+            {
+                ID = "422",
+                FullName = "Яковлев Сергей Петрович",
+                PhoneWork = "1118",
+                PhoneMobile = "8-988-888-8888",
+                PhoneExch = "801118",
+                Email = "example1@mail.com",
+                Division = "Отдел тестирования",
+                Position = "Тестировщик",
+                BirthDayShort = "19.05.1989",
+                StartDayShort = "20.06.2014"
+            };
+
+            employeeLst.Add(empl);
+
+            empl = new Employee()
+            {
+                ID = "423",
+                FullName = "Орлов Никита Егорович",
+                PhoneWork = "1115",
+                PhoneMobile = "8-955-555-5555",
+                PhoneExch = "801115",
+                Email = "example2@mail.com",
+                Division = "Отдел тестирования",
+                Position = "Тестировщик",
+                BirthDayShort = "21.06.1989",
+                StartDayShort = "23.06.2013"
+            };
+
+            employeeLst.Add(empl);
+
+            empl = new Employee()
+            {
+                ID = "424",
+                FullName = "Соболева Мария Давыдовна",
+                PhoneWork = "1112",
+                PhoneMobile = "8-922-222-2222",
+                PhoneExch = "801112",
+                Email = "example3@mail.com",
+                Division = "Отдел маркетинга",
+                Position = "Менеджер",
+                BirthDayShort = "25.06.1987",
+                StartDayShort = "18.06.2013"
+            };
+
+            employeeLst.Add(empl);
+
+            var customerLst = new List<Customer>();
+            var cust = new Customer()
+            {
+                FullName = "Носов Владимир Андреевич",
+                Position = "Главный инженер",
+                PhoneWork = "567890",
+                PhoneMobile = "8-933-333-5555",
+                Email = "example4@mail.com",
+                Company = "ООО Solar System"
+            };
+
+            customerLst.Add(cust);
+
+            cust = new Customer()
+            {
+                FullName = "Климов Юрий Сергеевич",
+                Position = "Метролог",
+                PhoneWork = "239745",
+                PhoneMobile = "8-933-555-1212",
+                Email = "example5@mail.com",
+                Company = "ООО НКБСФ"
+            };
+
+            customerLst.Add(cust);
+
+            this.EmployeeWrite(employeeLst, DataBaseName);
+
+            this.CustomerWrite(customerLst, DataBaseName);
         }
     }
 }

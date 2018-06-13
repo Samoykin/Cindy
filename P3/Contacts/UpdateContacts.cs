@@ -8,7 +8,7 @@
     using System.Windows.Forms;
     using Model;
     using NLog;
-    using static Model.Shell;
+    using static Model.SettingsShell;
     using Excel = Microsoft.Office.Interop.Excel;    
 
     /// <summary>Обновить контакты.</summary>
@@ -16,7 +16,6 @@
     {
         private const string DatabasePath = "DBTels.sqlite";
         private const string DatabasePathTemp = "DBTelsTemp.sqlite";
-        private const string SettingsPath = "Settings.xml";
         private Logger logger = LogManager.GetCurrentClassLogger();
         private bool flag = false;
 
@@ -55,7 +54,7 @@
         /// <returns>Состояние.</returns>
         public bool Update(string customPath)
         {
-            if (customPath != string.Empty)
+            if (!string.IsNullOrEmpty(customPath))
             {
                 this.flag = this.ReadData(customPath);
                 File.Copy(DatabasePathTemp, DatabasePath, true);
@@ -71,13 +70,14 @@
             var filename = string.Empty;
             try
             {
-                var openFileDialog = new OpenFileDialog();
-
-                openFileDialog.InitialDirectory = "c:\\";
-                openFileDialog.Filter = "Execl files (*.xlsx)|*.xlsx";
-                openFileDialog.FilterIndex = 0;
-                openFileDialog.RestoreDirectory = true;
-
+                var openFileDialog = new OpenFileDialog
+                {
+                    InitialDirectory = "c:\\",
+                    Filter = "Execl files (*.xlsx)|*.xlsx",
+                    FilterIndex = 0,
+                    RestoreDirectory = true
+                };
+                
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     filename = openFileDialog.FileName;
@@ -97,9 +97,8 @@
         /// <param name="customPath">Путь к файлу.</param>
         /// <returns>Состояние.</returns>
         public bool ReadData(string customPath)
-        {            
-            Customer cust;
-            List<Customer> customers = new List<Customer>();
+        {
+            var customers = new List<Customer>();
 
             try
             {
@@ -108,15 +107,17 @@
                 this.workBookExcel = this.excelApp.Workbooks.Open(customPath, false);
                 this.workSheetExcel = (Excel.Worksheet)this.workBookExcel.Sheets[1]; 
 
-                for (int i = 2; this.workSheetExcel.Cells[i, 1].Text.ToString() != string.Empty; i++)
+                for (var i = 2; this.workSheetExcel.Cells[i, 1].Text.ToString() != string.Empty; i++)
                 {
-                    cust = new Customer();
-                    cust.FullName = this.CleanString(this.workSheetExcel.Cells[i, 1].Text.ToString());
-                    cust.Position = this.CleanString(this.workSheetExcel.Cells[i, 2].Text.ToString());
-                    cust.PhoneMobile = this.CleanString(this.workSheetExcel.Cells[i, 3].Text.ToString());
-                    cust.PhoneWork = this.CleanString(this.workSheetExcel.Cells[i, 4].Text.ToString());
-                    cust.Email = this.CleanString(this.workSheetExcel.Cells[i, 5].Text.ToString());
-                    cust.Company = this.CleanString(this.workSheetExcel.Cells[i, 6].Text.ToString());
+                    var cust = new Customer
+                    {
+                        FullName = this.CleanString(this.workSheetExcel.Cells[i, 1].Text.ToString()),
+                        Position = this.CleanString(this.workSheetExcel.Cells[i, 2].Text.ToString()),
+                        PhoneMobile = this.CleanString(this.workSheetExcel.Cells[i, 3].Text.ToString()),
+                        PhoneWork = this.CleanString(this.workSheetExcel.Cells[i, 4].Text.ToString()),
+                        Email = this.CleanString(this.workSheetExcel.Cells[i, 5].Text.ToString()),
+                        Company = this.CleanString(this.workSheetExcel.Cells[i, 6].Text.ToString())
+                    };
 
                     customers.Add(cust);                    
                 }
@@ -223,7 +224,7 @@
         // Очищение от спецсимволов
         private string CleanString(string str)
         {
-            if (str != null && str.Length > 0)
+            if (!string.IsNullOrEmpty(str))
             {
                 var stringBuilder = new StringBuilder(str.Length);
                 foreach (char ch in str)

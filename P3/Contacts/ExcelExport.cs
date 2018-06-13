@@ -36,8 +36,10 @@
 
             try
             {
-                this.excelApp = new Excel.Application();
-                this.excelApp.Visible = false;
+                this.excelApp = new Excel.Application
+                {
+                    Visible = false
+                };
 
                 this.excelApp.Workbooks.Add();
                 this.workSheetExcel = (Excel.Worksheet)this.excelApp.ActiveSheet;
@@ -49,7 +51,7 @@
                 this.workSheetExcel.Cells[1, 5] = "Почта";
                 this.workSheetExcel.Cells[1, 6] = "Организация";
 
-                int i = 0;
+                var i = 0;
 
                 foreach (var n in custLst)
                 {

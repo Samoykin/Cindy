@@ -22,7 +22,11 @@
 
             do
             {
-                count = resStream.Read(buf, 0, buf.Length);
+                if (resStream != null)
+                {
+                    count = resStream.Read(buf, 0, buf.Length);
+                }
+
                 if (count != 0)
                 {
                     sb.Append(Encoding.UTF8.GetString(buf, 0, count));

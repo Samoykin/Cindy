@@ -139,15 +139,7 @@
         /// <summary>Отправить E-mail.</summary>   
         public ICommand SendMail
         {
-            get
-            {
-                if (this.sendMail == null)
-                {
-                    this.sendMail = new RelayCommand<object>(this.SendMail_Execute);
-                }
-
-                return this.sendMail;
-            }
+            get { return this.sendMail ?? (this.sendMail = new RelayCommand<object>(this.SendMail_Execute)); }
         }
 
         #region Implement INotyfyPropertyChanged members
@@ -156,10 +148,7 @@
         /// <param name="propertyName">Имя свойства.</param>
         protected virtual void OnPropertyChanged(string propertyName)
         {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion        

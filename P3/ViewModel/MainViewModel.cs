@@ -14,7 +14,7 @@
     using NLog;
     using Updater;
     using Utils;
-    using static Model.Shell;
+    using static Model.SettingsShell;
 
     /// <summary>Главная ViewModel.</summary>
     public class MainViewModel 
@@ -29,7 +29,7 @@
         private LogInfo logInfo = new LogInfo();
         private System.Windows.Forms.Timer timerForUpd = new System.Windows.Forms.Timer();
         private DispatcherTimer timer1 = new DispatcherTimer();
-        private IDData upd = new IDData();
+        private DataUpdater upd = new DataUpdater();
         private SettingsXml<RootElement> settingsXml;
 
         // Конфигурация        
@@ -52,7 +52,7 @@
                 // Инициализация модели настроек
                 this.settingsXml = new SettingsXml<RootElement>(SettingsPath);
                 this.settings.SoftUpdate = new SoftUpdate();
-                this.settings.Contacts = new Contacts();
+                this.settings.Contacts = new SettingsShell.Contacts();
 
                 if (!File.Exists(SettingsPath))
                 {
@@ -149,25 +149,15 @@
                     this.News = newsManag.GetNews();
                     this.FutureNews = newsManag.GetFutureNews();
 
-                    this.Misc.EmployeeCount = this.EmployeeLst.Count() - 10; // Количество сотрудников кроме Корпорат номера сотр Логистика, Офис в Иркутсе, Офис в Красноярске, Офис в Москве, Офис в США, Офис в ТВЗ, Офис в Томске, Охранник, Столовая
+                    this.Misc.EmployeeCount = this.EmployeeLst.Count();
 
-                    int age = 0;
-                    int timeRec = 0;
+                    var age = 0;
+                    var timeRec = 0;
 
                     foreach (var em in this.EmployeeLst)
                     {
                         age += em.Age;
-
-                        int timeRecT = 0;
-                        if (em.TimeRecord == "менее года")
-                        {
-                            timeRecT = 0;
-                        }
-                        else
-                        {
-                            timeRecT = Convert.ToInt32(em.TimeRecord);
-                        }
-
+                        var timeRecT = em.TimeRecord == "менее года" ? 0 : Convert.ToInt32(em.TimeRecord);
                         timeRec += timeRecT;
                     }
 
@@ -176,7 +166,6 @@
 
                     // Подразделения
                     var divList = new List<string>();
-                    Division division;
 
                     foreach (var ee in this.EmployeeLst)
                     {
@@ -188,20 +177,25 @@
 
                     var result = (from m in divList select m).Distinct().ToList();
 
-                    division = new Division();
-                    division.Value = "1. Все";
+                    var division = new Division
+                    {
+                        Value = "1. Все"
+                    };
+
                     this.Divisions.Add(division);
 
                     foreach (var s in result)
                     {
-                        division = new Division();
-                        division.Value = s;
+                        division = new Division
+                        {
+                            Value = s
+                        };
+
                         this.Divisions.Add(division);
                     }
 
                     this.SelectedDiv.Division = "1. Все";
 
-                    // ----------------------
                     this.emplStat = new EmplStatistic(this.EmployeeLst, this.Statistic);
                     this.Statistic = this.emplStat.CalcCount();
 
@@ -214,6 +208,7 @@
                         this.EmployeeNewLst.Add(ee);
                     }
 
+                    this.SortNameAsc();
                     this.UpdateContacts();
                     this.Misc.ContactsCount = this.CustomerLst.Count();
                     this.SortNameAscContact();
@@ -352,7 +347,7 @@
             {
                 if (this.sendMail == null)
                 {
-                    this.sendMail = new RelayCommand<object>(this.SendMail_Execute);
+                    this.sendMail = new RelayCommand<object>(this.SendMailExecute);
                 }
 
                 return this.sendMail;
@@ -378,11 +373,10 @@
         // Сохранение контакта
         private void SaveData_Execute(object parameter)
         {
-            string name = parameter.ToString();
-            Customer chageContact = new Customer();
-            bool flag = false;
+            var name = parameter.ToString();
+            var chageContact = new Customer();
 
-            foreach (Customer c in this.CustomerLst)
+            foreach (var c in this.CustomerLst)
             {
                 if (c.FullName == name)
                 {
@@ -396,32 +390,26 @@
             }
 
             // Сохранение в Excel
-            flag = this.updCont.SaveData2(parameter.ToString(), chageContact);
+            var flag = this.updCont.SaveData2(parameter.ToString(), chageContact);
 
             // Сохранение в БД
             this.dbc.CustomerUpdatePerson(chageContact);
+            this.dbc.DatabaseCopy();
 
-            if (flag == true)
-            {
-                this.Misc.SaveStatus = "Данные контакта обновлены";
-            }
-            else
-            {
-                this.Misc.SaveStatus = "Данные не обновлены";
-            }
+            this.Misc.SaveStatus = flag ? "Данные контакта обновлены" : "Данные не обновлены";
 
             this.timerForUpd.Interval = 2000;
-            this.timerForUpd.Tick += new EventHandler(this.Timer_Tick);
+            this.timerForUpd.Tick += this.TimerTick;
             this.timerForUpd.Start();
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private void TimerTick(object sender, EventArgs e)
         {
             this.Misc.SaveStatus = string.Empty;
             this.timerForUpd.Stop();
-        }        
+        }
 
-        private void SendMail_Execute(object parameter)
+        private void SendMailExecute(object parameter)
         {
             var sm = new SendMail();
             sm.SendMailOutlook(parameter.ToString());
@@ -469,14 +457,14 @@
             this.EmployeeLst.Clear();
             if (this.SelectedDiv.Division == "1. Все")
             {
-                foreach (Employee ee in this.EmployeeLstT)
+                foreach (var ee in this.EmployeeLstT)
                 {
                     this.EmployeeLst.Add(ee);
                 }
             }
             else
             {
-                foreach (Employee ee in this.EmployeeLstT)
+                foreach (var ee in this.EmployeeLstT)
                 {
                     if (ee.Division.IndexOf(this.SelectedDiv.Division, StringComparison.OrdinalIgnoreCase) != -1)
                     {
@@ -518,7 +506,7 @@
             this.CustomerLst.Clear();
             this.CustomerLstT = this.dbc.CustomerRead();
 
-            foreach (Customer ee in this.CustomerLstT)
+            foreach (var ee in this.CustomerLstT)
             {
                 this.CustomerLst.Add(ee);
             }
@@ -530,7 +518,7 @@
         private void SearchContact()
         {
             this.CustomerLst.Clear();
-            foreach (Customer ee in this.CustomerLstT)
+            foreach (var ee in this.CustomerLstT)
             {
                 if (ee.FullName.IndexOf(this.Misc.TextChangeCust, StringComparison.OrdinalIgnoreCase) != -1)
                 {
@@ -544,8 +532,7 @@
         // Загрузка контактов из файла
         private void DownloadContact()
         {
-            var customPath = string.Empty;
-            customPath = this.updCont.LoadCustom();
+            var customPath = this.updCont.LoadCustom();
 
             this.Preparer(customPath);
 
@@ -563,20 +550,19 @@
         private void AddNewContact()
         {
             this.CustomerLst.Add(this.NewContact);            
-            this.updCont.SaveData2(this.NewContact.FullName, this.NewContact); // сохранение в Excel            
-            this.dbc.CustomerWritePerson(this.NewContact); // сохранение в БД
+            this.updCont.SaveData2(this.NewContact.FullName, this.NewContact); // Сохранение в Excel            
+            this.dbc.CustomerWritePerson(this.NewContact); // Сохранение в БД
+            this.dbc.DatabaseCopy();
             this.SortNameAscContact();
         }
 
         // Сортировка по имени по возрастанию
         private void SortNameAscContact()
         {
-            ObservableCollection<Customer> customerLstTemp;
-
-            customerLstTemp = this.CustomerLst;
+            var customerLstTemp = this.CustomerLst;
             customerLstTemp = new ObservableCollection<Customer>(customerLstTemp.OrderBy(a => a.FullName));
             this.CustomerLst.Clear();
-            foreach (Customer ee in customerLstTemp)
+            foreach (var ee in customerLstTemp)
             {
                 this.CustomerLst.Add(ee);
             }
@@ -587,12 +573,10 @@
         // Сортировка по имени по убыванию
         private void SortNameDescContact()
         {
-            ObservableCollection<Customer> customerLstTemp;
-
-            customerLstTemp = this.CustomerLst;
+            var customerLstTemp = this.CustomerLst;
             customerLstTemp = new ObservableCollection<Customer>(customerLstTemp.OrderByDescending(a => a.FullName));
             this.CustomerLst.Clear();
-            foreach (Customer ee in customerLstTemp)
+            foreach (var ee in customerLstTemp)
             {
                 this.CustomerLst.Add(ee);
             }
@@ -638,9 +622,9 @@
             this.Misc.PageStatistic = "Collapsed";
 
             // Контакты
-            if (this.contactUpd == true)
+            if (this.contactUpd)
             {
-                string customPath = this.updCont.GetPath();
+                var customPath = this.updCont.GetPath();
                 if (customPath == string.Empty)
                 {
                     this.Preparer(customPath);
@@ -662,12 +646,10 @@
         // Сортировка
         private void SortNameAsc()
         {
-            ObservableCollection<Employee> sortedEmployees;
-
-            sortedEmployees = this.EmployeeLst;
+            var sortedEmployees = this.EmployeeLst;
             sortedEmployees = new ObservableCollection<Employee>(sortedEmployees.OrderBy(a => a.FullName));
             this.EmployeeLst.Clear();
-            foreach (Employee ee in sortedEmployees)
+            foreach (var ee in sortedEmployees)
             {
                 this.EmployeeLst.Add(ee);
             }
@@ -677,12 +659,10 @@
 
         private void SortNameDesc()
         {
-            ObservableCollection<Employee> sortedEmployees;
-
-            sortedEmployees = this.EmployeeLst;
+            var sortedEmployees = this.EmployeeLst;
             sortedEmployees = new ObservableCollection<Employee>(sortedEmployees.OrderByDescending(a => a.FullName));
             this.EmployeeLst.Clear();
-            foreach (Employee ee in sortedEmployees)
+            foreach (var ee in sortedEmployees)
             {
                 this.EmployeeLst.Add(ee);
             }            
@@ -692,12 +672,10 @@
 
         private void SortBirthAsc()
         {
-            ObservableCollection<Employee> sortedEmployees;
-
-            sortedEmployees = this.EmployeeLst;
+            var sortedEmployees = this.EmployeeLst;
             sortedEmployees = new ObservableCollection<Employee>(sortedEmployees.OrderBy(a => a.BirthDayShort));
             this.EmployeeLst.Clear();
-            foreach (Employee ee in sortedEmployees)
+            foreach (var ee in sortedEmployees)
             {
                 this.EmployeeLst.Add(ee);
             }
@@ -707,12 +685,10 @@
 
         private void SortBirthDesc()
         {
-            ObservableCollection<Employee> sortedEmployees;
-
-            sortedEmployees = this.EmployeeLst;
+            var sortedEmployees = this.EmployeeLst;
             sortedEmployees = new ObservableCollection<Employee>(sortedEmployees.OrderByDescending(a => a.BirthDayShort));
             this.EmployeeLst.Clear();
-            foreach (Employee ee in sortedEmployees)
+            foreach (var ee in sortedEmployees)
             {
                 this.EmployeeLst.Add(ee);
             }
@@ -722,12 +698,10 @@
 
         private void SortStartAsc()
         {
-            ObservableCollection<Employee> sortedEmployees;
-
-            sortedEmployees = this.EmployeeLst;
+            var sortedEmployees = this.EmployeeLst;
             sortedEmployees = new ObservableCollection<Employee>(sortedEmployees.OrderBy(a => a.StartDayShort));
             this.EmployeeLst.Clear();
-            foreach (Employee ee in sortedEmployees)
+            foreach (var ee in sortedEmployees)
             {
                 this.EmployeeLst.Add(ee);
             }
@@ -737,12 +711,10 @@
 
         private void SortStartDesc()
         {
-            ObservableCollection<Employee> sortedEmployees;
-
-            sortedEmployees = this.EmployeeLst;
+            var sortedEmployees = this.EmployeeLst;
             sortedEmployees = new ObservableCollection<Employee>(sortedEmployees.OrderByDescending(a => a.StartDayShort));
             this.EmployeeLst.Clear();
-            foreach (Employee ee in sortedEmployees)
+            foreach (var ee in sortedEmployees)
             {
                 this.EmployeeLst.Add(ee);
             }
@@ -752,31 +724,27 @@
 
         private async void Preparer(string customPath)
         {
-            bool flag;
-            flag = await Task<bool>.Factory.StartNew(() =>
-            {
-                return this.updCont.Update(customPath);
-            });
+            await Task<bool>.Factory.StartNew(() => this.updCont.Update(customPath));
 
             this.UpdateContacts();
             this.SortNameAscContact();
         }
 
-        // обновление данных с сайта
+        // Обновление данных с сайта
         private void DataUpd()
         {
             this.Misc.UpdStatus = "Обновление данных";            
-            this.upd.ParseHTML();
+            this.upd.ParseHTML(this.logger);
 
             this.timer1.Interval = new TimeSpan(0, 0, 0, 5);
-            this.timer1.Tick += new EventHandler(this.Timer_Tick1);
+            this.timer1.Tick += this.Timer_Tick1;
             this.timer1.Start();  
         }
 
         private void Timer_Tick1(object sender, EventArgs e)
         {
             var flag = this.upd.Flag;
-            if (flag == true)
+            if (flag)
             {
                 this.DataUpdCalc();
             }
@@ -805,7 +773,7 @@
 
         private RootElement SetDefaultValue(RootElement set)
         {
-            set.SoftUpdate.UpdPath = @"d:\Temp\RemoteProp.xml";
+            set.SoftUpdate.RemoteSettingsPath = @"d:\Temp\RemoteProp.xml";
             set.Contacts.FilePath = @"C:\Контакты.xlsx";            
 
             return set;

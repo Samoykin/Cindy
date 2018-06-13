@@ -1,9 +1,10 @@
-﻿namespace P3.Utils
+﻿namespace P3.DataUpd
 {
     using System;
     using System.Collections.Generic;
     using System.Net.NetworkInformation;
     using System.Text.RegularExpressions;
+    using Utils;
 
     /// <summary>Состояние.</summary>
     public class Status
@@ -18,75 +19,50 @@
         private List<string> statusName = new List<string>();
         private List<string> statusState = new List<string>();
         private List<string> statusDate = new List<string>();
-        private List<string> statusID = new List<string>();
         private List<string> statusAct = new List<string>();
 
         /// <summary>Распарсить HTML.</summary>
         public void ParseHTML()
         {
             short i = 0;
-            var startPos = 0;
-
             var ping = new Ping();
 
-            try
+            var pingReply = ping.Send("ares.elcom.local");
+            if (pingReply != null && pingReply.Status == IPStatus.Success)
             {
-                var pingReply = ping.Send("ares.elcom.local");
-                if (pingReply.Status == IPStatus.Success)
+                this.htmlText = this.ghtml.Html(Address);
+
+                if (this.htmlText.IndexOf(@"Кол-во значений", 0, StringComparison.Ordinal) != -1)
                 {
-                    this.htmlText = this.ghtml.Html(Address);
+                    this.text = this.htmlText.Substring(this.htmlText.IndexOf(@"Кол-во значений", StringComparison.Ordinal));
+                    var startPos = this.text.IndexOf(@"_self", 0, StringComparison.Ordinal);
 
-                    if (this.htmlText.IndexOf(@"Кол-во значений", 0) != -1)
+                    this.countStatus = int.Parse(this.text.Substring(18, this.text.IndexOf(@"</B>", 19, StringComparison.Ordinal) - 18));
+
+                    while (i != this.countStatus)
                     {
-                        this.text = this.htmlText.Substring(this.htmlText.IndexOf(@"Кол-во значений"));
-                        startPos = this.text.IndexOf(@"_self", 0);
+                        this.status.Add(this.SubObj("_self", startPos));
 
-                        this.countStatus = int.Parse(this.text.Substring(18, this.text.IndexOf(@"</B>", 19) - 18));
-
-                        while (i != this.countStatus)
-                        {
-                            this.status.Add(this.SubObj("_self", startPos));
-
-                            startPos += 5;
-                            startPos = this.text.IndexOf(@"_self", startPos);
-                            i++;
-                        }
-
-                        this.StatusParse();
+                        startPos += 5;
+                        startPos = this.text.IndexOf(@"_self", startPos, StringComparison.Ordinal);
+                        i++;
                     }
+
+                    this.StatusParse();
                 }
-            }
-            catch
-            {
-                throw;
             }
         }
 
         private string SubObj(string sub, int startPos)
         {
-            var len = sub.Length + 2;
-            string sub2;
+            var startNamePos = this.text.IndexOf(sub, startPos, StringComparison.Ordinal) + sub.Length + 2;
+            var endNamePos = this.text.IndexOf(sub == "_self" ? @"</a>" : @"</TD>", startNamePos, StringComparison.Ordinal);
 
-            if (sub == "_self")
-            {
-                sub2 = @"</a>";
-            }
-            else
-            {
-                sub2 = @"</TD>";
-            }
-
-            var startNamePos = this.text.IndexOf(sub, startPos) + len;
-            var endNamePos = this.text.IndexOf(sub2, startNamePos);
-            var subObj = this.text.Substring(startNamePos, endNamePos - startNamePos);
-
-            return subObj;
+            return this.text.Substring(startNamePos, endNamePos - startNamePos);
         }
 
         private void StatusParse()
         {
-            var st = string.Empty;
-
             var pattern = @"(\w{2,}\s\w[.]\s|\w{2,}\s\w[.]\w[.])";
             var regex = new Regex(pattern);
 
@@ -101,7 +77,7 @@
 
             var k = 0;
 
-            foreach (string str in this.status)
+            foreach (var str in this.status)
             {
                 var match2 = regex2.Match(this.status[k]);
                 var match3 = regex3.Match(this.status[k]);
@@ -109,7 +85,7 @@
 
                 foreach (Match match in regex.Matches(this.status[k]))
                 {
-                    st = match.Value.Remove(match.Value.LastIndexOf('.'));
+                    var st = match.Value.Remove(match.Value.LastIndexOf('.'));
                     if (st.LastIndexOf('.') != -1)
                     {
                         st = st.Remove(st.LastIndexOf('.'));
@@ -125,53 +101,32 @@
             }
 
             this.dbc.EployeeStatusWrite(this.statusState, this.statusName, this.statusAct);
+            this.dbc.DatabaseCopy();
             this.dbc.StatusWrite(this.status);
         }
 
         private string ActStatus(string date)
         {
             var act = string.Empty;
-            var stD = string.Empty;
-            var endD = string.Empty;
             DateTime d1;
-            DateTime d2;
-
-            var pattern3 = @"(\d+\W\d+)";
-            var regex3 = new Regex(pattern3);
-
-            var match3 = regex3.Match(date);
 
             switch (date.Length)
             {
                 case 5:
                     d1 = DateTime.ParseExact(date, "dd.MM", null);
 
-                    if (d1 <= DateTime.Today)
-                    {
-                        act = "1";
-                    }
-                    else
-                    {
-                        act = "0";
-                    }
+                    act = d1 <= DateTime.Today ? "1" : "0";
 
                     break;
 
                 case 11:
-                    stD = date.Substring(0, 5);
-                    endD = date.Substring(6, 5);
+                    var stD = date.Substring(0, 5);
+                    var endD = date.Substring(6, 5);
 
                     d1 = DateTime.ParseExact(stD, "dd.MM", null);
-                    d2 = DateTime.ParseExact(endD, "dd.MM", null);
+                    var d2 = DateTime.ParseExact(endD, "dd.MM", null);
 
-                    if (d1 <= DateTime.Today && d2 >= DateTime.Today)
-                    {
-                        act = "1";
-                    }
-                    else
-                    {
-                        act = "0";
-                    }
+                    act = (d1 <= DateTime.Today && d2 >= DateTime.Today) ? "1" : "0";
 
                     break;
             }

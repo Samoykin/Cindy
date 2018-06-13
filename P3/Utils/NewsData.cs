@@ -13,9 +13,11 @@
         /// <returns>Список.</returns>
         public NewsList GetNews(IEnumerable<Employee> employeeLst)
         {
-            var newsList = new NewsList();
-            newsList.News = new List<NewEvent>();
-            newsList.FutureNews = new List<NewEvent>();
+            var newsList = new NewsList
+            {
+                News = new List<NewEvent>(),
+                FutureNews = new List<NewEvent>()
+            };
 
             foreach (var employee in employeeLst)
             {
@@ -67,22 +69,22 @@
                     newsList.News.Add(item);
                 }
 
-                // ----------------------------------------------------------
                 // Предстоящие события
                 var dt1 = DateTime.Now;
                 var dt2 = employee.BirthDay;
-                int diff = dt1.Year - dt2.Year;
+                var diff = dt1.Year - dt2.Year;
 
                 dt2 = employee.BirthDay.AddYears(diff);
 
                 // День рождения
                 if (dt2 > dt1 && dt2 < dt1.AddDays(7))
                 {
-                    var item = new NewEvent();
-
-                    item.Date = new DateTime(DateTime.Now.Year, employee.BirthDay.Month, employee.BirthDay.Day);
-                    item.FullName = employee.FullName;
-                    item.YearCount = employee.Age + 1;
+                    var item = new NewEvent
+                    {
+                        Date = new DateTime(DateTime.Now.Year, employee.BirthDay.Month, employee.BirthDay.Day),
+                        FullName = employee.FullName,
+                        YearCount = employee.Age + 1
+                    };
 
                     if (Convert.ToInt32(employee.Age + 1) % 5 == 0)
                     {                        
@@ -101,15 +103,17 @@
                 // Годовщина работы
                 var dt3 = DateTime.Now;
                 var dt4 = employee.StartDay;
-                int diff2 = dt3.Year - dt4.Year;
+                var diff2 = dt3.Year - dt4.Year;
 
                 dt2 = employee.StartDay.AddYears(diff2);
 
                 if (dt2 > dt1 && dt2 < dt1.AddDays(7))
                 {
-                    var item = new NewEvent();
-                    item.Date = new DateTime(DateTime.Now.Year, employee.StartDay.Month, employee.StartDay.Day);
-                    item.FullName = employee.FullName;
+                    var item = new NewEvent
+                    {
+                        Date = new DateTime(DateTime.Now.Year, employee.StartDay.Month, employee.StartDay.Day),
+                        FullName = employee.FullName
+                    };
 
                     if (employee.TimeRecord == "менее года")
                     {                        

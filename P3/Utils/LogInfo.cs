@@ -1,6 +1,7 @@
 ﻿namespace P3.Utils
 {
     using System;
+    using System.Globalization;
     using System.IO;
     using System.Windows.Forms;
 
@@ -23,11 +24,11 @@
             {
                 if (!File.Exists(infoPathFile))
                 {
-                    FileStream fs = File.Create(infoPathFile);
+                    var fs = File.Create(infoPathFile);
                     fs.Close();
                 }
 
-                this.LogInfoWriteFile(infoPathFile, date.ToString(), name, computerName, ip);
+                this.LogInfoWriteFile(infoPathFile, date.ToString(CultureInfo.InvariantCulture), name, computerName, ip);
             }
         }
 

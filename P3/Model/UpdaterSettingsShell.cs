@@ -4,7 +4,7 @@
     using System.Xml.Serialization;
 
     /// <summary>Оболочка.</summary>
-    public class ShellUpdaterSettings
+    public class UpdaterSettingsShell
     {
         /// <summary>Корневой элемент.</summary>
         [Serializable]

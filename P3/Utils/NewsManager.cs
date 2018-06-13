@@ -22,14 +22,10 @@
         public ObservableCollection<NewEvent> GetNews()
         {
             var news = new ObservableCollection<NewEvent>();
-
             var newsData = new NewsData();
-            var newsList = new NewsList();
-            var newsT = new List<NewEvent>();
 
-            newsList = newsData.GetNews(this.employeeLst);
-
-            newsT = newsList.News;
+            var newsList = newsData.GetNews(this.employeeLst);
+            var newsT = newsList.News;
 
             if (newsT != null && newsT.Count != 0)
             {
@@ -40,9 +36,12 @@
             }
             else
             {
-                var newT = new NewEvent();
-                newT.Prefix = "На данный момент количество новостей ";
-                newT.Postfix = " штук";
+                var newT = new NewEvent
+                {
+                    Prefix = "На данный момент количество новостей ",
+                    Postfix = " штук"
+                };
+
                 news.Add(newT);
             }
             
@@ -54,18 +53,14 @@
         public ObservableCollection<NewEvent> GetFutureNews()
         {
             var futureNews = new ObservableCollection<NewEvent>();
-
             var newsData = new NewsData();
 
-            var newsList = new NewsList();
-            var futureNewsT = new List<NewEvent>();
-            newsList = newsData.GetNews(this.employeeLst);
-
-            futureNewsT = newsList.FutureNews;
+            var newsList = newsData.GetNews(this.employeeLst);
+            var futureNewsT = newsList.FutureNews;
 
             if (futureNewsT != null)
             {
-                foreach (NewEvent n in futureNewsT.OrderBy(a => a.Date))
+                foreach (var n in futureNewsT.OrderBy(a => a.Date))
                 {
                     futureNews.Add(n);
                 }

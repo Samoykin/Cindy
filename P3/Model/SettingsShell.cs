@@ -4,7 +4,7 @@
     using System.Xml.Serialization;
 
     /// <summary>Оболочка.</summary>
-    public class Shell
+    public class SettingsShell
     {
         /// <summary>Корневой элемент.</summary>
         [Serializable]
@@ -24,7 +24,7 @@
         {
             /// <summary>Путь к настройкам обновления.</summary>
             [XmlAttribute]
-            public string UpdPath { get; set; }
+            public string RemoteSettingsPath { get; set; }
         }
 
         /// <summary>Параметры контактов.</summary>

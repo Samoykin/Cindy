@@ -91,9 +91,9 @@
     </ApplicationDefinition>
     <Compile Include="Model\NewsList.cs" />
     <Compile Include="Model\NewEvent.cs" />
-    <Compile Include="Model\UpdaterSettings.cs" />
-    <Compile Include="Model\RemoteSettings.cs" />
-    <Compile Include="Model\Settings.cs" />
+    <Compile Include="Model\UpdaterSettingsShell.cs" />
+    <Compile Include="Model\RemoteSettingsShell.cs" />
+    <Compile Include="Model\SettingsShell.cs" />
     <Compile Include="Utils\EmplStatistic.cs" />
     <Compile Include="Utils\NewsManager.cs" />
     <Compile Include="Utils\NewsData.cs" />
@@ -118,7 +118,7 @@
     </Compile>
     <Compile Include="Contacts\ExcelExport.cs" />
     <Compile Include="Contacts\UpdateContacts.cs" />
-    <Compile Include="DataUpd\IDData.cs" />
+    <Compile Include="DataUpd\DataUpdater.cs" />
     <Compile Include="DataUpd\PersonalData.cs" />
     <Compile Include="Model\Customer.cs" />
     <Compile Include="Model\Employee.cs" />
@@ -127,11 +127,11 @@
     <Compile Include="Model\People.cs" />
     <Compile Include="Model\Statistic.cs" />
     <Compile Include="Utils\DBconnect.cs" />
-    <Compile Include="Utils\Picture.cs" />
+    <Compile Include="DataUpd\Picture.cs" />
     <Compile Include="Utils\GetHTML.cs" />
     <Compile Include="Utils\LogInfo.cs" />
     <Compile Include="Utils\SendMail.cs" />
-    <Compile Include="Utils\Status.cs" />
+    <Compile Include="DataUpd\Status.cs" />
     <Compile Include="Updater\SoftUpdater.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />
     <Compile Include="ViewModel\Command.cs" />
@@ -172,6 +172,18 @@
     </EmbeddedResource>
     <Resource Include="Fonts\Open Sans Light.ttf" />
     <Resource Include="Fonts\Open Sans.ttf" />
+    <None Include="img\421.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="img\422.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="img\423.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="img\424.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
