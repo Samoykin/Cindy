@@ -26,7 +26,7 @@
         private DBconnect dbc = new DBconnect();
 
         // Конфигурация        
-        private RootElement settings = new RootElement();
+        private RootElement settings;
 
         /// <summary>Initializes a new instance of the <see cref="UpdateContacts" /> class.</summary>
         /// <param name="settings">Параметры.</param>
@@ -92,76 +92,31 @@
 
             return filename;
         }
-
-        /// <summary>Прочитать.</summary>
-        /// <param name="customPath">Путь к файлу.</param>
-        /// <returns>Состояние.</returns>
-        public bool ReadData(string customPath)
-        {
-            var customers = new List<Customer>();
-
-            try
-            {
-                this.excelApp = new Excel.Application();
-                this.excelApp.Visible = false;
-                this.workBookExcel = this.excelApp.Workbooks.Open(customPath, false);
-                this.workSheetExcel = (Excel.Worksheet)this.workBookExcel.Sheets[1]; 
-
-                for (var i = 2; this.workSheetExcel.Cells[i, 1].Text.ToString() != string.Empty; i++)
-                {
-                    var cust = new Customer
-                    {
-                        FullName = this.CleanString(this.workSheetExcel.Cells[i, 1].Text.ToString()),
-                        Position = this.CleanString(this.workSheetExcel.Cells[i, 2].Text.ToString()),
-                        PhoneMobile = this.CleanString(this.workSheetExcel.Cells[i, 3].Text.ToString()),
-                        PhoneWork = this.CleanString(this.workSheetExcel.Cells[i, 4].Text.ToString()),
-                        Email = this.CleanString(this.workSheetExcel.Cells[i, 5].Text.ToString()),
-                        Company = this.CleanString(this.workSheetExcel.Cells[i, 6].Text.ToString())
-                    };
-
-                    customers.Add(cust);                    
-                }
-
-                this.workBookExcel.Close(false, Type.Missing, Type.Missing); 
-                this.excelApp.Quit();
-                GC.Collect();
-
-                // Запись в БД
-                this.dbc.ClearTable("customer");
-                this.dbc.CustomerWrite(customers);
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка. {ex.Message}");
-                this.logger.Error(ex.Message);
-                return false;
-            }            
-        }
-
+        
         /// <summary>Сохранить.</summary>
         /// <param name="contactName">Имя контакта.</param>
         /// <param name="contact">Контакт.</param>
         /// <returns>Состояние.</returns>
         public bool SaveData2(string contactName, Customer contact)
         {
-            string customPath = this.GetPath();
-            string name;
-            bool flag = false;
+            var customPath = this.GetPath();
+            var flag = false;
             try
             {
                 if (customPath != string.Empty)
                 {
-                    this.excelApp = new Excel.Application();
-                    this.excelApp.Visible = false;
+                    this.excelApp = new Excel.Application
+                    {
+                        Visible = false
+                    };
+
                     this.workBookExcel = this.excelApp.Workbooks.Open(customPath);
                     this.workSheetExcel = (Excel.Worksheet)this.workBookExcel.Sheets[1];
                     this.excelApp.DisplayAlerts = false;
-                    int i = 3;
+                    var i = 3;
                     for (; this.workSheetExcel.Cells[i, 1].Text.ToString() != string.Empty; i++)
                     {
-                        name = this.CleanString(this.workSheetExcel.Cells[i, 1].Text.ToString());
+                        var name = this.CleanString(this.workSheetExcel.Cells[i, 1].Text.ToString());
                         if (name == contactName)
                         {
                             break;
@@ -196,8 +151,6 @@
         /// <param name="custLst">Коллекция контактов.</param>
         public void SaveData(ObservableCollection<Customer> custLst)
         {
-            var fileName = string.Empty;
-
             try
             {
                 var saveFileDialog = new SaveFileDialog();
@@ -209,7 +162,7 @@
 
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    fileName = saveFileDialog.FileName;
+                    var fileName = saveFileDialog.FileName;
                     var excelEx = new ExcelExport(fileName);
                     excelEx.ExcelWrite(custLst);
                 }
@@ -221,15 +174,65 @@
             }
         }
 
+        /// <summary>Прочитать.</summary>
+        /// <param name="customPath">Путь к файлу.</param>
+        /// <returns>Состояние.</returns>
+        private bool ReadData(string customPath)
+        {
+            var customers = new List<Customer>();
+
+            try
+            {
+                this.excelApp = new Excel.Application
+                {
+                    Visible = false
+                };
+
+                this.workBookExcel = this.excelApp.Workbooks.Open(customPath, false);
+                this.workSheetExcel = (Excel.Worksheet)this.workBookExcel.Sheets[1];
+
+                for (var i = 2; this.workSheetExcel.Cells[i, 1].Text.ToString() != string.Empty; i++)
+                {
+                    var cust = new Customer
+                    {
+                        FullName = this.CleanString(this.workSheetExcel.Cells[i, 1].Text.ToString()),
+                        Position = this.CleanString(this.workSheetExcel.Cells[i, 2].Text.ToString()),
+                        PhoneMobile = this.CleanString(this.workSheetExcel.Cells[i, 3].Text.ToString()),
+                        PhoneWork = this.CleanString(this.workSheetExcel.Cells[i, 4].Text.ToString()),
+                        Email = this.CleanString(this.workSheetExcel.Cells[i, 5].Text.ToString()),
+                        Company = this.CleanString(this.workSheetExcel.Cells[i, 6].Text.ToString())
+                    };
+
+                    customers.Add(cust);
+                }
+
+                this.workBookExcel.Close(false, Type.Missing, Type.Missing);
+                this.excelApp.Quit();
+                GC.Collect();
+
+                // Запись в БД
+                this.dbc.ClearTable("customer");
+                this.dbc.CustomerWrite(customers);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка. {ex.Message}");
+                this.logger.Error(ex.Message);
+                return false;
+            }
+        }
+
         // Очищение от спецсимволов
         private string CleanString(string str)
         {
             if (!string.IsNullOrEmpty(str))
             {
                 var stringBuilder = new StringBuilder(str.Length);
-                foreach (char ch in str)
+                foreach (var ch in str)
                 {
-                    if (char.IsControl(ch) == true)
+                    if (char.IsControl(ch))
                     {
                         continue;
                     }

@@ -124,7 +124,6 @@
     <Compile Include="Model\Employee.cs" />
     <Compile Include="Model\Division.cs" />
     <Compile Include="Model\Misc.cs" />
-    <Compile Include="Model\People.cs" />
     <Compile Include="Model\Statistic.cs" />
     <Compile Include="Utils\DBconnect.cs" />
     <Compile Include="DataUpd\Picture.cs" />

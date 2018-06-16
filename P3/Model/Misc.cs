@@ -3,7 +3,7 @@
     using System.ComponentModel;
 
     /// <summary>Настройки.</summary>
-    public class Misc : INotifyPropertyChanged
+    public sealed class Misc : INotifyPropertyChanged
     {
         #region Fields
 
@@ -442,7 +442,7 @@
 
         /// <summary>Изменения свойства.</summary>
         /// <param name="propertyName">Имя свойства.</param>
-        protected virtual void OnPropertyChanged(string propertyName)
+        private void OnPropertyChanged(string propertyName)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

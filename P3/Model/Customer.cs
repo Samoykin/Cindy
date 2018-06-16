@@ -2,12 +2,11 @@
 {
     using System.ComponentModel;
     using System.Windows.Input;
-
     using Utils;
     using ViewModel;
 
     /// <summary>Заказчик.</summary>
-    public class Customer : INotifyPropertyChanged
+    public sealed class Customer : INotifyPropertyChanged
     {
         #region Fields
 
@@ -137,26 +136,23 @@
         #endregion
 
         /// <summary>Отправить E-mail.</summary>   
-        public ICommand SendMail
+        public ICommand SendMailCmd => this.sendMail ?? (this.sendMail = new RelayCommand<object>(SendMail));
+
+        private static void SendMail(object parameter)
         {
-            get { return this.sendMail ?? (this.sendMail = new RelayCommand<object>(this.SendMail_Execute)); }
+            var sm = new SendMail();
+            sm.SendMailOutlook(parameter.ToString());
         }
 
         #region Implement INotyfyPropertyChanged members
 
         /// <summary>Изменения свойства.</summary>
         /// <param name="propertyName">Имя свойства.</param>
-        protected virtual void OnPropertyChanged(string propertyName)
+        private void OnPropertyChanged(string propertyName)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        #endregion        
-
-        private void SendMail_Execute(object parameter)
-        {
-            var sm = new SendMail();
-            sm.SendMailOutlook(parameter.ToString());
-        }
+        #endregion
     }
 }

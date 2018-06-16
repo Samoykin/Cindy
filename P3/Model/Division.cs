@@ -3,7 +3,7 @@
     using System.ComponentModel;
 
     /// <summary>Подразделение.</summary>
-    public class Division : INotifyPropertyChanged
+    public sealed class Division : INotifyPropertyChanged
     {
         private string divValue;
 
@@ -32,7 +32,7 @@
         
         /// <summary>Изменения свойства.</summary>
         /// <param name="propertyName">Имя свойства.</param>
-        protected virtual void OnPropertyChanged(string propertyName)
+        private void OnPropertyChanged(string propertyName)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

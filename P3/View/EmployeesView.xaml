@@ -214,7 +214,7 @@
                 <TextBox Name="email" Grid.Row="4" Grid.Column="1" Margin="5" Text="{Binding Path=Email, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" BorderBrush="{x:Null}" Foreground="#FF1500EC"  >
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseDoubleClick" >
-                            <i:InvokeCommandAction Command="{Binding SendMail}" CommandParameter="{Binding ElementName=email, Path=Text}"/>
+                            <i:InvokeCommandAction Command="{Binding SendMailCmd}" CommandParameter="{Binding ElementName=email, Path=Text}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>

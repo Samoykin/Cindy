@@ -115,7 +115,7 @@
                 <TextBox Name="email" Grid.Row="3" Grid.Column="1" Margin="5" Text="{Binding Path=Email, UpdateSourceTrigger=PropertyChanged}" BorderBrush="{x:Null}" Foreground="#FF1500EC"  >
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseDoubleClick" >
-                            <i:InvokeCommandAction Command="{Binding SendMail}" CommandParameter="{Binding ElementName=email, Path=Text}"/>
+                            <i:InvokeCommandAction Command="{Binding SendMailCmd}" CommandParameter="{Binding ElementName=email, Path=Text}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
@@ -126,7 +126,7 @@
                 <TextBox Grid.Row="5" Grid.Column="1" Margin="5" Text="{Binding Path=Company}" BorderBrush="{x:Null}"></TextBox>
             </Grid>
             <WrapPanel>
-                <Button Content="Сохранить" Width="100" Command="{Binding SaveData}" CommandParameter="{Binding Path=Text, ElementName=tbContactName}" Margin="0,0,0,7"/>
+                <Button Content="Сохранить" Width="100" Command="{Binding SaveDataCmd}" CommandParameter="{Binding Path=Text, ElementName=tbContactName}" Margin="0,0,0,7"/>
                 <TextBlock Margin="5"  Text="{Binding Path=Misc.SaveStatus}" Foreground="#FF2300FF" />
             </WrapPanel>
         </StackPanel>

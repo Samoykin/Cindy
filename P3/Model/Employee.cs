@@ -3,12 +3,11 @@
     using System;
     using System.ComponentModel;
     using System.Windows.Input;
-
     using Utils;
     using ViewModel;
 
     /// <summary>Сотрудник.</summary>
-    public class Employee : INotifyPropertyChanged
+    public sealed class Employee : INotifyPropertyChanged
     { 
         #region Fields
 
@@ -326,36 +325,25 @@
         }
         
         /// <summary>Отправить письмо.</summary>
-        public ICommand SendMail
-        {
-            get
-            {
-                if (this.sendMail == null)
-                {
-                    this.sendMail = new RelayCommand<object>(this.SendMail_Execute);
-                }
-
-                return this.sendMail;
-            }
-        }        
+        public ICommand SendMailCmd => this.sendMail ?? (this.sendMail = new RelayCommand<object>(SendMail));
 
         #endregion
 
+        private static void SendMail(object parameter)
+        {
+            var sm = new SendMail();
+            sm.SendMailOutlook(parameter.ToString());
+        }
+
         #region Implement INotyfyPropertyChanged members
-        
+
         /// <summary>Изменения свойства.</summary>
         /// <param name="propertyName">Имя свойства.</param>
-        protected virtual void OnPropertyChanged(string propertyName)
+        private void OnPropertyChanged(string propertyName)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion
-
-        private void SendMail_Execute(object parameter)
-        {
-            var sm = new SendMail();
-            sm.SendMailOutlook(parameter.ToString());
-        }
     }
 }

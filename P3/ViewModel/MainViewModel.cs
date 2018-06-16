@@ -27,8 +27,8 @@
         private UpdateContacts updCont; 
         private Logger logger = LogManager.GetCurrentClassLogger();
         private LogInfo logInfo = new LogInfo();
-        private System.Windows.Forms.Timer timerForUpd = new System.Windows.Forms.Timer();
-        private DispatcherTimer timer1 = new DispatcherTimer();
+        private DispatcherTimer statusTimer = new DispatcherTimer();
+        private DispatcherTimer dataUpdateTimer = new DispatcherTimer();
         private DataUpdater upd = new DataUpdater();
         private SettingsXml<RootElement> settingsXml;
 
@@ -313,9 +313,6 @@
         /// <summary>Сортировка по имени по убыванию.</summary>
         public ICommand SortNameDescContactCmd { get; set; }
 
-        /// <summary>Добавить контакт.</summary>
-        public ICommand ClickCommandAddPerson { get; set; }
-
         /// <summary>Обновить новичков.</summary>
         public ICommand UpdateNewersStatCmd { get; set; }
 
@@ -340,38 +337,13 @@
         /// <summary>Обновить данные с сайта.</summary>
         public ICommand DataUpdCmd { get; set; }
 
-        /// <summary>Отправить E-mail.</summary>
-        public ICommand SendMail
-        {
-            get
-            {
-                if (this.sendMail == null)
-                {
-                    this.sendMail = new RelayCommand<object>(this.SendMailExecute);
-                }
-
-                return this.sendMail;
-            }
-        }
-
         /// <summary>Сохранить контакт.</summary>
-        public ICommand SaveData
-        {
-            get
-            {
-                if (this.saveData == null)
-                {
-                    this.saveData = new RelayCommand<object>(this.SaveData_Execute);
-                }
-
-                return this.saveData;
-            }
-        }
+        public ICommand SaveDataCmd => this.saveData ?? (this.saveData = new RelayCommand<object>(this.SaveData));
 
         #endregion
 
         // Сохранение контакта
-        private void SaveData_Execute(object parameter)
+        private void SaveData(object parameter)
         {
             var name = parameter.ToString();
             var chageContact = new Customer();
@@ -397,22 +369,16 @@
             this.dbc.DatabaseCopy();
 
             this.Misc.SaveStatus = flag ? "Данные контакта обновлены" : "Данные не обновлены";
-
-            this.timerForUpd.Interval = 2000;
-            this.timerForUpd.Tick += this.TimerTick;
-            this.timerForUpd.Start();
+            
+            this.statusTimer.Interval = new TimeSpan(0, 0, 2);
+            this.statusTimer.Tick += this.ChangeStatus;
+            this.statusTimer.Start(); 
         }
 
-        private void TimerTick(object sender, EventArgs e)
+        private void ChangeStatus(object sender, EventArgs e)
         {
             this.Misc.SaveStatus = string.Empty;
-            this.timerForUpd.Stop();
-        }
-
-        private void SendMailExecute(object parameter)
-        {
-            var sm = new SendMail();
-            sm.SendMailOutlook(parameter.ToString());
+            this.statusTimer.Stop();
         }
 
         // Поиск сотрудника
@@ -736,12 +702,12 @@
             this.Misc.UpdStatus = "Обновление данных";            
             this.upd.ParseHTML(this.logger);
 
-            this.timer1.Interval = new TimeSpan(0, 0, 0, 5);
-            this.timer1.Tick += this.Timer_Tick1;
-            this.timer1.Start();  
+            this.dataUpdateTimer.Interval = new TimeSpan(0, 0, 0, 5);
+            this.dataUpdateTimer.Tick += this.DataUpdate;
+            this.dataUpdateTimer.Start();  
         }
 
-        private void Timer_Tick1(object sender, EventArgs e)
+        private void DataUpdate(object sender, EventArgs e)
         {
             var flag = this.upd.Flag;
             if (flag)
@@ -763,12 +729,12 @@
                 this.EmployeeLst.Add(ee);
             }
 
-            this.Misc.EmployeeCount = this.EmployeeLst.Count() - 10;
+            this.Misc.EmployeeCount = this.EmployeeLst.Count();
 
             this.Misc = this.dbc.EmployeeReadStatusCount(this.Misc);
 
             this.Misc.SelectedIndex = 0;
-            this.timer1.Stop();
+            this.dataUpdateTimer.Stop();
         }
 
         private RootElement SetDefaultValue(RootElement set)

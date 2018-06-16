@@ -40,9 +40,9 @@
 
             // Вычитывание параметров из удаленного xml
             // Инициализация модели настроек
-            var settingsXml = new SettingsXml<RootElementRemoteSettings>(this.remotePropPath);
+            var settingsXml = new SettingsXml<RootElementRemoteSettings>(this.settings.SoftUpdate.RemoteSettingsPath);
             this.remoteSettings.Phonebook = new Phonebook();
-            this.remoteSettings.PhonebookUpd = new PhonebookUpd();                       
+            this.remoteSettings.PhonebookUpd = new PhonebookUpd();
 
             try
             {

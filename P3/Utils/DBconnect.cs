@@ -253,18 +253,16 @@
 
                 foreach (DbDataRecord record in reader)
                 {
-                    string dtime;
-                    string dtime2;
                     DateTime dateValue;
 
                     var birthDayTemp = record["tBirthDay"].ToString();
                     var startDayTemp = record["tStartDay"].ToString();
 
                     // День рождения
-                    dtime = birthDayTemp.Length > 0 && DateTime.TryParse(birthDayTemp, out dateValue) ? birthDayTemp : "21.12.1994";
+                    var dtime = birthDayTemp.Length > 0 && DateTime.TryParse(birthDayTemp, out dateValue) ? birthDayTemp : "21.12.1994";
 
                     // Дата прихода
-                    dtime2 = startDayTemp.Length > 0 && DateTime.TryParse(startDayTemp, out dateValue) ? startDayTemp : "21.12.1994";
+                    var dtime2 = startDayTemp.Length > 0 && DateTime.TryParse(startDayTemp, out dateValue) ? startDayTemp : "21.12.1994";
 
                     var empl = new Employee
                     {
@@ -472,43 +470,41 @@
         /// <summary>Скопировать таблицу сотрудников.</summary>
         public void EmployeeCopyTables()
         {
-            var tempName = new List<string>();
-            var tempTel = new List<string>();
-            var tempTel2 = new List<string>();
-            var tempTel3 = new List<string>();
-            var tempEm = new List<string>();
-            var tempDi = new List<string>();
-            var tempPo = new List<string>();
-            var tempId = new List<string>();
+            var emplList = new List<Employee>();
 
-            var connection = new SQLiteConnection(string.Format("Data Source={0};Password={1};", "DBTels2.sqlite", Pass));
-            connection.Open();
-            var command = new SQLiteCommand("SELECT * FROM 'employee';", connection);
-            var reader = command.ExecuteReader();
-            foreach (DbDataRecord record in reader)
+            using (var connection = new SQLiteConnection(this.Connstring("DBTels2.sqlite")))
             {
-                tempName.Add(record["tNames"].ToString());
-                tempTel.Add(record["tTels"].ToString());
-                tempTel2.Add(record["tTels2"].ToString());
-                tempTel3.Add(record["tTels3"].ToString());
-                tempEm.Add(record["tEmail"].ToString());
-                tempDi.Add(record["tDiv"].ToString());
-                tempPo.Add(record["tPos"].ToString());
-                tempId.Add(record["tID"].ToString());
+                connection.Open();
+                var command = new SQLiteCommand("SELECT * FROM 'employee';", connection);
+                var reader = command.ExecuteReader();
+                emplList.AddRange(reader.Cast<DbDataRecord>()
+                    .Select(record => new Employee
+                    {
+                        FullName = record["tNames"].ToString(),
+                        PhoneWork = record["tTels"].ToString(),
+                        PhoneMobile = record["tTels2"].ToString(),
+                        PhoneExch = record["tTels3"].ToString(),
+                        Email = record["tEmail"].ToString(),
+                        Division = record["tDiv"].ToString(),
+                        Position = record["tPos"].ToString(),
+                        ID = record["tID"].ToString()
+                    }));
+
+                connection.Close();
             }
 
-            connection.Close();
-
-            var connection2 = new SQLiteConnection(string.Format("Data Source={0};Password={1};", "DBTels.sqlite", Pass));
-            connection2.Open();
-
-            for (var i = 0; i < tempName.Count(); i++)
+            using (var connection2 = new SQLiteConnection(this.Connstring(DataBaseName)))
             {
-                var command2 = new SQLiteCommand($"INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos') VALUES ('{tempId[i]}', '{tempName[i]}', '{tempTel[i]}', '{tempTel2[i]}', '{tempTel3[i]}', '{tempEm[i]}', '{tempDi[i]}', '{tempPo[i]}');", connection2);
-                command2.ExecuteNonQuery();
-            }
+                connection2.Open();
 
-            connection2.Close();
+                for (var i = 0; i < emplList.Count(); i++)
+                {
+                    var command2 = new SQLiteCommand($"INSERT INTO 'employee' ('tID', 'tNames', 'tTels', 'tTels2', 'tTels3', 'tEmail', 'tDiv', 'tPos') VALUES ('{emplList[i].ID}', '{emplList[i].FullName}', '{emplList[i].PhoneWork}', '{emplList[i].PhoneMobile}', '{emplList[i].PhoneExch}', '{emplList[i].Email}', '{emplList[i].Division}', '{emplList[i].Position}');", connection2);
+                    command2.ExecuteNonQuery();
+                }
+
+                connection2.Close();
+            }
         }
 
         /// <summary>Посчитать кол-во статусов.</summary>
